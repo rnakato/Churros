@@ -1,1 +1,1 @@
-# Churros: Docker image for ChIP-seq analysis
+# Churros: Docker image for ChIP-seq/ATAC-seq analysis
