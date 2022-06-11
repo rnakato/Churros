@@ -21,7 +21,7 @@ function usage()
     echo '               3: bigWig (.bw)' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname chip.sort.bam chip hg38 Database/Ensembl-GRCh38" 1>&2
-    echo "      For single-end: $cmdname -p chip.sort.bam chip hg38 Database/Ensembl-GRCh38" 1>&2
+    echo "      For paired-end: $cmdname -p chip.sort.bam chip hg38 Database/Ensembl-GRCh38" 1>&2
 }
 
 binsize=100

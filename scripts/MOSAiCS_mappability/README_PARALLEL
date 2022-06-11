@@ -1,0 +1,82 @@
+
+This is an introduction to running the Parallel version of compile.py, called ParallelCompile.py
+It uses NetWorkSpaces to parallelize each of the three stages of processing.  Each stage must
+complete before the next begins.
+
+It can be run in two modes: with or without PBS.  The script automatically determines if it is running
+under PBS.
+
+In both cases, first cd to the directory that holds the fa file (same as with compile.py).
+
+A couple of initial caveats:
+- I'd suggest that you try an initial run on a small input, like C Elegans.  CE completes in a couple of minutes
+on 16 cpus.
+ 
+- You MUST use Nick's python (both because you need a modern version, and because NetWorkSpaces is installed in Nick's
+python), and an unqualified invocation of python must refer to his python. And an
+alias won't work (py5).  I made a change to your .bashrc PATH to put Nick's directory in the front of your PATH.
+
+- You should not run this script manually (i.e. without PBS) directly on bulldogi, since it will be very
+compute intensive.  I'd advise using PBS.  If you want to run manually, first allocate an entire node
+interactively:
+
+$ qsub -I -lnodes=1:ppn=4 -q sandbox -W group_list=sand
+
+Then cd to the correct dir (holding the fa files) and run the script there.
+
+Without PBS:  
+$ python ../new_code/ParallelCompile.py 30
+
+4 workers will be created on the local node.  Since BDI has 4 cpus, this should increase
+processing by 4x.
+
+With PBS:
+put run.pbs in the dir holding the fa files.  You can modify the number of nodes you want, if you like.
+
+$ qsub run.pbs
+
+This is what run.pbs looks like:
+-----------------------------
+#PBS -lnodes=4:ppn=4
+#PBS -q sandbox -W group_list=sand
+#PBS -A Joel
+
+cd $PBS_O_WORKDIR
+~njc2/myInstalls/bin/python ../new_code/ParallelCompile.py 30 > Run.out
+-----------------------------
+
+If all goes well, in both cases you should begin to see output in that directory.  
+
+Seeing what happening, and debugging:
+This can take a bit of getting used to, since output goes to several places.
+
+PBS puts stdout and stderr into run.pbs.[eo]* in the qsub directory.
+ParallelCompile.py writes its output to Run.out, but only for the master, not the workers.  
+The workers create log files in logdir, which is currently set to '/home2/jsr59/Work/Mappability_Map/logs'
+
+The best way to watch what is happening is to use the web interface to NWS.  To do that, you would normally point
+a browser to bulldogi.wss.yale.edu:8766 (see caveat below).  
+You'll see a list of current nws's; your's is named JOEL*(date).  
+
+Click on it, and you'll see 'variables' that are controlling the execution.  Two of the most interesting to
+look at are:
+
+task: This shows tasks that are waiting for workers.  Keep in mind that it doesn't show tasks that are being 
+worked on.  Therefore, at the end of each phase, it's normal for there to be no tasks, since all have been taken.
+
+logDebug: This is a kind of running log of what the workers are doing.
+
+Unfortunately, bulldogi's firewall will not let you directly attach to port 8766 from outside.  So, you have two options:
+
+1) (use a browswer on bdi)  
+ssh -Y to bulldogi to set up X forwarding back to your local machine.  Then run mozilla directly on bulldogi.  
+In mozilla, open localhost:8766
+
+2) (set up an ssh tunnel)
+On your local machine, ssh -Nf -L8766:localhost:8766 jsr59@bulldogi.wss.yale.edu
+(the ssh will return immediately, but the tunnel will have been set up.)
+
+Then, in a browser on your local machine, open localhost:8766.  The ssh tunnel will redirect the traffic to bulldogi.
+
+
+

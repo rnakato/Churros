@@ -1,0 +1,66 @@
+#!/bin/bash
+cmdname=`basename $0`
+function usage()
+{
+    echo "$cmdname [Options] <samplepairlist> <prefix> <build> <Ddir>" 1>&2
+    echo '   <samplepairlist>: text file of ChIP/Input sample pairs' 1>&2
+    echo '   <prefix>: output prefix' 1>&2
+    echo '   <build>: genome build (e.g., hg38)' 1>&2
+    echo '   <Ddir>: directory of bowtie2 index' 1>&2
+    echo '   Options:' 1>&2
+    echo '      -b <int>: binsize (defalt: 100)' 1>&2
+    echo '      -l <int>: line size for each page (defalt: 1000 (kbp))' 1>&2
+    echo '      -d <str>: directory of parse2wig+ (default: parse2wigdir+)' 1>&2
+    echo '      -o <str>: output directory (default: drompa+)' 1>&2
+    echo "   Example:" 1>&2
+    echo "      $cmdname samplelist.txt chip-seq hg38 Database/Ensembl-GRCh38" 1>&2
+}
+
+binsize=100
+linesize=1000
+pdir=parse2wigdir+
+odir=drompa+
+while getopts b:d:mnf:p: option
+do
+    case ${option} in
+        b) binsize=${OPTARG};;
+        l) linensize=${OPTARG};;
+        o) odir=${OPTARG};;
+	*)
+	    usage
+	    exit 1
+	    ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+if [ $# -ne 3 ]; then
+  usage
+  exit 1
+fi
+
+samplepairlist=$1
+prefix=$2
+Ddir=$3
+
+gt=$Ddir/genometable.txt
+gene=$Ddir/gtf_chrUCSC/chr.gene.refFlat
+ideogram=/opt/DROMPAplus/data/ideogram/$build.tsv
+GC=$Ddir/GCcontents/
+GD=$Ddir/genedensity/
+
+s=""
+sGV=""
+while read LINE; do
+    LINE=($LINE)
+    chip=${LINE[0]}
+    input=${LINE[1]}
+    label=${LINE[2]}
+    s="$s -i $pdir/${LINE[0]}$post.$binsize.bw,$pdir/${LINE[1]}$post.$binsize.bw,${label}"
+    sGV="$s -i $pdir/${LINE[0]}$post.100000.bw,$pdir/${LINE[1]}$post.100000.bw,${label}"
+done < $samplepairlist
+
+param="--gt $gt -g $gene"
+ex "drompa+ PC_SHARP $s -o $odir/Read.$binsize $param --ls $linesize --showchr"
+rm $odir/Read.$binsize.pdf
+ex "drompa+ GV $sGV -o $odir/GV --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 500000"

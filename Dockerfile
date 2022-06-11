@@ -61,10 +61,9 @@ RUN git clone --recursive https://github.com/rnakato/DROMPAplus \
 
 RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeker', 'Rsamtools'))" \
     && R -e "install.packages(c('snow','snowfall','bitops','caTools'))"
-#COPY phantompeakqualtools /opt/phantompeakqualtools
-#RUN R -e "install.packages('/opt/phantompeakqualtools/spp_1.14.tar.gz')"
 
 COPY scripts/ /opt/scripts
+RUN make -C /opt/scripts/MOSAiCS_mappability/
 RUN chmod +x /opt/scripts/*
 
 ENV PATH ${PATH}:/opt/scripts:/opt/SSP/bin:/opt/DROMPAplus/bin:/opt/DROMPAplus/submodules/cpdf/Linux-Intel-64bit:/opt/DROMPAplus/otherbins:/opt:/opt/bwa-0.7.17:/opt/bowtie-1.3.1-linux-x86_64:/opt/bowtie2-2.4.5-linux-x86_64

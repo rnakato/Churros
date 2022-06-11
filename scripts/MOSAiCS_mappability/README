@@ -1,0 +1,14 @@
+
+Steps to create your own mappability files:
+
+- Download the fa files you want (one per chromosome), and put them in a directory, making sure that they end in '.fa'.  
+
+- Make the three executables chr2hash, oligoFindPLFFile, mergeOligoCounts, using the Makefile.  
+Make sure they are in your PATH.
+
+- In the directory containing the fa files, do: python compile.py.  
+
+You'll end up with pairs of files for each <chrname>.fa.HashOffsetTable, <chrname>.fa.HashPosTable
+
+Then, use CountMap.py in the usual way to access the data.
+
