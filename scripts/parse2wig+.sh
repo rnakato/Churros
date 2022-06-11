@@ -79,7 +79,6 @@ else
 fi
 mp="--mptable $mptable"
 
-
 parse2wigparam="--gt $gt -i $bam $mp $pair --odir $pdir --outputformat $of -p 12"
 
 func(){
@@ -105,7 +104,7 @@ func(){
 }
 
 echo "Parsing $bam by parse2wig+."
-func
+func >& log/parse2wig+-$prefix
 
 echo "Parse stats of parse2wig+."
 parsestats4DROMPAplus.pl $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv >& log/parsestats-$prefix.GC.100000
