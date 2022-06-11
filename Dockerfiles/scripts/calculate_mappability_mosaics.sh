@@ -8,19 +8,22 @@ function usage()
     echo '      -f <int>: fragment length (default: 150)' 1>&2
     echo '      -b <array <int>>: binsizes (default: "10000 25000 50000 500000 1000000")' 1>&2
     echo '      -r <array <int>>: read length (default: "36 50")' 1>&2
+    echo '      -p <int>: number of CPUs (default: 12)' 1>&2
     echo "   Example:" 1>&2
     echo "      $cmdname Ensembl-GRCh38" 1>&2
 }
 
+ncore=12
 fraglen=150
 arr_readlen="36 50"
 arr_binsize="10000 25000 50000 500000 1000000"
-while getopts f:r:b: option
+while getopts f:r:b:p: option
 do
     case ${option} in
         f) fraglen=${OPTARG};;
         r) arr_readlen=${OPTARG};;
         b) arr_binsize=${OPTARG};;
+	p) ncore=${OPTARG};;
         *)
             usage
             exit 1
@@ -35,7 +38,6 @@ if [ $# -ne 1 ]; then
 fi
 
 Ddir=$1
-
 Mdir=/opt/scripts/MOSAiCS_mappability/
 
 ex(){ echo $1; eval $1; }
@@ -50,6 +52,20 @@ read_genometable(){
     done < $gt
 }
 
+
+func_hashing_eachchr(){
+    dir=$1
+    chr=$2
+
+    if test -e $dir/$chr.fa; then
+	if test ! -e $dir/$chr.fa.HashOffsetTable || test ! -s $dir/$chr.fa.HashOffsetTable; then
+	    ex "$Mdir/chr2hash $dir/$chr.fa"
+        fi
+    else
+        echo "warning: $dir/$chr.fa does not exist."
+    fi
+}
+
 func_hashing(){
     gt=$1
     dir=$2
@@ -58,15 +74,10 @@ func_hashing(){
     unset LEN
     read_genometable $gt
 
-    for ((i=0; i<${#CHR[@]}; i++)); do
-	if test -e $dir/${CHR[$i]}.fa; then
-	    if test ! -e $dir/${CHR[$i]}.fa.HashOffsetTable || test ! -s $dir/${CHR[$i]}.fa.HashOffsetTable; then
-		ex "$Mdir/chr2hash $dir/${CHR[$i]}.fa"
-	    fi
-	else
-	    echo "warning: $dir/${CHR[$i]}.fa does not exist."
-	fi
-    done
+    echo "${CHR[@]}" | xargs -n1 -P $ncore ash -c "func_hashing_eachchr $dir {}"
+#    for ((i=0; i<${#CHR[@]}; i++)); do
+#	func_hashing_eachchr $dir ${CHR[$i]}
+ #   done
 }
 
 oligoFind(){
@@ -96,7 +107,7 @@ mergeOligo(){
     gt=$1
     readlen=$2
     hashdir=$3
-    odir=mappability_${readlen}mer
+    odir=$Ddir/mappability_${readlen}mer
     if test ! -e $odir; then mkdir $odir; fi
 
     unset CHR
@@ -124,7 +135,7 @@ MOSAICS(){
     read_genometable $gt
 
     scriptsdir=/opt/scripts/MOSAiCS_scripts
-    Mosdir=mappability_Mosaics_${readlen}mer
+    Mosdir=$Ddir/mappability_Mosaics_${readlen}mer
     ex "mkdir -p $Mosdir"
 
     eachchr(){
@@ -133,7 +144,7 @@ MOSAICS(){
 	outfile=$Mosdir/map_${chr}_binary.txt
 	echo $outfile
 	if test ! -e $outfile || test ! -s $outfile; then
-	    ex "/usr/bin/python $scriptsdir/cal_binary_map_score.py mappability_${readlen}mer/${chr}b.out 1 ${LEN[$i]} > $outfile"
+	    ex "/usr/bin/python $scriptsdir/cal_binary_map_score.py $Mosdir/${chr}b.out 1 ${LEN[$i]} > $outfile"
 	fi
 	ex "perl $scriptsdir/process_score_java.pl $outfile $Mosdir/map_fragL${fraglen}_${chr}_bin${binsize}.txt $readlen $fraglen $binsize"
 	ex "perl $scriptsdir/cal_binary_GC_N_score.pl $dir/${chr}.fa $Mosdir/${chr} 1"
@@ -149,7 +160,6 @@ MOSAICS(){
 
     ex "makemappabilitytable.pl $gt $Mosdir/map > $Mosdir/map_fragL${fraglen}_genome.txt"
 }
-
 
 hashdir=$Ddir/mappability_hashtable
 chrdir=$Ddir/chromosomes
