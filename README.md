@@ -2,16 +2,19 @@
 
 Docker image is available at [DockerHub](https://hub.docker.com/r/rnakato/churros).
 
+## 2. Tutorial
 
+Generate the database (genome, gene annotation and index file):
 
-## mapping_QC.sh: ChIP-seq analysis
-Usage:
+    build=GRCh38  # specify the build (Ensembl) that you need
+    Ddir=Ensembl-$build/
+    mkdir -p log
+    # Download genome and gtf
+    download_genomedata.sh $build $Ddir 2>&1 | tee log/Ensembl-$build
+    # make index for STAR-RSEM 
+    build-index.sh rsem-star $build $Ddir
 
-    mapping_QC.sh [-s] [-e] [-a] [-d bamdir] <exec|stats> <fastq> <prefix> <bowtie param> <build>
-
-### Example
-
-#### Execute bowtie and parse2wig
+### Execute bowtie2 and parse2wig+
 
     mapping_QC.sh exec fastq/SRR20753.fastq Rad21 "-n2 -m1" hg38
 
@@ -28,7 +31,7 @@ Output:
 * parse2wig log (log/parsestats-Rad21-n2-m1-hg38)
 
 
-#### Check mapping stats:
+### Check mapping stats:
 
     mapping_QC.sh stats fastq/SRR20753.fastq Rad21 "-n2 -m1" hg38
 
@@ -38,7 +41,7 @@ Output:
 |Rad21	|33,035,083	|9,543,103	|28.89	|3,975,423	|12.03	|13,518,526	|40.92	|19,516,557	|59.08	|8321928 (87.2%)	|1221175 (12.8%)|(0.872)	|0.46	|0.99	|8,321,928 / 9,543,103	|50	|1.162648	|0.9433482	|0|
 
 
-#### For multiple gzipped fastq files:
+### For multiple gzipped fastq files:
 
       dir=fastq/
       build=hg38
@@ -49,4 +52,27 @@ Output:
           mapping_QC.sh -a stats $dir/$prefix.fastq $prefix "-n2 -m1" $build
       done
 
-To be continued
+
+
+## 3. Commands in Churros
+
+## churros_mapping: ChIP-seq analysis
+
+Usage:
+
+    mapping_QC.sh [-s] [-e] [-a] [-d bamdir] <exec|stats> <fastq> <prefix> <bowtie param> <build>
+
+## ssp.sh
+
+    ssp.sh [-k kmer] [-o dir] [-p] <mapfile> <prefix> <build> <genometable>
+       <mapfile>: mapfile (SAM|BAM|CRAM|TAGALIGN format)
+       <prefix>: output prefix
+       <build>: genome build (e.g., hg38)
+       <genometable>: genome table file
+       Options:
+          -k: read length (36 or 50) for mappability calculation (default: 50)
+          -p: for paired-end file
+         -o: output directory (default: sspout)
+       Example:
+          For single-end: ssp.sh chip.sort.bam chip hg38 genometable.hg38.txt
+          For single-end: ssp.sh -p chip.sort.bam chip hg38 genometable.hg38.txt
