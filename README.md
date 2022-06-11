@@ -110,9 +110,39 @@ This `<odir>` is used in the **Churros** commands below.
 
 ### churros_mapping: ChIP-seq analysis
 
-Usage:
+`churros_mapping` takes a fastq file as input and:
+- uses `bowtie2.sh` for mapping reads
+- uses `parse2wig+.sh` for generating bigWig
+- uses `ssp.sh` for quality check.
 
-    mapping_QC.sh [-s] [-e] [-a] [-d bamdir] <exec|stats> <fastq> <prefix> <bowtie param> <build>
+`churros_mapping` contains three commands, `exec`, `stats` and `header`.
+
+    churros_mapping [-b binsize] [-n] [-f of] [-d outputdir] [-p "bowtie2 param"] <exec|stats|header> <fastq> <prefix> <build> <Ddir>
+      <command>:
+         exec: bowtie2, ssp and parse2wig+;
+         stats: show mapping/QC stats;
+         header: print header line of the stats
+      <fastq>: fastq file
+      <prefix>: output prefix
+      <build>: genome build (e.g., hg38)
+      <Ddir>: directory of bowtie2 index
+      Options:
+         -b: binsize of parse2wig+ (defalt: 100)
+         -m: consider genome mappability in parse2wig+
+         -n: omit ssp
+         -f: output format of parse2wig+ (default: 3)
+                  0: compressed wig (.wig.gz)
+                  1: uncompressed wig (.wig)
+                  2: bedGraph (.bedGraph)
+                  3: bigWig (.bw)
+         -d: output directory of cram files (default: cram)
+         -p "bowtie2 param": parameter of bowtie2 (shouled be quated)
+      Example:
+         For single-end: churros_mapping exec chip.fastq.gz chip hg38 Database/Ensembl-GRCh38
+         For paired-end: churros_mapping exec "-1 chip_1.fastq.gz -2 chip_2.fastq.gz" chip hg38 Database/Ensembl-GRCh38
+
+          
+### bowtie2.sh
 
 ### parse2wig+.sh 
 
