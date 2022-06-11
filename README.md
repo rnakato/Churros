@@ -1,6 +1,28 @@
 # Churros: Docker image for ChIP-seq/ATAC-seq analysis
 
+## 1. Installation
+
 Docker image is available at [DockerHub](https://hub.docker.com/r/rnakato/churros).
+
+### 1.1 Docker 
+To use docker command, type:
+
+    docker pull rnakato/churros
+    docker run -it --rm rnakato/churros <command>
+
+### 1.2 Singularity
+
+Singularity can also be used to execute the docker image:
+
+    singularity build churros.sif docker://rnakato/churros
+    singularity exec churros.sif <command>
+
+Singularity mounts the current directory automatically. If you access the files in the other directory, please mount by `--bind` option, for instance:
+
+    singularity exec --bind /work churros.sif <command>
+    
+This command mounts `/work` directory.
+
 
 ## 2. Tutorial
 
