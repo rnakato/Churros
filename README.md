@@ -78,13 +78,15 @@ Output:
 
 ## 3. Commands in Churros
 
-## churros_mapping: ChIP-seq analysis
+### churros_mapping: ChIP-seq analysis
 
 Usage:
 
     mapping_QC.sh [-s] [-e] [-a] [-d bamdir] <exec|stats> <fastq> <prefix> <bowtie param> <build>
 
-## ssp.sh
+### parse2wig+.sh 
+
+### ssp.sh
 
     ssp.sh [-k kmer] [-o dir] [-p] <mapfile> <prefix> <build> <genometable>
        <mapfile>: mapfile (SAM|BAM|CRAM|TAGALIGN format)
