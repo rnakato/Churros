@@ -75,8 +75,38 @@ Output:
       done
 
 
-
 ## 3. Commands in Churros
+
+### download_genomedata.sh
+
+`download_genomedata.sh` downloads the genome and gene annotation files of the genome build specified.
+**Churros** assumes the reference data is downloaded bu this command.
+
+    download_genomedata.sh <build> <outputdir>
+      build:
+             human (GRCh38, GRCh37)
+             mouse (GRCm39, GRCm38)
+             rat (mRatBN7.2)
+             fly (BDGP6)
+             zebrafish (GRCz11)
+             chicken (GRCg6a)
+             African clawed frog (xenLae2)
+             C. elegans (WBcel235)
+             S. serevisiae (R64-1-1)
+             S. pombe (SPombe)
+      Example:
+             download_genomedata.sh GRCh38 Ensembl-GRCh38
+
+
+### build-index.sh
+
+`build-index.sh` builds index files of the tools specified. `<odir>` should be the same with `<outputdir>` directory provided in `download_genomedata.sh`. 
+This `<odir>` is used in the **Churros** commands below.
+
+    build-index.sh [-p ncore] -a <program> <odir>
+      program: bowtie, bowtie-cs, bowtie2, bwa, chromap
+      Example:
+             build-index.sh bowtie2 Ensembl-GRCh38
 
 ### churros_mapping: ChIP-seq analysis
 
@@ -100,3 +130,25 @@ Usage:
        Example:
           For single-end: ssp.sh chip.sort.bam chip hg38 genometable.hg38.txt
           For single-end: ssp.sh -p chip.sort.bam chip hg38 genometable.hg38.txt
+
+
+## 4. Utility scripts in Churros
+   
+### parsebowtielog.pl
+
+### parsebowtielog2.pl
+
+## 5. Build Docker image from Dockerfile
+
+First clone and move to the repository
+
+    git clone https://github.com/rnakato/RumBall.git
+    cd RumBall
+
+Then type:
+
+    docker build -t <account>/rumball
+
+## 6. Contact
+
+Ryuichiro Nakato: rnakato AT iqb.u-tokyo.ac.jp
