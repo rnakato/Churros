@@ -41,6 +41,7 @@ Ddir=$1
 Mdir=/opt/scripts/MOSAiCS_mappability/
 
 ex(){ echo $1; eval $1; }
+export -f ex
 
 read_genometable(){
     gt=$1
@@ -52,10 +53,10 @@ read_genometable(){
     done < $gt
 }
 
-
 func_hashing_eachchr(){
     dir=$1
     chr=$2
+    Mdir=/opt/scripts/MOSAiCS_mappability/
 
     if test -e $dir/$chr.fa; then
 	if test ! -e $dir/$chr.fa.HashOffsetTable || test ! -s $dir/$chr.fa.HashOffsetTable; then
@@ -66,18 +67,18 @@ func_hashing_eachchr(){
     fi
 }
 
+export -f func_hashing_eachchr
+
 func_hashing(){
     gt=$1
     dir=$2
+    hashdir=$3
 
     unset CHR
     unset LEN
     read_genometable $gt
 
-    echo "${CHR[@]}" | xargs -n1 -P $ncore ash -c "func_hashing_eachchr $dir {}"
-#    for ((i=0; i<${#CHR[@]}; i++)); do
-#	func_hashing_eachchr $dir ${CHR[$i]}
- #   done
+    echo ${CHR[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "func_hashing_eachchr $dir {} $hashdir"
 }
 
 oligoFind(){
@@ -99,27 +100,37 @@ oligoFind(){
 	    fi
 	done
     }
+    export -f func
 
-    for ((i=0; i<${#CHR[@]}; i++)); do func $i; done
+#    for ((i=0; i<${#CHR[@]}; i++)); do func $i; done
+    echo ${CHR[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "func {}"
 }
 
 mergeOligo(){
     gt=$1
     readlen=$2
     hashdir=$3
-    odir=$Ddir/mappability_${readlen}mer
+    odir=$Ddir/mappability_hashdir_${readlen}mer
     if test ! -e $odir; then mkdir $odir; fi
 
     unset CHR
     unset LEN
     read_genometable $gt
 
-    for ((i=0; i<${#CHR[@]}; i++)); do
-	outfile=$odir/${CHR[$i]}b.out
+    func(){
+	chr=$1
+	readlen=$2
+	outfile=$odir/${chr}b.out
 	if test ! -e $outfile || test ! -s $outfile; then
-	    ex "$Mdir/mergeOligoCounts $hashdir/chr*${CHR[$i]}.${readlen}mer.out > $outfile"
+	    ex "$Mdir/mergeOligoCounts $hashdir/chr*$chr.${readlen}mer.out > $outfile"
 	fi
-    done
+    }
+    export -f func
+
+    echo ${CHR[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "func {} $readlen"
+#    for ((i=0; i<${#CHR[@]}; i++)); do
+#	func ${CHR[$i]} $readlen
+#    done
 }
 
 MOSAICS(){
@@ -144,7 +155,7 @@ MOSAICS(){
 	outfile=$Mosdir/map_${chr}_binary.txt
 	echo $outfile
 	if test ! -e $outfile || test ! -s $outfile; then
-	    ex "/usr/bin/python $scriptsdir/cal_binary_map_score.py $Mosdir/${chr}b.out 1 ${LEN[$i]} > $outfile"
+	    ex "/usr/bin/python $scriptsdir/cal_binary_map_score.py $Ddir/mappability_hashdir_${readlen}mer/${chr}b.out 1 ${LEN[$i]} > $outfile"
 	fi
 	ex "perl $scriptsdir/process_score_java.pl $outfile $Mosdir/map_fragL${fraglen}_${chr}_bin${binsize}.txt $readlen $fraglen $binsize"
 	ex "perl $scriptsdir/cal_binary_GC_N_score.pl $dir/${chr}.fa $Mosdir/${chr} 1"
@@ -166,13 +177,14 @@ chrdir=$Ddir/chromosomes
 gt=$Ddir/genometable.txt
 
 if test ! -e $hashdir; then mkdir $hashdir; fi
-func_hashing $gt $chrdir
+func_hashing $gt $chrdir $hashdir
 
 for readlen in $arr_readlen
 do
     oligoFind $gt $readlen $chrdir $hashdir
     mergeOligo $gt $readlen $hashdir
 
+    exit
     for binsize in $arr_binsize
     do
 	MOSAICS $gt $readlen $fraglen $binsize $chrdir $hashdir
