@@ -110,7 +110,7 @@ oligoFind(){
     }
     export -f func_oligoFind
 
-    echo ${CHR[@]} | tr ' ' '\n' | xargs -t -n1 -I {} -P $ncore bash -c "func_oligoFind {} $dir $hashdir $readlen $gt"
+    echo ${CHR[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "func_oligoFind {} $dir $hashdir $readlen $gt"
 }
 
 mergeOligo(){

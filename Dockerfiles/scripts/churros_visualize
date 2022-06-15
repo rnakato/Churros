@@ -11,7 +11,7 @@ function usage()
     echo '      -b <int>: binsize (defalt: 100)' 1>&2
     echo '      -l <int>: line size for each page (defalt: 1000 (kbp))' 1>&2
     echo '      -d <str>: directory of parse2wig+ (default: parse2wigdir+)' 1>&2
-    echo '      -o <str>: output directory (default: drompa+)' 1>&2
+    echo '      -p <str>: postfix of .bw files (default: "-bowtie2-<build>-raw-GR")' 1>&2
     echo "   Example:" 1>&2
     echo "      $cmdname samplelist.txt chip-seq hg38 Database/Ensembl-GRCh38" 1>&2
 }
@@ -19,13 +19,14 @@ function usage()
 binsize=100
 linesize=1000
 pdir=parse2wigdir+
-odir=drompa+
-while getopts b:d:mnf:p: option
+post_predefined=""
+while getopts b:l:d:o:p: option
 do
     case ${option} in
         b) binsize=${OPTARG};;
         l) linensize=${OPTARG};;
-        o) odir=${OPTARG};;
+        d) pdir=${OPTARG};;
+        p) post_predefined=${OPTARG};;
 	*)
 	    usage
 	    exit 1
@@ -34,20 +35,29 @@ do
 done
 shift $((OPTIND - 1))
 
-if [ $# -ne 3 ]; then
+if [ $# -ne 4 ]; then
   usage
   exit 1
 fi
 
 samplepairlist=$1
 prefix=$2
-Ddir=$3
+build=$3
+Ddir=$4
+
+if test "$post_predefined" = ""; then
+    post=-bowtie2-$build-raw-GR
+else
+    post=$post_predefined
+fi
 
 gt=$Ddir/genometable.txt
 gene=$Ddir/gtf_chrUCSC/chr.gene.refFlat
 ideogram=/opt/DROMPAplus/data/ideogram/$build.tsv
 GC=$Ddir/GCcontents/
-GD=$Ddir/genedensity/
+GD=$Ddir/gtf_chrUCSC/genedensity
+
+ex(){ echo $1; eval $1; }
 
 s=""
 sGV=""
@@ -57,10 +67,10 @@ while read LINE; do
     input=${LINE[1]}
     label=${LINE[2]}
     s="$s -i $pdir/${LINE[0]}$post.$binsize.bw,$pdir/${LINE[1]}$post.$binsize.bw,${label}"
-    sGV="$s -i $pdir/${LINE[0]}$post.100000.bw,$pdir/${LINE[1]}$post.100000.bw,${label}"
+    sGV="$sGV -i $pdir/${LINE[0]}$post.100000.bw,$pdir/${LINE[1]}$post.100000.bw,${label}"
 done < $samplepairlist
 
 param="--gt $gt -g $gene"
-ex "drompa+ PC_SHARP $s -o $odir/Read.$binsize $param --ls $linesize --showchr"
-rm $odir/Read.$binsize.pdf
-ex "drompa+ GV $sGV -o $odir/GV --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 500000"
+ex "drompa+ PC_SHARP $s -o $prefix.PCSHARP.$binsize $param --ls $linesize --showchr"
+rm $prefix.PCSHARP.$binsize.pdf
+ex "drompa+ GV $sGV -o $prefix.GV.100000 --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 500000"
