@@ -7,8 +7,8 @@ WORKDIR /opt
 ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-c"]
 
-RUN apt update \
-    && apt install -y --no-install-recommends \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
     build-essential \
     libboost-all-dev \
     libbz2-dev \
@@ -21,7 +21,7 @@ RUN apt update \
     cmake \
     curl \
     pigz \
-    && apt clean \
+    && apt-get clean \
     && rm -rf /var/lib/apt/list
 
 # BWA 0.7.17
@@ -63,8 +63,8 @@ RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeke
     && R -e "install.packages(c('snow','snowfall','bitops','caTools'))"
 
 COPY scripts/ /opt/scripts
-RUN make -C /opt/scripts/MOSAiCS_mappability/
-RUN chmod +x /opt/scripts/*
+RUN make -C /opt/scripts/MOSAiCS_mappability/ \
+    && chmod +x /opt/scripts/*
 
 ENV PATH ${PATH}:/opt/scripts:/opt/SSP/bin:/opt/DROMPAplus/bin:/opt/DROMPAplus/submodules/cpdf/Linux-Intel-64bit:/opt/DROMPAplus/otherbins:/opt:/opt/bwa-0.7.17:/opt/bowtie-1.3.1-linux-x86_64:/opt/bowtie2-2.4.5-linux-x86_64
 

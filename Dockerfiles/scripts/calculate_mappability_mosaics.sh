@@ -145,8 +145,8 @@ func_MOSAICS(){
     gt=$1
     readlen=$2
     fraglen=$3
-    binsize=$4
-    chrdir=$5
+#    binsize=$4
+    chrdir=$4
 
     unset CHR
     unset LEN
@@ -156,55 +156,39 @@ func_MOSAICS(){
     ex "mkdir -p $Mosdir"
 
     MOSAICS_eachchr(){
-	chr=$1
-	Mosdir=$2
-	binsize=$3
-	fraglen=$4
-	chrdir=$5
-	Ddir=$6
-	scriptsdir=/opt/scripts/MOSAiCS_scripts
+       i=$1
+       Mosdir=$2
+       readlen=$3
+       fraglen=$4
+       chrdir=$5
+       Ddir=$6
+       gt=$7
+       arr_binsize=$8
+       scriptsdir=/opt/scripts/MOSAiCS_scripts
 
-	outfile=$Mosdir/map_${chr}_binary.txt
-	echo $chr $outfile
-	ex "/usr/bin/python $scriptsdir/cal_binary_map_score.py $Ddir/mappability_hashdir_${readlen}mer/${chr}b.out 1 ${LEN[$i]} > $outfile"
-	ex "perl $scriptsdir/process_score_java.pl $outfile $Mosdir/map_fragL${fraglen}_${chr}_bin${binsize}.txt $readlen $fraglen $binsize"
-	ex "perl $scriptsdir/cal_binary_GC_N_score.pl $chrdir/${chr}.fa $Mosdir/${chr} 1"
+       read_genometable $gt
+       chr=${CHR[$i]}
+       len=${LEN[$i]}
 
-	for str in GC N; do
-	    ex "perl $scriptsdir/process_score.pl \
-		 $Mosdir/${chr}_${str}_binary.txt \
-		 $Mosdir/${str}_fragL${fraglen}_${chr}_bin${binsize}.txt \
-		 $fraglen $binsize" &
-	done
-	wait
+       outfile=$Mosdir/map_${chr}_binary.txt
+       echo $chr $outfile
+       ex "/usr/bin/python $scriptsdir/cal_binary_map_score.py $Ddir/mappability_hashdir_${readlen}mer/${chr}b.out 1 $len > $outfile"
+       ex "perl $scriptsdir/cal_binary_GC_N_score.pl $chrdir/${chr}.fa $Mosdir/${chr} 1"
 
-	pigz -f $outfile
+       for binsize in $arr_binsize; do
+	   ex "perl $scriptsdir/process_score_java.pl $outfile $Mosdir/map_fragL${fraglen}_${chr}_bin${binsize}.txt $readlen $fraglen $binsize"
+	   for str in GC N; do
+               ex "perl $scriptsdir/process_score.pl $Mosdir/${chr}_${str}_binary.txt $Mosdir/${str}_fragL${fraglen}_${chr}_bin${binsize}.txt $fraglen $binsize" &
+	   done
+	   wait
+       done
     }
     export -f MOSAICS_eachchr
 
-    eachchr(){
-       i=$1
-       chr=${CHR[$i]}
-       len=${LEN[$i]}
-       scriptsdir=/opt/scripts/MOSAiCS_scripts
+    seq 0 $(( ${#CHR[@]} -1 )) | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "MOSAICS_eachchr {} $Mosdir $readlen $fraglen $chrdir $Ddir $gt \"$arr_binsize\""
+#    for ((i=0; i<${#CHR[@]}; i++)); do eachchr $i; done
 
-       outfile=$Mosdir/map_${chr}_binary.txt
-       if test ! -e $outfile || test ! -s $outfile; then
-           ex "/usr/bin/python $scriptsdir/cal_binary_map_score.py $Ddir/mappability_hashdir_${readlen}mer/${chr}b.out 1 $len > $outfile"
-       fi
-       ex "perl $scriptsdir/process_score_java.pl $outfile $Mosdir/map_fragL${fraglen}_${chr}_bin${binsize}.txt $readlen $fraglen $binsize"
-       ex "perl $scriptsdir/cal_binary_GC_N_score.pl $chrdir/${chr}.fa $Mosdir/${chr} 1"
-
-       for str in GC N; do
-           ex "perl $scriptsdir/process_score.pl $Mosdir/${chr}_${str}_binary.txt \
-               $Mosdir/${str}_fragL${fraglen}_${chr}_bin${binsize}.txt $fraglen $binsize"
-       done
-       pigz -f $outfile
-    }
-
-#    echo ${CHR[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "MOSAICS_eachchr {} $Mosdir $binsize $fraglen $chrdir $Ddir \"${LEN[@]}\""
-    for ((i=0; i<${#CHR[@]}; i++)); do eachchr $i; done
-
+    pigz -f $Mosdir/map_*_binary.txt
     ex "makemappabilitytable.pl $gt $Mosdir/map > $Mosdir/map_fragL${fraglen}_genome.txt"
 }
 
@@ -220,8 +204,8 @@ do
     oligoFind $gt $readlen $chrdir $hashdir
     mergeOligo $gt $readlen $hashdir
 
-    for binsize in $arr_binsize
-    do
-	func_MOSAICS $gt $readlen $fraglen $binsize $chrdir
-    done
+#    for binsize in $arr_binsize
+ #   do
+    func_MOSAICS $gt $readlen $fraglen $chrdir
+    #done
 done
