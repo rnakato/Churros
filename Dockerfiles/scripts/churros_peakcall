@@ -34,6 +34,18 @@ fi
 samplepairlist=$1
 build=$2
 
+if test $build = "hg19" -o $build = "hg38"; then
+    sp="hs"
+elif test $build = "mm9" -o $build = "mm10" -o $build = "mm39"; then
+    sp="mm"
+elif test $build = "ce11"; then
+    sp="ce"
+elif test $build = "dm3" -o test $build = "dm6" -o test $build = "dm7"; then
+    sp="dm"
+else
+    sp="1e8"
+fi
+
 ex(){ echo $1; eval $1; }
 
 IFS=","
@@ -43,12 +55,12 @@ while read LINE; do
     input=${LINE[1]}
     label=${LINE[2]}
     mode=${LINE[3]}
-    IPbam=bam/$chip-bowtie2-$build.sort.cram
-    Inputbam=bam/$input-bowtie2-$build.sort.cram
+    IPbam=bam/$chip-bowtie2-$build.sort.bam
+    Inputbam=bam/$input-bowtie2-$build.sort.bam
 
     if test "$input" = ""; then
-	macs.sh -q $qval -m $mdir $IPbam none $label $mode
+	macs.sh -s $sp -q $qval -d $mdir $IPbam none $label $mode
     else
-	macs.sh -q $qval -m $mdir $IPbam $Inputbam $label $mode
+	macs.sh -s $sp -q $qval -d $mdir $IPbam $Inputbam $label $mode
     fi
 done < $samplepairlist

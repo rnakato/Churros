@@ -88,12 +88,15 @@ while read LINE; do
     churros_mapping $parseparam exec "$fastq" $prefix $build $Ddir
 done < $samplelist
 
-churros_mapping header > stats.tsv
+churros_mapping header "$fastq" $prefix $build $Ddir > stats.tsv
 while read LINE; do
     LINE=($LINE)
     prefix=${LINE[0]}
     fq1=${LINE[1]}
-    churros_mapping stats $fq1 $prefix $build >> stats.tsv
+    churros_mapping stats $fq1 $prefix $build $Ddir >> stats.tsv
 done < $samplelist
 
-#churros_peakcall $samplepairlist $build
+churros_peakcall $samplepairlist $build
+
+mkdir -p pdf
+churros_visualize $samplepairlist pdf/drompa+ $build $Ddir
