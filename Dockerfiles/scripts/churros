@@ -85,16 +85,15 @@ while read LINE; do
     else
 	fastq="$fq1"
     fi
-    chuross_peakcall exec "$fastq" $prefix $build $Ddir
+    churros_mapping $parseparam exec "$fastq" $prefix $build $Ddir
 done < $samplelist
 
-chuross_mapping header > stats.tsv
+churros_mapping header > stats.tsv
 while read LINE; do
-do
     LINE=($LINE)
     prefix=${LINE[0]}
     fq1=${LINE[1]}
-    chuross_mapping stats $fq1 $prefix $build >> stats.tsv
+    churros_mapping stats $fq1 $prefix $build >> stats.tsv
 done < $samplelist
 
-#chuross_peakcall $samplepairlist $build
+#churros_peakcall $samplepairlist $build
