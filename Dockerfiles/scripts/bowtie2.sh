@@ -17,11 +17,9 @@ function usage()
 
 echo $cmdname $*
 
-type=hiseq
 format=BAM
 bamdir=bam
 param=""
-outputbam=false
 
 while getopts cp: option
 do
@@ -72,12 +70,10 @@ ex_hiseq(){
     bowtie2 --version
 
     if test $format = "BAM"; then
-	command="bowtie2 $param -p12 -x $index \"$fastq\" | samtools sort > $file"
-	ex $command
+	ex "bowtie2 $param -p12 -x $index \"$fastq\" | samtools sort > $file"
 	if test ! -e $file.bai; then samtools index $file; fi
     else
-	command="bowtie2 $param -p12 -x $index \"$fastq\" | samtools view -C - -T $genome | samtools sort -O cram > $file"
-	ex $command
+	ex "bowtie2 $param -p12 -x $index \"$fastq\" | samtools view -C - -T $genome | samtools sort -O cram > $file"
 	if test ! -e $file.crai; then samtools index $file; fi
     fi
 

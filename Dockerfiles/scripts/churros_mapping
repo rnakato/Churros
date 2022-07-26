@@ -98,12 +98,12 @@ if test $command = "exec"; then
     if test $format = "CRAM"; then
        mapfile=$bamdir/$head.sort.cram
        bowtie2.sh -c -p "$bowtieparam" "$fastq" $prefix $build $Ddir
-       parse2wig+.sh $parseparam $pair -b $binsize -f $of $cram $head $build $Ddir
+       parse2wig+.sh $parseparam $pair -b $binsize -f $of $mapfile $head $build $Ddir
     else
        # BAM
        mapfile=$bamdir/$head.sort.bam
        bowtie2.sh -p "$bowtieparam" "$fastq" $prefix $build $Ddir
-       parse2wig+.sh $parseparam $pair -b $binsize -f $of $cram $head $build $Ddir
+       parse2wig+.sh $parseparam $pair -b $binsize -f $of $mapfile $head $build $Ddir
     fi
     if test $nopp != 1; then ssp.sh $pair $mapfile $head $build $gt; fi
 elif test $command = "stats"; then

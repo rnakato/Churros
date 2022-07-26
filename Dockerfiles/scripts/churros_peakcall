@@ -2,47 +2,23 @@
 cmdname=`basename $0`
 function usage()
 {
-    echo "$cmdname" '[-b binsize] [-n] [-f of] [-d outputdir] [-p "bowtie2 param"] <exec|stats|header> <fastq> <prefix> <build> <Ddir>' 1>&2
-    echo '   <command>:' 1>&2
-    echo '      exec: bowtie2, ssp and parse2wig+;' 1>&2
-    echo '      stats: show mapping/QC stats;' 1>&2
-    echo '      header: print header line of the stats' 1>&2
-    echo '   <fastq>: fastq file' 1>&2
-    echo '   <prefix>: output prefix' 1>&2
+    echo "$cmdname [Options] <samplepairlist> <build>" 1>&2
+    echo '   <samplepairlist>: text file of ChIP/Input sample pairs' 1>&2
     echo '   <build>: genome build (e.g., hg38)' 1>&2
-    echo '   <Ddir>: directory of bowtie2 index' 1>&2
     echo '   Options:' 1>&2
-    echo '      -b: binsize of parse2wig+ (defalt: 100)' 1>&2
-    echo '      -m: consider genome mappability in parse2wig+' 1>&2
-    echo '      -n: omit ssp' 1>&2
-    echo '      -f: output format of parse2wig+ (default: 3)' 1>&2
-    echo '               0: compressed wig (.wig.gz)' 1>&2
-    echo '               1: uncompressed wig (.wig)' 1>&2
-    echo '               2: bedGraph (.bedGraph)' 1>&2
-    echo '               3: bigWig (.bw)' 1>&2
-    echo '      -d: output directory of cram files (default: cram)' 1>&2
-    echo '      -p "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
-    echo "   Example:" 1>&2
-    echo "      For single-end: $cmdname exec chip.fastq.gz chip hg38 Database/Ensembl-GRCh38" 1>&2
-    echo "      For paired-end: $cmdname exec \"-1 chip_1.fastq.gz -2 chip_2.fastq.gz\" chip hg38 Database/Ensembl-GRCh38" 1>&2
+    echo '      -q <qvalue>: threshould of MACS2 (defalt: 0.05)' 1>&2
+    echo '      -m <mdir>: output direcotyr (defalt: "macs")' 1>&2
 }
 
-bowtieparam=""
-mp=0
-nopp=0
-cramdir=cram
-of=3
-binsize=100
-while getopts b:d:mnf:p: option
+qval=0.05
+mdir=macs
+
+while getopts q: option
 do
     case ${option} in
-	b) binsize=${OPTARG};;
-	d) cramdir=${OPTARG};;
-        m) mp=1;;
-        n) nopp=1;;
-        f) of=${OPTARG};;
-        p) bowtieparam=${OPTARG};;
-	*)
+	q) qval=${OPTARG};;
+	d) mdir=${OPTARG};;
+        *)
 	    usage
 	    exit 1
 	    ;;
@@ -50,61 +26,23 @@ do
 done
 shift $((OPTIND - 1))
 
-if [ $# -eq 0 ]; then
+if [ $# -ne 2 ]; then
   usage
   exit 1
 fi
 
-if test $1 = "header"; then
-    echo -e "\tSample\tSequenced reads	Mapped 1 time	%	Mapped >1 times	%	Mapped all	%	Unmapped	%	Nonredundant	Redundant	Complexity for10M	Read depth	Genome coverage	Tested reads	GC summit	read length	fragment length	SSP-NSC	SSP-RLSC	SSP-RSC	Background uniformity	FCS(read)	FCS(flen)	FCS(1k)	FCS(10k)	FCS(100k)"
-    exit
-fi
+samplepairlist=$1
+build=$2
 
-if [ $# -ne 5 ]; then
-  usage
-  exit 1
-fi
+ex(){ echo $1; eval $1; }
 
-type=$1
-fastq=$2
-prefix=$3
-build=$4
-Ddir=$5
-
-post="-bowtie2"`echo $bowtieparam | tr -d ' '`
-head=$prefix$post-$build
-
-pair=""
-# for paired-end fastq
-if [[ $fastq == *-1\ * ]]; then
-    fastq=${fastq/-1/\\-1}
-    fastq=${fastq/-2/\\-2}
-    pair="-p"
-fi
-
-gt=$Ddir/genometable.txt
-cram=$cramdir/$head.sort.cram
-
-if test $mp -eq 1; then
-    parseparam="-m"
-else
-    parseparam=""
-fi
-
-
-if test $type = "exec"; then
-    bowtie2.sh -d $cramdir -p "$bowtieparam" "$fastq" $prefix $build $Ddir
-    parse2wig+.sh $parseparam $pair -b $binsize -f $of $cram $head $build $Ddir
-    if test $nopp != 1; then ssp.sh $pair $cram $head $build $gt; fi
-elif test $type = "stats"; then
-    a=`parsebowtielog2.pl $pair log/bowtie2-$head | grep -v Sample`
-    b=`cat log/parsestats-$head.GC.100000 | grep -v Sample | cut -f6,7,8,9`
-    gcov=`cat log/parsestats-$head.$binsize | grep -v Sample | cut -f10`
-    b2=`cat log/parsestats-$head.GC.100000 | grep -v Sample | cut -f11,12`
-    echo -en "$a\t$b\t$gcov\t$b2\t$c"
-
-    if test $nopp != 1; then
-	echo -en "`tail -n1 sspout/$head.stats.txt | cut -f4,5,6,7,8,9,10,11,12,13,14`"
-    fi
-    echo ""
-fi
+while read LINE; do
+    LINE=($LINE)
+    chip=${LINE[0]}
+    input=${LINE[1]}
+    label=${LINE[2]}
+    mode=${LINE[3]}
+    IPbam=bam/$chip-bowtie2-$build.sort.cram
+    Inputbam=bam/$input-bowtie2-$build.sort.cram
+    macs.sh -q $qval -m $mdir $IPbam $Inputbam $chip $label
+done < $samplepairlist
