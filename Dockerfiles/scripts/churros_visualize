@@ -61,6 +61,7 @@ ex(){ echo $1; eval $1; }
 
 s=""
 sGV=""
+IFS=","
 while read LINE; do
     LINE=($LINE)
     chip=${LINE[0]}

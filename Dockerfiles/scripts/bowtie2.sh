@@ -15,7 +15,7 @@ function usage()
     echo "      For paired-end: $cmdname \"\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz\" chip hg38" 1>&2
 }
 
-echo $cmdname $*
+#echo $cmdname $*
 
 format=BAM
 bamdir=bam
