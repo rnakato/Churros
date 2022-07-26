@@ -1,0 +1,100 @@
+#!/bin/bash
+cmdname=`basename $0`
+function usage()
+{
+    echo "$cmdname [options] <samplelist> <samplepairlist> <build> <Ddir>" 1>&2
+    echo '   <samplelist>: sample list' 1>&2
+    echo '   <samplepairlist>: ChIP/Input pair list' 1>&2
+    echo '   <build>: genome build (e.g., hg38)' 1>&2
+    echo '   <Ddir>: directory of bowtie2 index' 1>&2
+    echo '   Options:' 1>&2
+    echo '      -c: output as CRAM format (defalt: BAM)' 1>&2
+    echo '      -b: binsize of parse2wig+ (defalt: 100)' 1>&2
+    echo '      -m: consider genome mappability in parse2wig+' 1>&2
+    echo '      -n: omit ssp' 1>&2
+    echo '      -f: output format of parse2wig+ (default: 3)' 1>&2
+    echo '               0: compressed wig (.wig.gz)' 1>&2
+    echo '               1: uncompressed wig (.wig)' 1>&2
+    echo '               2: bedGraph (.bedGraph)' 1>&2
+    echo '               3: bigWig (.bw)' 1>&2
+    echo '      -p "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
+    echo "   Example:" 1>&2
+    echo "      For single-end: $cmdname exec chip.fastq.gz chip hg38 Database/Ensembl-GRCh38" 1>&2
+}
+
+bowtieparam=""
+mp=0
+nopp=0
+format=BAM
+bamdir=bam
+of=3
+binsize=100
+while getopts cb:mnf:p: option
+do
+    case ${option} in
+	c) format=CRAM
+	   bamdir=cram
+	   ;;
+	b) binsize=${OPTARG};;
+        m) mp=1;;
+        n) nopp=1;;
+        f) of=${OPTARG};;
+        p) bowtieparam=${OPTARG};;
+	*)
+	    usage
+	    exit 1
+	    ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+if [ $# -ne 4 ]; then
+  usage
+  exit 1
+fi
+
+samplelist=$1
+samplepairlist=$2
+build=$3
+Ddir=$4
+
+post="-bowtie2"`echo $bowtieparam | tr -d ' '`
+
+if test $mp -eq 1; then
+    parseparam="-m"
+else
+    parseparam=""
+fi
+
+while read LINE; do
+    LINE=($LINE)
+    prefix=${LINE[0]}
+    fq1=${LINE[1]}
+    fq2=${LINE[2]}
+    head=$prefix$post-$build
+
+    if test "$fq1" = ""; then
+	echo "Error: specify fastq file in $samplelist."
+	exit
+    fi
+    # for paired-end fastq
+    pair=""
+    if test "$fq2" != ""; then
+	pair="-p"
+	fastq="-1 $fq1 -2 $fq2"
+    else
+	fastq="$fq1"
+    fi
+    chuross_peakcall exec "$fastq" $prefix $build $Ddir
+done < $samplelist
+
+chuross_mapping header > stats.tsv
+while read LINE; do
+do
+    LINE=($LINE)
+    prefix=${LINE[0]}
+    fq1=${LINE[1]}
+    chuross_mapping stats $fq1 $prefix $build >> stats.tsv
+done < $samplelist
+
+#chuross_peakcall $samplepairlist $build

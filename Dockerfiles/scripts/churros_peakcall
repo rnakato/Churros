@@ -36,6 +36,7 @@ build=$2
 
 ex(){ echo $1; eval $1; }
 
+IFS=","
 while read LINE; do
     LINE=($LINE)
     chip=${LINE[0]}
@@ -44,5 +45,10 @@ while read LINE; do
     mode=${LINE[3]}
     IPbam=bam/$chip-bowtie2-$build.sort.cram
     Inputbam=bam/$input-bowtie2-$build.sort.cram
-    macs.sh -q $qval -m $mdir $IPbam $Inputbam $chip $label
+
+    if test "$input" = ""; then
+	macs.sh -q $qval -m $mdir $IPbam none $label $mode
+    else
+	macs.sh -q $qval -m $mdir $IPbam $Inputbam $label $mode
+    fi
 done < $samplepairlist

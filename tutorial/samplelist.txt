@@ -1,5 +1,6 @@
-HepG2_H2A.Z	HepG2_Control	HepG2_H2A.Z	sharp
-HepG2_H3K4me3	HepG2_Control	HepG2_H3K4me3	sharp
-HepG2_H3K27ac	HepG2_Control	HepG2_H3K27ac	sharp
-HepG2_H3K27me3	HepG2_Control	HepG2_H3K27me3	broad
-HepG2_H3K36me3	HepG2_Control	HepG2_H3K36me3	broad
+HepG2_H2A.Z	fastq/SRR227639.fastq.gz,fastq/SRR227640.fastq.gz
+HepG2_H3K4me3	fastq/SRR227563.fastq.gz,fastq/SRR227564.fastq.gz
+HepG2_H3K27ac	fastq/SRR227575.fastq.gz,fastq/SRR227576.fastq.gz
+HepG2_H3K27me3	fastq/SRR227598.fastq.gz,fastq/SRR227599.fastq.gz
+HepG2_H3K36me3	fastq/SRR227447.fastq.gz,fastq/SRR227448.fastq.gz
+HepG2_Control	fastq/SRR227552.fastq.gz,fastq/SRR227553.fastq.gz
