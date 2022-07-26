@@ -2,7 +2,7 @@
 cmdname=`basename $0`
 function usage()
 {
-    echo "$cmdname" '[-b binsize] [-n] [-f of] [-d outputdir] [-p "bowtie2 param"] <exec|stats|header> <fastq> <prefix> <build> <Ddir>' 1>&2
+    echo "$cmdname" '[options] <exec|stats|header> <fastq> <prefix> <build> <Ddir>' 1>&2
     echo '   <command>:' 1>&2
     echo '      exec: bowtie2, ssp and parse2wig+;' 1>&2
     echo '      stats: show mapping/QC stats;' 1>&2
@@ -12,6 +12,7 @@ function usage()
     echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   <Ddir>: directory of bowtie2 index' 1>&2
     echo '   Options:' 1>&2
+    echo '      -c: output as CRAM format (defalt: BAM)' 1>&2
     echo '      -b: binsize of parse2wig+ (defalt: 100)' 1>&2
     echo '      -m: consider genome mappability in parse2wig+' 1>&2
     echo '      -n: omit ssp' 1>&2
@@ -20,7 +21,6 @@ function usage()
     echo '               1: uncompressed wig (.wig)' 1>&2
     echo '               2: bedGraph (.bedGraph)' 1>&2
     echo '               3: bigWig (.bw)' 1>&2
-    echo '      -d: output directory of cram files (default: cram)' 1>&2
     echo '      -p "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname exec chip.fastq.gz chip hg38 Database/Ensembl-GRCh38" 1>&2
@@ -30,14 +30,17 @@ function usage()
 bowtieparam=""
 mp=0
 nopp=0
-cramdir=cram
+format=BAM
+bamdir=bam
 of=3
 binsize=100
-while getopts b:d:mnf:p: option
+while getopts cb:mnf:p: option
 do
     case ${option} in
+	c) format=CRAM
+	   bamdir=cram
+	   ;;
 	b) binsize=${OPTARG};;
-	d) cramdir=${OPTARG};;
         m) mp=1;;
         n) nopp=1;;
         f) of=${OPTARG};;
@@ -65,7 +68,7 @@ if [ $# -ne 5 ]; then
   exit 1
 fi
 
-type=$1
+command=$1
 fastq=$2
 prefix=$3
 build=$4
@@ -83,7 +86,6 @@ if [[ $fastq == *-1\ * ]]; then
 fi
 
 gt=$Ddir/genometable.txt
-cram=$cramdir/$head.sort.cram
 
 if test $mp -eq 1; then
     parseparam="-m"
@@ -92,11 +94,19 @@ else
 fi
 
 
-if test $type = "exec"; then
-    bowtie2.sh -d $cramdir -p "$bowtieparam" "$fastq" $prefix $build $Ddir
-    parse2wig+.sh $parseparam $pair -b $binsize -f $of $cram $head $build $Ddir
-    if test $nopp != 1; then ssp.sh $pair $cram $head $build $gt; fi
-elif test $type = "stats"; then
+if test $command = "exec"; then
+    if test $format = "CRAM"; then
+       mapfile=$bamdir/$head.sort.cram
+       bowtie2.sh -c -p "$bowtieparam" "$fastq" $prefix $build $Ddir
+       parse2wig+.sh $parseparam $pair -b $binsize -f $of $cram $head $build $Ddir
+    else
+       # BAM
+       mapfile=$bamdir/$head.sort.bam
+       bowtie2.sh -p "$bowtieparam" "$fastq" $prefix $build $Ddir
+       parse2wig+.sh $parseparam $pair -b $binsize -f $of $cram $head $build $Ddir
+    fi
+    if test $nopp != 1; then ssp.sh $pair $mapfile $head $build $gt; fi
+elif test $command = "stats"; then
     a=`parsebowtielog2.pl $pair log/bowtie2-$head | grep -v Sample`
     b=`cat log/parsestats-$head.GC.100000 | grep -v Sample | cut -f6,7,8,9`
     gcov=`cat log/parsestats-$head.$binsize | grep -v Sample | cut -f10`

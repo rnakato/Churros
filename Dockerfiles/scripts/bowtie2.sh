@@ -8,8 +8,7 @@ function usage()
     echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   <Ddir>: directory of bowtie2 index' 1>&2
     echo '   Options:' 1>&2
-    echo '      -b: output as BAM format (default: CRAM)' 1>&2
-#    echo '      -d: output directory of mapfiles (default: cram)' 1>&2
+    echo '      -c: output as CRAM format (defalt: BAM)' 1>&2
     echo '      -p "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname -p \"--very-sensitive\" chip.fastq.gz chip hg38" 1>&2
@@ -19,19 +18,18 @@ function usage()
 echo $cmdname $*
 
 type=hiseq
-bamdir=cram
+format=BAM
+bamdir=bam
 param=""
 outputbam=false
 
-while getopts bd:p: option
+while getopts cp: option
 do
     case ${option} in
-	d)
-	    outputbam=true
-	    bamdir=bam
-	    ;;
-	d) bamdir=${OPTARG};;
-        p) param=${OPTARG};;
+	c) format=CRAM
+           bamdir=cram
+           ;;
+	p) param=${OPTARG};;
 	*)
 	    usage
 	    exit 1
@@ -54,7 +52,7 @@ post="-bowtie2"`echo $param | tr -d ' '`
 if test ! -e $bamdir; then mkdir $bamdir; fi
 if test ! -e log; then mkdir log; fi
 
-if test $outputbam = "true"; then
+if test $format = "BAM"; then
     file=$bamdir/$prefix$post-$build.sort.bam
 else
     file=$bamdir/$prefix$post-$build.sort.cram
@@ -73,7 +71,7 @@ ex_hiseq(){
 
     bowtie2 --version
 
-    if test $outputbam = "true"; then
+    if test $format = "BAM"; then
 	command="bowtie2 $param -p12 -x $index \"$fastq\" | samtools sort > $file"
 	ex $command
 	if test ! -e $file.bai; then samtools index $file; fi
