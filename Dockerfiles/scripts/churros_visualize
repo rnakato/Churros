@@ -12,6 +12,7 @@ function usage()
     echo '      -l <int>: line size for each page (defalt: 1000 (kbp))' 1>&2
     echo '      -d <str>: directory of parse2wig+ (default: parse2wigdir+)' 1>&2
     echo '      -p <str>: postfix of .bw files (default: "-bowtie2-<build>-raw-GR")' 1>&2
+    echo '      -G : genome-wide view (100kbp)' 1>&2
     echo "   Example:" 1>&2
     echo "      $cmdname samplelist.txt chip-seq hg38 Database/Ensembl-GRCh38" 1>&2
 }
@@ -20,13 +21,15 @@ binsize=100
 linesize=1000
 pdir=parse2wigdir+
 post_predefined=""
-while getopts b:l:d:o:p: option
+GV=0
+while getopts b:l:d:o:p:G option
 do
     case ${option} in
         b) binsize=${OPTARG};;
         l) linensize=${OPTARG};;
         d) pdir=${OPTARG};;
         p) post_predefined=${OPTARG};;
+        G) GV=1;;
 	*)
 	    usage
 	    exit 1
@@ -51,27 +54,41 @@ else
     post=$post_predefined
 fi
 
-gt=$Ddir/genometable.txt
-gene=$Ddir/gtf_chrUCSC/chr.gene.refFlat
-ideogram=/opt/DROMPAplus/data/ideogram/$build.tsv
-GC=$Ddir/GCcontents/
-GD=$Ddir/gtf_chrUCSC/genedensity
-
 ex(){ echo $1; eval $1; }
 
-s=""
-sGV=""
-IFS=","
-while read LINE; do
-    LINE=($LINE)
-    chip=${LINE[0]}
-    input=${LINE[1]}
-    label=${LINE[2]}
-    s="$s -i $pdir/${LINE[0]}$post.$binsize.bw,$pdir/${LINE[1]}$post.$binsize.bw,${label}"
-    sGV="$sGV -i $pdir/${LINE[0]}$post.100000.bw,$pdir/${LINE[1]}$post.100000.bw,${label}"
-done < $samplepairlist
+gt=$Ddir/genometable.txt
 
-param="--gt $gt -g $gene"
-ex "drompa+ PC_SHARP $s -o $prefix.PCSHARP.$binsize $param --ls $linesize --showchr"
-rm $prefix.PCSHARP.$binsize.pdf
-ex "drompa+ GV $sGV -o $prefix.GV.100000 --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 500000"
+mkdir -p log
+if test $GV -eq 1; then
+    # GV mode
+    ideogram=/opt/DROMPAplus/data/ideogram/$build.tsv
+    GC=$Ddir/GCcontents/
+    GD=$Ddir/gtf_chrUCSC/genedensity
+
+    sGV=""
+    while IFS=, read chip input label; do
+       if test "$input" != ""; then
+           sGV="$sGV -i $pdir/$chip$post.100000.bw,$pdir/$input$post.100000.bw,$label"
+       else
+           echo "sample $chip does not have the input sample. skipped.."
+       fi
+    done < $samplepairlist
+
+    head=`basename $prefix`
+    ex "drompa+ GV $sGV -o $prefix.GV.100000 --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 500000 >& log/drompa+.$head.GV.100000"
+else
+    s=""
+    while IFS=, read chip input label mode peak; do
+        if test "$input" != ""; then
+            s="$s -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,$label,$peak"
+        else
+            s="$s -i $pdir/$chip$post.$binsize.bw,,$label,$peak"
+        fi
+    done < $samplepairlist
+
+    gene=$Ddir/gtf_chrUCSC/chr.gene.refFlat
+    param="--gt $gt -g $gene"
+    head=`basename $prefix`
+    ex "drompa+ PC_SHARP $s -o $prefix.PCSHARP.$binsize $param --ls $linesize --showchr --callpeak >& log/drompa+.$head.PCSHARP.$binsize"
+    rm $prefix.PCSHARP.$binsize.pdf
+fi

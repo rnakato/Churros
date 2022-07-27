@@ -7,13 +7,13 @@ function usage()
     echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   Options:' 1>&2
     echo '      -q <qvalue>: threshould of MACS2 (defalt: 0.05)' 1>&2
-    echo '      -m <mdir>: output direcotyr (defalt: "macs")' 1>&2
+    echo '      -d <mdir>: output direcoty (defalt: "macs")' 1>&2
 }
 
 qval=0.05
 mdir=macs
 
-while getopts q: option
+while getopts q:d: option
 do
     case ${option} in
 	q) qval=${OPTARG};;
@@ -48,19 +48,18 @@ fi
 
 ex(){ echo $1; eval $1; }
 
-IFS=","
-while read LINE; do
-    LINE=($LINE)
-    chip=${LINE[0]}
-    input=${LINE[1]}
-    label=${LINE[2]}
-    mode=${LINE[3]}
+while IFS=, read chip input label mode; do
     IPbam=bam/$chip-bowtie2-$build.sort.bam
     Inputbam=bam/$input-bowtie2-$build.sort.bam
 
+    if test "$mode" = ""; then
+       mode="sharp"
+    fi
     if test "$input" = ""; then
-	macs.sh -s $sp -q $qval -d $mdir $IPbam none $label $mode
+       macs.sh -s $sp -q $qval -d $mdir $IPbam none $label $mode
     else
-	macs.sh -s $sp -q $qval -d $mdir $IPbam $Inputbam $label $mode
+       macs.sh -s $sp -q $qval -d $mdir $IPbam $Inputbam $label $mode
     fi
 done < $samplepairlist
+
+cat $samplepairlist | awk -F',' -v dir=$mdir 'BEGIN{OFS = ","} {printf("%s,%s,%s,%s,dir/%s_peaks.narrowPeak\n", $1, $2, $3, $4,$1) }' > $mdir/$samplepairlist

@@ -4,3 +4,4 @@ Ddir=/work/Database/Database_fromDocker/Ensembl-GRCh38
 
 mkdir -p pdf
 $sing churros_visualize samplepairlist.txt pdf/drompa+ $build $Ddir
+$sing churros_visualize -G macs/samplepairlist.txt pdf/drompa+ $build $Ddir

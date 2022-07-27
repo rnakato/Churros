@@ -12,6 +12,8 @@ function usage()
     echo '      -b: binsize of parse2wig+ (defalt: 100)' 1>&2
     echo '      -m: consider genome mappability in parse2wig+' 1>&2
     echo '      -n: omit ssp' 1>&2
+    echo '      -q <qvalue>: threshould of MACS2 (defalt: 0.05)' 1>&2
+    echo '      -d <mdir>: output direcoty of macs2 (defalt: "macs")' 1>&2
     echo '      -f: output format of parse2wig+ (default: 3)' 1>&2
     echo '               0: compressed wig (.wig.gz)' 1>&2
     echo '               1: uncompressed wig (.wig)' 1>&2
@@ -29,7 +31,11 @@ format=BAM
 bamdir=bam
 of=3
 binsize=100
-while getopts cb:mnf:p: option
+
+qval=0.05
+mdir=macs
+
+while getopts cb:mnf:p:q:d: option
 do
     case ${option} in
 	c) format=CRAM
@@ -40,6 +46,8 @@ do
         n) nopp=1;;
         f) of=${OPTARG};;
         p) bowtieparam=${OPTARG};;
+	q) qval=${OPTARG};;
+        d) mdir=${OPTARG};;
 	*)
 	    usage
 	    exit 1
@@ -88,15 +96,15 @@ while read LINE; do
     churros_mapping $parseparam exec "$fastq" $prefix $build $Ddir
 done < $samplelist
 
-churros_mapping header "$fastq" $prefix $build $Ddir > stats.tsv
+churros_mapping header "$fastq" $prefix $build $Ddir > churros.stats.tsv
 while read LINE; do
     LINE=($LINE)
     prefix=${LINE[0]}
     fq1=${LINE[1]}
-    churros_mapping stats $fq1 $prefix $build $Ddir >> stats.tsv
+    churros_mapping stats $fq1 $prefix $build $Ddir >> churros.stats.tsv
 done < $samplelist
 
-churros_peakcall $samplepairlist $build
+churros_peakcall -q $qval -d $mdir $samplepairlist $build
 
 mkdir -p pdf
-churros_visualize $samplepairlist pdf/drompa+ $build $Ddir
+churros_visualize $mdir/$samplepairlist pdf/drompa+ $build $Ddir
