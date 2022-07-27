@@ -3,4 +3,4 @@ build=hg38
 Ddir=/work/Database/Database_fromDocker/Ensembl-GRCh38
 
 mkdir -p pdf
-$sing churros_peakcall samplepairlist.txt $build
+$sing churros_callpeak samplepairlist.txt $build

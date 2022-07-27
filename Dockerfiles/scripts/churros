@@ -104,7 +104,9 @@ while read LINE; do
     churros_mapping stats $fq1 $prefix $build $Ddir >> churros.stats.tsv
 done < $samplelist
 
-churros_peakcall -q $qval -d $mdir $samplepairlist $build
+churros_callpeak -q $qval -d $mdir $samplepairlist $build
 
 mkdir -p pdf
-churros_visualize $mdir/$samplepairlist pdf/drompa+ $build $Ddir
+churros_visualize $mdir/$samplepairlist pdf/drompa+.macspeak $build $Ddir
+churros_visualize -b 5000 -l 8000 -P "--scale_tag 100" samplepairlist.txt pdf/drompa+.bin5M $build $Ddir
+churros_visualize -G samplepairlist.txt pdf/drompa+ $build $Ddir

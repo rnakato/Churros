@@ -48,18 +48,33 @@ fi
 
 ex(){ echo $1; eval $1; }
 
-while IFS=, read chip input label mode; do
+newlist=$mdir/$samplepairlist
+rm -rf $newlist
+#while IFS=, read chip input label mode; do
+while read LINE; do
+    LINE=(${LINE//,/ })
+    chip=${LINE[0]}
+    input=${LINE[1]}
+    label=${LINE[2]}
+    mode=${LINE[3]}
+
     IPbam=bam/$chip-bowtie2-$build.sort.bam
     Inputbam=bam/$input-bowtie2-$build.sort.bam
 
     if test "$mode" = ""; then
        mode="sharp"
     fi
+    if test $mode = "sharp" -o $mode = "nomodel"; then
+	peak=$mdir/${label}_peaks.narrowPeak
+    else
+	peak=$mdir/${label}_peaks.broadPeak
+    fi
     if test "$input" = ""; then
        macs.sh -s $sp -q $qval -d $mdir $IPbam none $label $mode
     else
        macs.sh -s $sp -q $qval -d $mdir $IPbam $Inputbam $label $mode
     fi
+    echo "$chip,$input,$label,$mode,$peak" >> $newlist
 done < $samplepairlist
 
-cat $samplepairlist | awk -F',' -v dir=$mdir 'BEGIN{OFS = ","} {printf("%s,%s,%s,%s,dir/%s_peaks.narrowPeak\n", $1, $2, $3, $4,$1) }' > $mdir/$samplepairlist
+#cat $samplepairlist | awk -F',' 'BEGIN{OFS = ","} {printf("%s,%s,%s,%s,'$mdir'/%s_peaks.narrowPeak\n", $1, $2, $3, $4, $1) }' > $mdir/$samplepairlist
