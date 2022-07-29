@@ -12,6 +12,7 @@ function usage()
     echo '      -l <int>: line size for each page (defalt: 1000 (kbp))' 1>&2
     echo '      -d <str>: directory of parse2wig+ (default: parse2wigdir+)' 1>&2
     echo '      -y <str>: postfix of .bw files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
+    echo '      -p: show p-value distribution instead of read distribution' 1>&2
     echo '      -P : additional parameters for DROMPA+ (shouled be quated)' 1>&2
     echo '      -G : genome-wide view (100kbp)' 1>&2
     echo "   Example:" 1>&2
@@ -23,8 +24,9 @@ linesize=1000
 pdir=parse2wigdir+
 post_predefined=""
 GV=0
+showpvalue=0
 param=""
-while getopts P:b:l:d:o:y:G option
+while getopts P:b:l:d:o:y:pG option
 do
     case ${option} in
 	P) param=${OPTARG};;
@@ -32,6 +34,7 @@ do
         l) linesize=${OPTARG};;
         d) pdir=${OPTARG};;
         y) post_predefined=${OPTARG};;
+	p) showpvalue=1;;
         G) GV=1;;
 	*)
 	    usage
@@ -55,6 +58,10 @@ if test "$post_predefined" = ""; then
     post=-bowtie2-$build-raw-GR
 else
     post=$post_predefined
+fi
+
+if test $showpvalue -eq 1; then
+    param="$param --showctag 0 --showpenrich 1"
 fi
 
 ex(){ echo $1; eval $1; }
