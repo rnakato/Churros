@@ -1,0 +1,74 @@
+#!/bin/bash
+cmdname=`basename $0`
+function usage()
+{
+    echo "$cmdname [Options] <samplepairlist> <odir> <build> <gt>" 1>&2
+    echo '   <samplepairlist>: text file of ChIP/Input sample pairs' 1>&2
+    echo '   <odir>: output directory' 1>&2
+    echo '   <build>: genome build (e.g., hg38)' 1>&2
+    echo '   <gt>: genome_table file' 1>&2
+    echo '   Options:' 1>&2
+    echo '      -b <int>: binsize (defalt: 100)' 1>&2
+    echo '      -d <str>: directory of parse2wig+ (default: parse2wigdir+)' 1>&2
+    echo '      -y <str>: postfix of .bw files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
+    echo '      -P : additional parameters for DROMPA+ (shouled be quated)' 1>&2
+    echo "   Example:" 1>&2
+    echo "      $cmdname samplelist.txt chip-seq hg38 Database/Ensembl-GRCh38" 1>&2
+}
+
+binsize=100
+pdir=parse2wigdir+
+post_predefined=""
+param=""
+while getopts b:d:y: option
+do
+    case ${option} in
+        b) binsize=${OPTARG};;
+        d) pdir=${OPTARG};;
+        y) post_predefined=${OPTARG};;
+	*)
+	    usage
+	    exit 1
+	    ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+if [ $# -ne 4 ]; then
+  usage
+  exit 1
+fi
+
+samplepairlist=$1
+odir=$2
+build=$3
+gt=$4
+
+if test "$post_predefined" = ""; then
+    post=-bowtie2-$build-raw-GR
+else
+    post=$post_predefined
+fi
+
+if test $showpvalue -eq 1; then
+    param="$param --showctag 0 --showpenrich 1"
+fi
+
+ex(){ echo $1; eval $1; }
+
+mkdir -p log
+
+while read LINE; do
+    LINE=(${LINE//,/ })
+    chip=${LINE[0]}
+    input=${LINE[1]}
+    label=${LINE[2]}
+
+    if test "$input" != ""; then
+	drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,${label}_up > log/drompa+.GENWIG.$chip$post.up
+	drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$input$post.$binsize.bw,$pdir/$chip$post.$binsize.bw,${label}_down  > log/drompa+.GENWIG.$chip$post.down
+    else
+	echo "Error: input sample is not specified for the sample $chip."
+	exit 1
+    fi
+done < $samplepairlist
