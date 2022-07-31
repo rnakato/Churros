@@ -20,6 +20,7 @@ function usage()
     echo '               2: bedGraph (.bedGraph)' 1>&2
     echo '               3: bigWig (.bw)' 1>&2
     echo '      -p "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
+    echo '      -w : output ChIP/Input -log(p) distribution as a begraph format' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname exec chip.fastq.gz chip hg38 Database/Ensembl-GRCh38" 1>&2
 }
@@ -31,11 +32,12 @@ format=BAM
 bamdir=bam
 of=3
 binsize=100
+outputpval=0
 
 qval=0.05
 mdir=macs
 
-while getopts cb:mnf:p:q:d: option
+while getopts cb:mnf:p:q:d:w option
 do
     case ${option} in
 	c) format=CRAM
@@ -48,6 +50,7 @@ do
         p) bowtieparam=${OPTARG};;
 	q) qval=${OPTARG};;
         d) mdir=${OPTARG};;
+	w) outputpval=1;;
 	*)
 	    usage
 	    exit 1
@@ -106,9 +109,11 @@ done < $samplelist
 
 churros_callpeak -q $qval -d $mdir $samplepairlist $build
 
-mkdir -p drompa+.pval
-gt=$Ddir/genometable.txt
-churros_genPvalwig $samplepairlist drompa+.pval $build $gt
+if test $outputpval -eq 1; then
+    mkdir -p drompa+.pval
+    gt=$Ddir/genometable.txt
+    churros_genPvalwig $samplepairlist drompa+.pval $build $gt
+fi
 
 mkdir -p pdf
 churros_visualize $mdir/$samplepairlist pdf/drompa+.macspeak $build $Ddir
