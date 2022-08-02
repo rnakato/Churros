@@ -12,6 +12,6 @@ ncore=24
 $sing download_genomedata.sh $build Ensembl-$build/ 2>&1 | tee log/Ensembl-$build
 $sing build-index.sh -p $ncore bowtie2 Ensembl-$build
 
-# download mappability files from GooglrDrive
+# download mappability files from GoogleDrive
 # https://drive.google.com/file/d/1VuxMv25AomaYvVnn7X7KfaW4LRDsdaVk/view?usp=sharing
 # put the data in Ensembl-$build directory
