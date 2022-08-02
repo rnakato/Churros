@@ -26,7 +26,7 @@ do
     $sing churros_mapping exec "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir
 done
 
-$sing churros_mapping head "${FASTQ[$i]}" label $build $Ddir > churros.stats.tsv
+$sing churros_mapping header "${FASTQ[$i]}" label $build $Ddir > churros.stats.tsv
 for ((i=0; i<${#FASTQ[@]}; i++))
 do
     $sing churros_mapping stats "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir >> churros.stats.tsv
