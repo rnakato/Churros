@@ -23,7 +23,7 @@ Ddir=Ensembl-GRCh38
 for ((i=0; i<${#FASTQ[@]}; i++))
 do
     echo ${NAME[$i]}
-    $sing churros_mapping exec "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir
+#    $sing churros_mapping exec "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir
 done
 
 $sing churros_mapping header "${FASTQ[$i]}" label $build $Ddir > churros.stats.tsv

@@ -23,18 +23,16 @@ Ddir=Ensembl-GRCh38
 ### Download mappability data from GoogleDrive
 # https://drive.google.com/drive/folders/1MbBwGjRrlFkUh9ZWd6ev3o9hV_kg9K4-?usp=sharing
 # Here we can use "Ensembl-GRCh38_mappability_Mosaics_36mer.tar.bz2"
-#tar xvfj -C $Ddir Ensembl-GRCh38_mappability_Mosaics_36mer.tar.bz2
+#tar xvfj Ensembl-GRCh38_mappability_Mosaics_36mer.tar.bz2 -C $Ddir
 
-for i in 0 #((i=0; i<${#FASTQ[@]}; i++))
-do
-    echo ${NAME[$i]}
-    $sing churros_mapping -m exec "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir
-done
-
-exit
-
-$sing churros_mapping head "${FASTQ[$i]}" label $build $Ddir > churros.stats.tsv
 for ((i=0; i<${#FASTQ[@]}; i++))
 do
-    $sing churros_mapping stats "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir >> churros.stats.tsv
+    echo ${NAME[$i]}
+    $sing churros_mapping -m -k 36 exec "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir
+done
+
+$sing churros_mapping -m header "${FASTQ[$i]}" label $build $Ddir > churros.stats.tsv
+for ((i=0; i<${#FASTQ[@]}; i++))
+do
+    $sing churros_mapping -m stats "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir >> churros.stats.tsv
 done

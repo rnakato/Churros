@@ -15,6 +15,7 @@ function usage()
     echo '      -c: output as CRAM format (defalt: BAM)' 1>&2
     echo '      -b: binsize of parse2wig+ (defalt: 100)' 1>&2
     echo '      -m: consider genome mappability in parse2wig+' 1>&2
+    echo '      -k [36|50]: read length of mappability file (default:50)' 1>&2
     echo '      -n: omit ssp' 1>&2
     echo '      -f: output format of parse2wig+ (default: 3)' 1>&2
     echo '               0: compressed wig (.wig.gz)' 1>&2
@@ -34,7 +35,8 @@ format=BAM
 bamdir=bam
 of=3
 binsize=100
-while getopts cb:mnf:p: option
+k=50
+while getopts cb:mk:nf:p: option
 do
     case ${option} in
 	c) format=CRAM
@@ -42,6 +44,7 @@ do
 	   ;;
 	b) binsize=${OPTARG};;
         m) mp=1;;
+	k) k=${OPTARG};;
         n) nopp=1;;
         f) of=${OPTARG};;
         p) bowtieparam=${OPTARG};;
@@ -59,7 +62,11 @@ if [ $# -eq 0 ]; then
 fi
 
 if test $1 = "header"; then
-    echo -e "\tSample\tSequenced reads	Mapped 1 time	%	Mapped >1 times	%	Mapped all	%	Unmapped	%	Nonredundant	Redundant	Complexity for10M	Read depth	Genome coverage	Tested reads	GC summit	read length	fragment length	SSP-NSC	SSP-RLSC	SSP-RSC	Background uniformity	FCS(read)	FCS(flen)	FCS(1k)	FCS(10k)	FCS(100k)"
+    if test $mp -eq 1; then
+	echo -e "\tSample\tSequenced reads	Mapped 1 time	%	Mapped >1 times	%	Mapped all	%	Unmapped	%	Nonredundant	Redundant	Complexity for10M	Read depth	Genome coverage	Tested reads	GC summit	read length	fragment length	SSP-NSC	SSP-RLSC	SSP-RSC	Background uniformity	FCS(read)	FCS(flen)	FCS(1k)	FCS(10k)	FCS(100k)"
+    else
+	echo -e "\tSample\tSequenced reads	Mapped 1 time	%	Mapped >1 times	%	Mapped all	%	Unmapped	%	Nonredundant	Redundant	Complexity for10M	Read depth	Genome coverage	Tested reads	read length	fragment length	SSP-NSC	SSP-RLSC	SSP-RSC	Background uniformity	FCS(read)	FCS(flen)	FCS(1k)	FCS(10k)	FCS(100k)"
+    fi
     exit
 fi
 
@@ -88,11 +95,10 @@ fi
 gt=$Ddir/genometable.txt
 
 if test $mp -eq 1; then
-    parseparam="-m"
+    parseparam="-m -k $k"
 else
     parseparam=""
 fi
-
 
 if test $command = "exec"; then
     if test $format = "CRAM"; then
@@ -108,9 +114,14 @@ if test $command = "exec"; then
     if test $nopp != 1; then ssp.sh $pair $mapfile $head $build $gt; fi
 elif test $command = "stats"; then
     a=`parsebowtielog2.pl $pair log/bowtie2-$head | grep -v Sample`
-    b=`cat log/parsestats-$head.GC.100000 | grep -v Sample | cut -f6,7,8,9`
+    b=`cat log/parsestats-$head.$binsize | grep -v Sample | cut -f6,7,8,9`
     gcov=`cat log/parsestats-$head.$binsize | grep -v Sample | cut -f10`
-    b2=`cat log/parsestats-$head.GC.100000 | grep -v Sample | cut -f11,12`
+    if test $mp -eq 1; then
+	b2=`cat log/parsestats-$head.GC.100000 | grep -v Sample | cut -f11,12`
+    else
+	b2=`cat log/parsestats-$head.$binsize | grep -v Sample | cut -f11`
+    fi
+
     echo -en "$a\t$b\t$gcov\t$b2\t$c"
 
     if test $nopp != 1; then

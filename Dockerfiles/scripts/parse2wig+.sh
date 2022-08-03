@@ -69,7 +69,7 @@ chrpath=$Ddir/chromosomes
 mptable=/opt/SSP/data/mptable/mptable.UCSC.$build.${k}mer.flen150.txt
 mpbinary=$Ddir/mappability_Mosaics_${k}mer
 
-if test $mp -eq 1; then
+if test "$mp" -eq 1; then
     echo "consider mappability: $mptable"
     mppost="-mpbl"
     mpbin="--mpdir $mpbinary"
@@ -77,9 +77,9 @@ else
     mppost=""
     mpbin=""
 fi
-mp="--mptable $mptable"
+mpparam="--mptable $mptable"
 
-parse2wigparam="--gt $gt -i $bam $mp $pair --odir $pdir --outputformat $of -p 12"
+parse2wigparam="--gt $gt -i $bam $mpparam $pair --odir $pdir --outputformat $of -p 12"
 
 func(){
     if test $all = 1; then
@@ -98,8 +98,10 @@ func(){
 	    ex "parse2wig+ $parse2wigparam -o $prefix-raw$mppost-GR -n GR --binsize $b"
 	fi
     done
-    if test ! -e $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv; then
-	ex "parse2wig+ $parse2wigparam -o $prefix-GC-depthoff$mppost-GR -n GR --chrdir $chrpath $mpbin --binsize 100000 --gcdepthoff"
+    if test "$mp" -eq 1; then
+	if test ! -e $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv; then
+	    ex "parse2wig+ $parse2wigparam -o $prefix-GC-depthoff$mppost-GR -n GR --chrdir $chrpath $mpbin --binsize 100000 --gcdepthoff"
+	fi
     fi
 }
 
@@ -107,6 +109,9 @@ echo "Parsing $bam by parse2wig+."
 func >& log/parse2wig+-$prefix
 
 echo "Parse stats of parse2wig+."
-parsestats4DROMPAplus.pl $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv >& log/parsestats-$prefix.GC.100000
 parsestats4DROMPAplus.pl $pdir/$prefix-raw$mppost-GR.$binsize.tsv >& log/parsestats-$prefix.$binsize
+
+if test "$mp" -eq 1; then
+    parsestats4DROMPAplus.pl $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv >& log/parsestats-$prefix.GC.100000
+fi
 echo "parse2wig+.sh done."

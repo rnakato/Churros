@@ -99,12 +99,12 @@ while read LINE; do
     churros_mapping $parseparam exec "$fastq" $prefix $build $Ddir
 done < $samplelist
 
-churros_mapping header "$fastq" $prefix $build $Ddir > churros.stats.tsv
+churros_mapping header $parseparam "$fastq" $prefix $build $Ddir > churros.stats.tsv
 while read LINE; do
     LINE=($LINE)
     prefix=${LINE[0]}
     fq1=${LINE[1]}
-    churros_mapping stats $fq1 $prefix $build $Ddir >> churros.stats.tsv
+    churros_mapping $parseparam stats $fq1 $prefix $build $Ddir >> churros.stats.tsv
 done < $samplelist
 
 churros_callpeak -q $qval -d $mdir $samplepairlist $build
