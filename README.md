@@ -17,12 +17,16 @@ Singularity can also be used to execute the docker image:
     singularity build churros.sif docker://rnakato/churros
     singularity exec churros.sif <command>
 
-Singularity mounts the current directory automatically. If you access the files in the other directory, please mount by `--bind` option, for instance:
+Singularity mounts the current directory automatically. If you access the files in the other directory, mount it by `--bind` option:
 
     singularity exec --bind /work churros.sif <command>
     
 This command mounts `/work` directory.
 
+
+## 2. Usage
+
+See the [Manual](https://churros.readthedocs.io/en/latest/).
 
 ## 2. Tutorial
 
