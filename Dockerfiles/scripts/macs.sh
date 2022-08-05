@@ -1,17 +1,15 @@
 #!/bin/bash
 function usage()
 {
-    echo "macs.sh [-s species] [-f fraglen] [-q qvalue] [-d outputdir] <IP bam> <Input bam> <prefix> [sharp|broad|nomodel|broad-nomodel]" 1>&2
+    echo "macs.sh [-f fraglen] [-q qvalue] [-d outputdir] <IP bam> <Input bam> <prefix> <build> [sharp|broad|sharp-nomodel|broad-nomodel]" 1>&2
 }
 
 flen=100
 qval=0.05
-species="hs"
 mdir=macs
-while getopts s:f:q:d: option
+while getopts f:q:d: option
 do
     case ${option} in
-        s) species=${OPTARG};;
 	f) flen=${OPTARG};;
 	q) qval=${OPTARG};;
 	d) mdir=${OPTARG};;
@@ -23,7 +21,7 @@ do
 done
 shift $((OPTIND - 1))
 
-if test $# -ne 4; then
+if test $# -ne 5; then
     usage
     exit 0
 fi
@@ -32,10 +30,24 @@ if test ! -e $mdir; then mkdir $mdir; fi
 
 IP=$1
 Input=$2
-peak=$3
-mode=$4
+prefix=$3
+build=$4
+mode=$5
 
 ex(){ echo $1; eval $1; }
+
+if test $build = "hg19" -o $build = "hg38"; then
+    sp="hs"
+elif test $build = "mm9" -o $build = "mm10" -o $build = "mm39"; then
+    sp="mm"
+elif test $build = "ce11"; then
+    sp="ce"
+elif test $build = "dm3" -o test $build = "dm6" -o test $build = "dm7"; then
+    sp="dm"
+else
+    sp="1e8"
+fi
+
 
 if test -e $IP && test -s $IP ; then
     n=1 # dummy
@@ -44,9 +56,9 @@ else
 fi
 
 if test $Input = "none"; then
-    macs="macs2 callpeak -t $IP -g $species -f BAM"
+    macs="macs2 callpeak -t $IP -g $sp -f BAM"
 else
-    macs="macs2 callpeak -t $IP -c $Input -g $species -f BAM"
+    macs="macs2 callpeak -t $IP -c $Input -g $sp -f BAM"
     if test -e $Input && test -s $Input; then
         n=1 # dummy
     else
@@ -54,11 +66,11 @@ else
     fi
 fi
 
-if   test $mode = "sharp";         then ex "$macs -q $qval -n $mdir/$peak"
-elif test $mode = "nomodel";       then ex "$macs -q $qval -n $mdir/$peak --nomodel --shift $flen"
-elif test $mode = "broad";         then ex "$macs -q $qval -n $mdir/$peak --broad"
-elif test $mode = "broad-nomodel"; then ex "$macs -q $qval -n $mdir/$peak --nomodel --shift $flen --broad"
+if   test $mode = "sharp";         then ex "$macs -q $qval -n $mdir/$prefix"
+elif test $mode = "sharp-nomodel"; then ex "$macs -q $qval -n $mdir/$prefix --nomodel --shift $flen"
+elif test $mode = "broad";         then ex "$macs -q $qval -n $mdir/$prefix --broad"
+elif test $mode = "broad-nomodel"; then ex "$macs -q $qval -n $mdir/$prefix --nomodel --shift $flen --broad"
 else
-    echo "Error: specify [sharp|broad|nomodel|broad-nomodel] for mode."
+    echo "Error: specify [sharp|broad|sharp-nomodel|broad-nomodel] for mode."
     exit 1
 fi

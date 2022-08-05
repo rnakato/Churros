@@ -2,7 +2,7 @@
 cmdname=`basename $0`
 function usage()
 {
-    echo "$cmdname [-a] [-e] [-m] [-p] [-b binsize] [-k kmer] [-o dir] [-f [0-3]] <mapfile> <prefix> <build> <Ddir>" 1>&2
+    echo "$cmdname [options] <mapfile> <prefix> <build> <Ddir>" 1>&2
     echo '   <mapfile>: mapfile (SAM|BAM|CRAM|TAGALIGN format)' 1>&2
     echo '   <prefix>: output prefix' 1>&2
     echo '   <build>: genome build (e.g., hg38)' 1>&2
@@ -10,6 +10,7 @@ function usage()
     echo '   Options:' 1>&2
     echo '      -a: also outout raw read distribution' 1>&2
     echo '      -b: binsize of parse2wig+ (defalt: 100)' 1>&2
+    echo '      -z: peak file for FRiP calculation (BED format)' 1>&2
     echo '      -m: consider genome mappability' 1>&2
     echo '      -k: read length (36 or 50) for mappability calculation (default: 50)' 1>&2
     echo '      -p: for paired-end file' 1>&2
@@ -31,11 +32,20 @@ all=0
 of=3
 pair=""
 mp=0
-while getopts ab:mk:o:f:p option
+peak=""
+while getopts ab:z:mk:o:f:p option
 do
     case ${option} in
 	a) all=1;;
 	b) binsize=${OPTARG};;
+	z) peak=${OPTARG}
+	   if test ! -e $peak; then
+	       echo "Error: $peak does not exist (-b)."
+	       exit 1
+	   else
+	       peak="--bed $peak"
+	   fi
+	   ;;
 	m) mp=1;;
 	k) k=${OPTARG};;
 	o) pdir=${OPTARG};;
@@ -79,7 +89,7 @@ else
 fi
 mpparam="--mptable $mptable"
 
-parse2wigparam="--gt $gt -i $bam $mpparam $pair --odir $pdir --outputformat $of -p 12"
+parse2wigparam="--gt $gt -i $bam $mpparam $pair $peak --odir $pdir --outputformat $of -p 12"
 
 func(){
     if test $all = 1; then
@@ -102,16 +112,13 @@ func(){
 	if test ! -e $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv; then
 	    ex "parse2wig+ $parse2wigparam -o $prefix-GC-depthoff$mppost-GR -n GR --chrdir $chrpath $mpbin --binsize 100000 --gcdepthoff"
 	fi
+	parsestats4DROMPAplus.pl $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv >& log/parsestats-$prefix.GC.100000
     fi
 }
 
 echo "Parsing $bam by parse2wig+."
 func >& log/parse2wig+-$prefix
 
-echo "Parse stats of parse2wig+."
 parsestats4DROMPAplus.pl $pdir/$prefix-raw$mppost-GR.$binsize.tsv >& log/parsestats-$prefix.$binsize
 
-if test "$mp" -eq 1; then
-    parsestats4DROMPAplus.pl $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv >& log/parsestats-$prefix.GC.100000
-fi
 echo "parse2wig+.sh done."

@@ -34,18 +34,6 @@ fi
 samplepairlist=$1
 build=$2
 
-if test $build = "hg19" -o $build = "hg38"; then
-    sp="hs"
-elif test $build = "mm9" -o $build = "mm10" -o $build = "mm39"; then
-    sp="mm"
-elif test $build = "ce11"; then
-    sp="ce"
-elif test $build = "dm3" -o test $build = "dm6" -o test $build = "dm7"; then
-    sp="dm"
-else
-    sp="1e8"
-fi
-
 ex(){ echo $1; eval $1; }
 
 newlist=$mdir/$samplepairlist
@@ -70,9 +58,9 @@ while read LINE; do
 	peak=$mdir/${label}_peaks.broadPeak
     fi
     if test "$input" = ""; then
-       macs.sh -s $sp -q $qval -d $mdir $IPbam none $label $mode
+       macs.sh -q $qval -d $mdir $IPbam none $label $build $mode
     else
-       macs.sh -s $sp -q $qval -d $mdir $IPbam $Inputbam $label $mode
+       macs.sh -q $qval -d $mdir $IPbam $Inputbam $label $build $mode
     fi
     echo "$chip,$input,$label,$mode,$peak" >> $newlist
 done < $samplepairlist
