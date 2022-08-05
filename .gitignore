@@ -1,3 +1,4 @@
+docs/_build/
 tutorial/bam/
 tutorial/cram/
 tutorial/fastq/
@@ -6,4 +7,3 @@ tutorial/macs/
 tutorial/parse2wigdir+/
 tutorial/pdf/
 tutorial/sspout/
-tutorial/churros.stats.tsv
