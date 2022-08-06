@@ -6,18 +6,24 @@ function usage()
     echo '   <samplepairlist>: text file of ChIP/Input sample pairs' 1>&2
     echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   Options:' 1>&2
-    echo '      -q <qvalue>: threshould of MACS2 (defalt: 0.05)' 1>&2
-    echo '      -d <mdir>: output direcoty (defalt: "macs")' 1>&2
+    echo '      -q : threshould of MACS2 (defalt: 0.05)' 1>&2
+    echo '      -b : bam direcoty (defalt: "bam")' 1>&2
+    echo '      -d : output direcoty (defalt: "macs")' 1>&2
+    echo '      -p : number of CPUs (defalt: 4)' 1>&2
 }
 
 qval=0.05
 mdir=macs
+bamdir=bam
+ncore=4
 
-while getopts q:d: option
+while getopts b:q:d:p: option
 do
     case ${option} in
+	b) bamdir=${OPTARG};;
 	q) qval=${OPTARG};;
 	d) mdir=${OPTARG};;
+	p) ncore=${OPTARG};;
         *)
 	    usage
 	    exit 1
@@ -36,21 +42,47 @@ build=$2
 
 ex(){ echo $1; eval $1; }
 
-newlist=$mdir/$samplepairlist
+mkdir -p $mdir
+newlist=$mdir/samplepairlist.txt
 rm -rf $newlist
-#while IFS=, read chip input label mode; do
+array=""
 while read LINE; do
+    array="$array $LINE"
+
     LINE=(${LINE//,/ })
     chip=${LINE[0]}
     input=${LINE[1]}
     label=${LINE[2]}
     mode=${LINE[3]}
-
-    IPbam=bam/$chip-bowtie2-$build.sort.bam
-    Inputbam=bam/$input-bowtie2-$build.sort.bam
-
     if test "$mode" = ""; then
        mode="sharp"
+    fi
+    if test $mode = "sharp" -o $mode = "nomodel"; then
+       peak=$mdir/${label}_peaks.narrowPeak
+    else
+       peak=$mdir/${label}_peaks.broadPeak
+    fi
+    echo "$chip,$input,$label,$mode,$peak" >> $newlist
+done < $samplepairlist
+
+do_macs(){
+    LINE=$1
+    build=$2
+    bamdir=$3
+    mdir=$4
+    newlist=$5
+    qval=$6
+
+    LINE=(${LINE//,/ })
+    chip=${LINE[0]}
+    input=${LINE[1]}
+    label=${LINE[2]}
+    mode=${LINE[3]}
+    IPbam=$bamdir/$chip-bowtie2-$build.sort.bam
+    Inputbam=$bamdir/$input-bowtie2-$build.sort.bam
+
+    if test "$mode" = ""; then
+	mode="sharp"
     fi
     if test $mode = "sharp" -o $mode = "nomodel"; then
 	peak=$mdir/${label}_peaks.narrowPeak
@@ -58,11 +90,11 @@ while read LINE; do
 	peak=$mdir/${label}_peaks.broadPeak
     fi
     if test "$input" = ""; then
-       macs.sh -q $qval -d $mdir $IPbam none $label $build $mode
+	macs.sh -q $qval -d $mdir $IPbam none $label $build $mode
     else
-       macs.sh -q $qval -d $mdir $IPbam $Inputbam $label $build $mode
+	macs.sh -q $qval -d $mdir $IPbam $Inputbam $label $build $mode
     fi
-    echo "$chip,$input,$label,$mode,$peak" >> $newlist
-done < $samplepairlist
+}
+export -f do_macs
 
-#cat $samplepairlist | awk -F',' 'BEGIN{OFS = ","} {printf("%s,%s,%s,%s,'$mdir'/%s_peaks.narrowPeak\n", $1, $2, $3, $4, $1) }' > $mdir/$samplepairlist
+echo ${array[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval"

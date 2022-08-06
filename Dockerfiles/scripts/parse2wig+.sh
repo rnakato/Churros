@@ -93,9 +93,9 @@ parse2wigparam="--gt $gt -i $bam $mpparam $pair $peak --odir $pdir --outputforma
 
 func(){
     if test $all = 1; then
-	if test ! -e $pdir/$prefix-raw$mppost.$binsize.tsv; then
+#	if test ! -e $pdir/$prefix-raw$mppost.$binsize.tsv; then
 	    ex "parse2wig+ $parse2wigparam -o $prefix-raw$mppost --binsize $binsize"
-	fi
+#	fi
     fi
 
     if test $build = "scer" -o $build = "pombe"; then
@@ -104,14 +104,14 @@ func(){
 	bins="$binsize 5000 100000"
     fi
     for b in $bins; do
-	if test ! -e $pdir/$prefix-raw$mppost-GR.$b.tsv; then
+#	if test ! -e $pdir/$prefix-raw$mppost-GR.$b.tsv; then
 	    ex "parse2wig+ $parse2wigparam -o $prefix-raw$mppost-GR -n GR --binsize $b"
-	fi
+#	fi
     done
     if test "$mp" -eq 1; then
-	if test ! -e $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv; then
+#	if test ! -e $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv; then
 	    ex "parse2wig+ $parse2wigparam -o $prefix-GC-depthoff$mppost-GR -n GR --chrdir $chrpath $mpbin --binsize 100000 --gcdepthoff"
-	fi
+#	fi
 	parsestats4DROMPAplus.pl $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv >& log/parsestats-$prefix.GC.100000
     fi
 }

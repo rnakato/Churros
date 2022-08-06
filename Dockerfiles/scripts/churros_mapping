@@ -75,9 +75,9 @@ fi
 
 if test $1 = "header"; then
     if test $mp -eq 1; then
-	echo -e "\tSample\tSequenced reads	Mapped 1 time	%	Mapped >1 times	%	Mapped all	%	Unmapped	%	Nonredundant	Redundant	Complexity for10M	Read depth	Genome coverage	Tested reads	GC summit	read length	fragment length	SSP-NSC	SSP-RLSC	SSP-RSC	Background uniformity	FCS(read)	FCS(flen)	FCS(1k)	FCS(10k)	FCS(100k)"
+	echo -e "\tSample\tSequenced reads	Mapped 1 time	%	Mapped >1 times	%	Mapped all	%	Unmapped	%	Nonredundant	Redundant	Complexity for10M	Read depth	Genome coverage	Tested reads	reads in peaks	FRiP	GC summit	read length	fragment length	SSP-NSC	SSP-RLSC	SSP-RSC	Background uniformity	FCS(read)	FCS(flen)	FCS(1k)	FCS(10k)	FCS(100k)"
     else
-	echo -e "\tSample\tSequenced reads	Mapped 1 time	%	Mapped >1 times	%	Mapped all	%	Unmapped	%	Nonredundant	Redundant	Complexity for10M	Read depth	Genome coverage	Tested reads	read length	fragment length	SSP-NSC	SSP-RLSC	SSP-RSC	Background uniformity	FCS(read)	FCS(flen)	FCS(1k)	FCS(10k)	FCS(100k)"
+	echo -e "\tSample\tSequenced reads	Mapped 1 time	%	Mapped >1 times	%	Mapped all	%	Unmapped	%	Nonredundant	Redundant	Complexity for10M	Read depth	Genome coverage	Tested reads	reads in peaks	FRiP	read length	fragment length	SSP-NSC	SSP-RLSC	SSP-RSC	Background uniformity	FCS(read)	FCS(flen)	FCS(1k)	FCS(10k)	FCS(100k)"
     fi
     exit
 fi
@@ -128,7 +128,7 @@ if test $command = "postprocess" -o $command = "exec"; then
        if test "$peak" != ""; then
 	   parse2wig+.sh $parseparam $pair -b $binsize $peak -f $of $mapfile $head $build $Ddir
        else
-	   macs.sh $mapfile none ${prefix}_forFRiP sharp
+	   macs.sh $mapfile none ${prefix}_forFRiP $build sharp
 	   parse2wig+.sh $parseparam $pair -b $binsize -z macs/${prefix}_forFRiP_peaks.narrowPeak -f $of $mapfile $head $build $Ddir
        fi
     fi
@@ -139,9 +139,9 @@ if test $command = "stats"; then
     b=`cat log/parsestats-$head.$binsize | grep -v Sample | cut -f6,7,8,9`
     gcov=`cat log/parsestats-$head.$binsize | grep -v Sample | cut -f10`
     if test $mp -eq 1; then
-	b2=`cat log/parsestats-$head.GC.100000 | grep -v Sample | cut -f11,12`
+	b2=`cat log/parsestats-$head.GC.100000 | grep -v Sample | cut -f11,12,13,12`
     else
-	b2=`cat log/parsestats-$head.$binsize | grep -v Sample | cut -f11`
+	b2=`cat log/parsestats-$head.$binsize | grep -v Sample | cut -f11,12,13`
     fi
 
     echo -en "$a\t$b\t$gcov\t$b2\t$c"

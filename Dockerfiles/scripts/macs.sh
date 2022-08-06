@@ -66,10 +66,11 @@ else
     fi
 fi
 
-if   test $mode = "sharp";         then ex "$macs -q $qval -n $mdir/$prefix"
-elif test $mode = "sharp-nomodel"; then ex "$macs -q $qval -n $mdir/$prefix --nomodel --shift $flen"
-elif test $mode = "broad";         then ex "$macs -q $qval -n $mdir/$prefix --broad"
-elif test $mode = "broad-nomodel"; then ex "$macs -q $qval -n $mdir/$prefix --nomodel --shift $flen --broad"
+mkdir -p log
+if   test $mode = "sharp";         then ex "$macs -q $qval -n $mdir/$prefix >& log/macs.$prefix.$mode"
+elif test $mode = "sharp-nomodel"; then ex "$macs -q $qval -n $mdir/$prefix --nomodel --shift $flen >& log/macs.$prefix.$mode"
+elif test $mode = "broad";         then ex "$macs -q $qval -n $mdir/$prefix --broad >& log/macs.$prefix.$mode"
+elif test $mode = "broad-nomodel"; then ex "$macs -q $qval -n $mdir/$prefix --nomodel --shift $flen --broad >& log/macs.$prefix.$mode"
 else
     echo "Error: specify [sharp|broad|sharp-nomodel|broad-nomodel] for mode."
     exit 1
