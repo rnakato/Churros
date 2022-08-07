@@ -27,8 +27,6 @@ do
     $sing churros_mapping exec "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir
 done
 
-exit
-
 # output QC stats
 $sing churros_mapping header "${FASTQ[$i]}" label $build $Ddir > churros.QCstats.tsv
 for ((i=0; i<${#FASTQ[@]}; i++))

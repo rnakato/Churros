@@ -51,9 +51,19 @@ COPY chromap-0.2.1_x64-linux.tar.bz2 chromap-0.2.1_x64-linux.tar.bz2
 RUN tar xvfj chromap-0.2.1_x64-linux.tar.bz2 \
      && rm chromap-0.2.1_x64-linux.tar.bz2
 
-RUN git clone https://github.com/rnakato/SSP.git \
-    && cd SSP \
-    && make
+RUN mkdir HOMER && cd HOMER \
+    && mkdir bin cpp update \
+    && wget http://homer.ucsd.edu/homer/configureHomer.pl \
+    && perl configureHomer.pl -install human-o \
+    && perl configureHomer.pl -install human-p \
+    && perl configureHomer.pl -install mouse-o \
+    && perl configureHomer.pl -install mouse-p \
+    && perl configureHomer.pl -install zebrafish-o \
+    && perl configureHomer.pl -install yeast-o
+
+#RUN git clone https://github.com/rnakato/SSP.git \
+#    && cd SSP \
+#    && make
 RUN git clone --recursive https://github.com/rnakato/DROMPAplus \
     && cd DROMPAplus \
     && git submodule foreach git pull origin master \
@@ -66,6 +76,6 @@ COPY scripts/ /opt/scripts
 RUN make -C /opt/scripts/MOSAiCS_mappability/ \
     && chmod +x /opt/scripts/*
 
-ENV PATH ${PATH}:/opt/scripts:/opt/SSP/bin:/opt/DROMPAplus/bin:/opt/DROMPAplus/submodules/cpdf/Linux-Intel-64bit:/opt/DROMPAplus/otherbins:/opt:/opt/bwa-0.7.17:/opt/bowtie-1.3.1-linux-x86_64:/opt/bowtie2-2.4.5-linux-x86_64
+ENV PATH ${PATH}:/opt/scripts:/opt/SSP/bin:/opt/DROMPAplus/bin:/opt/DROMPAplus/submodules/cpdf/Linux-Intel-64bit:/opt/DROMPAplus/otherbins:/opt:/opt/bwa-0.7.17:/opt/bowtie-1.3.1-linux-x86_64:/opt/bowtie2-2.4.5-linux-x86_64::/opt/HOMER/bin/
 
 CMD ["/bin/bash"]
