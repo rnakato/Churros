@@ -25,7 +25,9 @@ function usage()
     echo '               1: uncompressed wig (.wig)' 1>&2
     echo '               2: bedGraph (.bedGraph)' 1>&2
     echo '               3: bigWig (.bw)' 1>&2
-    echo '      -p "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
+    echo '      -P "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
+    echo '      -p : number of CPUs (default: 12)' 1>&2
+    echo '      -D outputdir: output dir (defalt: ./)' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname exec chip.fastq.gz chip hg38 Database/Ensembl-GRCh38" 1>&2
     echo "      For paired-end: $cmdname exec \"-1 chip_1.fastq.gz -2 chip_2.fastq.gz\" chip hg38 Database/Ensembl-GRCh38" 1>&2
@@ -40,14 +42,17 @@ of=3
 binsize=100
 k=50
 peak=""
-while getopts cb:z:a:mk:nf:p: option
+ncore=12
+chdir="./"
+
+while getopts cb:z:a:mk:nf:P:p:D: option
 do
     case ${option} in
-	c) format=CRAM
-	   bamdir=cram
-	   ;;
-	b) binsize=${OPTARG};;
-	z) peak=${OPTARG}
+        c) format=CRAM
+           bamdir=cram
+           ;;
+        b) binsize=${OPTARG};;
+        z) peak=${OPTARG}
            if test ! -e $peak; then
                echo "Error: $peak does not exist (-b)."
                exit 1
@@ -55,15 +60,17 @@ do
                peak="--bed $peak"
            fi
            ;;
-	m) mp=1;;
-	k) k=${OPTARG};;
+        m) mp=1;;
+        k) k=${OPTARG};;
         n) nopp=1;;
         f) of=${OPTARG};;
-        p) bowtieparam=${OPTARG};;
-	*)
-	    usage
-	    exit 1
-	    ;;
+        P) bowtieparam=${OPTARG};;
+        p) ncore=${OPTARG};;
+        D) chdir=${OPTARG};;
+        *)
+            usage
+            exit 1
+            ;;
     esac
 done
 shift $((OPTIND - 1))
@@ -106,48 +113,59 @@ fi
 
 gt=$Ddir/genometable.txt
 
+parseparam="-D $chdir -t $ncore $pair -f $of"
+
 if test $mp -eq 1; then
-    parseparam="-m -k $k"
+    parseparam="$parseparam -m -k $k"
 else
-    parseparam=""
+    parseparam=$parseparam
 fi
 
 if test $command = "map" -o $command = "exec"; then
+    echo "mapping reads by bowtie2..."
     if test $format = "CRAM"; then
-        bowtie2.sh -c -p "$bowtieparam" "$fastq" $prefix $build $Ddir
+        bowtie2.sh -c -p $ncore -P "$bowtieparam" -D $chdir "$fastq" $prefix $build $Ddir
     else
-        bowtie2.sh -p "$bowtieparam" "$fastq" $prefix $build $Ddir
+        bowtie2.sh    -p $ncore -P "$bowtieparam" -D $chdir "$fastq" $prefix $build $Ddir
     fi
+    echo "done."
 fi
 if test $command = "postprocess" -o $command = "exec"; then
     if test $format = "CRAM"; then
-       mapfile=$bamdir/$head.sort.cram
-       parse2wig+.sh $parseparam $pair -b $binsize $peak -f $of $mapfile $head $build $Ddir
+       mapfile=$chdir/$bamdir/$head.sort.cram
+       echo "parse mapfile by parse2wig+..."
+       parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir
     else
-       mapfile=$bamdir/$head.sort.bam
+       mapfile=$chdir/$bamdir/$head.sort.bam
        if test "$peak" != ""; then
-	   parse2wig+.sh $parseparam $pair -b $binsize $peak -f $of $mapfile $head $build $Ddir
+	   echo "parse mapfile by parse2wig+..."
+           parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir
        else
-	   macs.sh $mapfile none ${prefix}_forFRiP $build sharp
-	   parse2wig+.sh $parseparam $pair -b $binsize -z macs/${prefix}_forFRiP_peaks.narrowPeak -f $of $mapfile $head $build $Ddir
+           echo "execute MACS2 without Input to estimate FRiP..."
+           macs.sh -d $chdir/macs $mapfile none ${prefix}_forFRiP $build sharp
+	   echo "parse mapfile by parse2wig+..."
+           parse2wig+.sh $parseparam -b $binsize -z $chdir/macs/${prefix}_forFRiP_peaks.narrowPeak $mapfile $head $build $Ddir
        fi
     fi
-    if test $nopp != 1; then ssp.sh $pair $mapfile $head $build $gt; fi
+    echo "quality check by SSP..."
+    if test $nopp != 1; then ssp.sh -t $ncore $pair -D $chdir $mapfile $head $build $gt; fi
+    echo "done."
 fi
 if test $command = "stats"; then
-    a=`parsebowtielog2.pl $pair log/bowtie2-$head | grep -v Sample`
-    b=`cat log/parsestats-$head.$binsize | grep -v Sample | cut -f6,7,8,9`
-    gcov=`cat log/parsestats-$head.$binsize | grep -v Sample | cut -f10`
+    logdir=$chdir/log
+    a=`parsebowtielog2.pl $pair $logdir/bowtie2-$head | grep -v Sample`
+    b=`cat $logdir/parsestats-$head.$binsize | grep -v Sample | cut -f6,7,8,9`
+    gcov=`cat $logdir/parsestats-$head.$binsize | grep -v Sample | cut -f10`
     if test $mp -eq 1; then
-	b2=`cat log/parsestats-$head.GC.100000 | grep -v Sample | cut -f11,12,13,14`
+        b2=`cat $logdir/parsestats-$head.GC.100000 | grep -v Sample | cut -f11,12,13,14`
     else
-	b2=`cat log/parsestats-$head.$binsize | grep -v Sample | cut -f11,12,13`
+        b2=`cat $logdir/parsestats-$head.$binsize | grep -v Sample | cut -f11,12,13`
     fi
 
     echo -en "$a\t$b\t$gcov\t$b2\t$c"
 
     if test $nopp != 1; then
-	echo -en "`tail -n1 sspout/$head.stats.txt | cut -f4,5,6,7,8,9,10,11,12,13,14`"
+        echo -en "`tail -n1 $chdir/sspout/$head.stats.txt | cut -f4,5,6,7,8,9,10,11,12,13,14`"
     fi
     echo ""
 fi

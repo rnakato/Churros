@@ -11,6 +11,7 @@ function usage()
     echo '      -b <int>: binsize (defalt: 100)' 1>&2
     echo '      -d <str>: directory of parse2wig+ (default: parse2wigdir+)' 1>&2
     echo '      -y <str>: postfix of .bw files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
+    echo '      -D <str>: output directory (defalt: ./)' 1>&2
     echo "   Example:" 1>&2
     echo "      $cmdname samplelist.txt chip-seq hg38 Database/Ensembl-GRCh38" 1>&2
 }
@@ -18,12 +19,15 @@ function usage()
 binsize=100
 pdir=parse2wigdir+
 post_predefined=""
-while getopts b:d:y: option
+chdir="./"
+
+while getopts b:d:y:D: option
 do
     case ${option} in
         b) binsize=${OPTARG};;
         d) pdir=${OPTARG};;
         y) post_predefined=${OPTARG};;
+        D) chdir=${OPTARG};;
 	*)
 	    usage
 	    exit 1
@@ -42,6 +46,11 @@ odir=$2
 build=$3
 gt=$4
 
+pdir=$chdir/$pdir
+logdir=$chdir/log
+mkdir -p $logdir
+odir=$chdir/$odir
+
 if test "$post_predefined" = ""; then
     post=-bowtie2-$build-raw-GR
 else
@@ -50,8 +59,6 @@ fi
 
 ex(){ echo $1; eval $1; }
 
-mkdir -p log
-
 while read LINE; do
     LINE=(${LINE//,/ })
     chip=${LINE[0]}
@@ -59,8 +66,8 @@ while read LINE; do
     label=${LINE[2]}
 
     if test "$input" != ""; then
-	drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,${label}_up > log/drompa+.GENWIG.$chip$post.up
-	drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$input$post.$binsize.bw,$pdir/$chip$post.$binsize.bw,${label}_down  > log/drompa+.GENWIG.$chip$post.down
+	drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,${label}_up > $logdir/drompa+.GENWIG.$chip$post.up
+	drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$input$post.$binsize.bw,$pdir/$chip$post.$binsize.bw,${label}_down  > $logdir/drompa+.GENWIG.$chip$post.down
     else
 	echo "Error: input sample is not specified for the sample $chip."
 	exit 1

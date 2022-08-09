@@ -15,6 +15,7 @@ function usage()
     echo '      -p: show p-value distribution instead of read distribution' 1>&2
     echo '      -P : additional parameters for DROMPA+ (shouled be quated)' 1>&2
     echo '      -G : genome-wide view (100kbp)' 1>&2
+    echo '      -D outputdir: output dir (defalt: ./)' 1>&2
     echo "   Example:" 1>&2
     echo "      $cmdname samplelist.txt chip-seq hg38 Database/Ensembl-GRCh38" 1>&2
 }
@@ -26,7 +27,9 @@ post_predefined=""
 GV=0
 showpvalue=0
 param=""
-while getopts P:b:l:d:o:y:pG option
+chdir="./"
+
+while getopts P:b:l:d:o:y:pGD: option
 do
     case ${option} in
 	P) param=${OPTARG};;
@@ -36,6 +39,7 @@ do
         y) post_predefined=${OPTARG};;
 	p) showpvalue=1;;
         G) GV=1;;
+        D) chdir=${OPTARG};;
 	*)
 	    usage
 	    exit 1
@@ -54,6 +58,10 @@ prefix=$2
 build=$3
 Ddir=$4
 
+pdir=$chdir/$pdir
+logdir=$chdir/log
+mkdir -p $logdir
+
 if test "$post_predefined" = ""; then
     post=-bowtie2-$build-raw-GR
 else
@@ -68,7 +76,6 @@ ex(){ echo $1; eval $1; }
 
 gt=$Ddir/genometable.txt
 
-mkdir -p log
 if test $GV -eq 1; then
     # GV mode
     ideogram=/opt/DROMPAplus/data/ideogram/$build.tsv
@@ -91,7 +98,7 @@ if test $GV -eq 1; then
     done < $samplepairlist
 
     head=`basename $prefix`
-    ex "drompa+ GV $param $sGV -o $prefix.GV.100000 --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 500000 >& log/drompa+.$head.GV.100000"
+    ex "drompa+ GV $param $sGV -o $prefix.GV.100000 --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 500000 >& $logdir/drompa+.$head.GV.100000"
 else
     s=""
 #    while IFS=, read chip input label mode peak; do
@@ -111,6 +118,6 @@ else
 
     gene=$Ddir/gtf_chrUCSC/chr.gene.refFlat
     head=`basename $prefix`
-    ex "drompa+ PC_SHARP $param $s -o $prefix.PCSHARP.$binsize --gt $gt -g $gene --ls $linesize --showchr --callpeak >& log/drompa+.$head.PCSHARP.$binsize"
+    ex "drompa+ PC_SHARP $param $s -o $prefix.PCSHARP.$binsize --gt $gt -g $gene --ls $linesize --showchr --callpeak >& $logdir/drompa+.$head.PCSHARP.$binsize"
     rm $prefix.PCSHARP.$binsize.pdf
 fi

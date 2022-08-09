@@ -9,7 +9,9 @@ function usage()
     echo '   <Ddir>: directory of bowtie2 index' 1>&2
     echo '   Options:' 1>&2
     echo '      -c: output as CRAM format (defalt: BAM)' 1>&2
-    echo '      -p "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
+    echo '      -p: number of CPUs (default: 12)' 1>&2
+    echo '      -P "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
+    echo '      -D: output dir (defalt: ./)' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname -p \"--very-sensitive\" chip.fastq.gz chip hg38" 1>&2
     echo "      For paired-end: $cmdname \"\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz\" chip hg38" 1>&2
@@ -20,14 +22,18 @@ function usage()
 format=BAM
 bamdir=bam
 param=""
+ncore=12
+chdir="./"
 
-while getopts cp: option
+while getopts cP:p:D: option
 do
     case ${option} in
 	c) format=CRAM
            bamdir=cram
            ;;
-	p) param=${OPTARG};;
+	p) ncore=${OPTARG};;
+	P) param=${OPTARG};;
+        D) chdir=${OPTARG};;
 	*)
 	    usage
 	    exit 1
@@ -47,8 +53,9 @@ build=$3
 Ddir=$4
 post="-bowtie2"`echo $param | tr -d ' '`
 
-if test ! -e $bamdir; then mkdir $bamdir; fi
-if test ! -e log; then mkdir log; fi
+logdir=$chdir/log
+bamdir=$chdir/$bamdir
+mkdir -p $logdir $bamdir
 
 if test $format = "BAM"; then
     file=$bamdir/$prefix$post-$build.sort.bam
@@ -70,14 +77,13 @@ ex_hiseq(){
     bowtie2 --version
 
     if test $format = "BAM"; then
-	ex "bowtie2 $param -p12 -x $index \"$fastq\" | samtools sort > $file"
+	ex "bowtie2 $param -p $ncore -x $index \"$fastq\" | samtools sort > $file"
 	if test ! -e $file.bai; then samtools index $file; fi
     else
-	ex "bowtie2 $param -p12 -x $index \"$fastq\" | samtools view -C - -T $genome | samtools sort -O cram > $file"
+	ex "bowtie2 $param -p $ncore -x $index \"$fastq\" | samtools view -C - -T $genome | samtools sort -O cram > $file"
 	if test ! -e $file.crai; then samtools index $file; fi
     fi
 
 }
 
-log=log/bowtie2-$prefix$post-$build
-ex_hiseq >& $log
+ex_hiseq >& $logdir/bowtie2-$prefix$post-$build

@@ -14,12 +14,14 @@ function usage()
     echo '      -m: consider genome mappability' 1>&2
     echo '      -k: read length (36 or 50) for mappability calculation (default: 50)' 1>&2
     echo '      -p: for paired-end file' 1>&2
+    echo '      -t: number of CPUs (default: 4)' 1>&2
     echo '      -o: output directory (default: parse2wigdir+)' 1>&2
     echo '      -f: output format of parse2wig+ (default: 3)' 1>&2
     echo '               0: compressed wig (.wig.gz)' 1>&2
     echo '               1: uncompressed wig (.wig)' 1>&2
     echo '               2: bedGraph (.bedGraph)' 1>&2
     echo '               3: bigWig (.bw)' 1>&2
+    echo '      -D outputdir: output dir (defalt: ./)' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname chip.sort.bam chip hg38 Database/Ensembl-GRCh38" 1>&2
     echo "      For paired-end: $cmdname -p chip.sort.bam chip hg38 Database/Ensembl-GRCh38" 1>&2
@@ -33,7 +35,10 @@ of=3
 pair=""
 mp=0
 peak=""
-while getopts ab:z:mk:o:f:p option
+ncore=4
+chdir="./"
+
+while getopts ab:z:mk:o:f:pt:D: option
 do
     case ${option} in
 	a) all=1;;
@@ -51,6 +56,8 @@ do
 	o) pdir=${OPTARG};;
 	f) of=${OPTARG};;
 	p) pair="--pair";;
+	t) ncore=${OPTARG};;
+        D) chdir=${OPTARG};;
         *)
 	    usage
 	    exit 1
@@ -69,9 +76,11 @@ prefix=$2
 build=$3
 Ddir=$4
 
-ex(){ echo $1; eval $1; }
+pdir=$chdir/$pdir
+logdir=$chdir/log
+mkdir -p $logdir
 
-if test ! -e log; then ex "mkdir log"; fi
+ex(){ echo $1; eval $1; }
 
 gt=$Ddir/genometable.txt
 chrpath=$Ddir/chromosomes
@@ -89,7 +98,7 @@ else
 fi
 mpparam="--mptable $mptable"
 
-parse2wigparam="--gt $gt -i $bam $mpparam $pair $peak --odir $pdir --outputformat $of -p 12"
+parse2wigparam="--gt $gt -i $bam $mpparam $pair $peak --odir $pdir --outputformat $of -p $ncore"
 
 func(){
     if test $all = 1; then
@@ -112,13 +121,13 @@ func(){
 #	if test ! -e $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv; then
 	    ex "parse2wig+ $parse2wigparam -o $prefix-GC-depthoff$mppost-GR -n GR --chrdir $chrpath $mpbin --binsize 100000 --gcdepthoff"
 #	fi
-	parsestats4DROMPAplus.pl $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv >& log/parsestats-$prefix.GC.100000
+	parsestats4DROMPAplus.pl $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv >& $logdir/parsestats-$prefix.GC.100000
     fi
 }
 
 echo "Parsing $bam by parse2wig+."
-func >& log/parse2wig+-$prefix
+func >& $logdir/parse2wig+-$prefix
 
-parsestats4DROMPAplus.pl $pdir/$prefix-raw$mppost-GR.$binsize.tsv >& log/parsestats-$prefix.$binsize
+parsestats4DROMPAplus.pl $pdir/$prefix-raw$mppost-GR.$binsize.tsv >& $logdir/parsestats-$prefix.$binsize
 
 echo "parse2wig+.sh done."
