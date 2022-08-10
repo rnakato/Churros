@@ -27,7 +27,7 @@ function usage()
     echo '               3: bigWig (.bw)' 1>&2
     echo '      -P "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
     echo '      -p : number of CPUs (default: 12)' 1>&2
-    echo '      -D outputdir: output dir (defalt: ./)' 1>&2
+    echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname exec chip.fastq.gz chip hg38 Database/Ensembl-GRCh38" 1>&2
     echo "      For paired-end: $cmdname exec \"-1 chip_1.fastq.gz -2 chip_2.fastq.gz\" chip hg38 Database/Ensembl-GRCh38" 1>&2
@@ -43,7 +43,7 @@ binsize=100
 k=50
 peak=""
 ncore=12
-chdir="./"
+chdir="Churros_result"
 
 while getopts cb:z:a:mk:nf:P:p:D: option
 do
@@ -112,6 +112,10 @@ if [[ $fastq == *-1\ * ]]; then
 fi
 
 gt=$Ddir/genometable.txt
+if test ! -e $gt; then
+    echo "Error: $gt does not exist. Please make it by 'download_genomedata.sh'."
+    exit 1
+fi
 
 parseparam="-D $chdir -t $ncore $pair -f $of"
 

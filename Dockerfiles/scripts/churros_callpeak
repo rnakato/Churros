@@ -40,6 +40,11 @@ fi
 samplepairlist=$1
 build=$2
 
+if test ! -e $samplepairlist; then
+    echo "Error: $samplepairlist does not exist."
+    exit 1
+fi
+
 ex(){ echo $1; eval $1; }
 
 mkdir -p $mdir

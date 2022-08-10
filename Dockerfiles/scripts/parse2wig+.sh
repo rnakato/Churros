@@ -83,6 +83,11 @@ mkdir -p $logdir
 ex(){ echo $1; eval $1; }
 
 gt=$Ddir/genometable.txt
+if test ! -e $gt; then
+    echo "Error: $gt does not exist."
+    exit 1
+fi
+
 chrpath=$Ddir/chromosomes
 #mptable=$Ddir/mappability_Mosaics_${k}mer/map_fragL150_genome.txt
 mptable=/opt/SSP/data/mptable/mptable.UCSC.$build.${k}mer.flen150.txt

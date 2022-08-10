@@ -11,7 +11,7 @@ function usage()
     echo '      -b <int>: binsize (defalt: 100)' 1>&2
     echo '      -d <str>: directory of parse2wig+ (default: parse2wigdir+)' 1>&2
     echo '      -y <str>: postfix of .bw files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
-    echo '      -D <str>: output directory (defalt: ./)' 1>&2
+    echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
     echo "   Example:" 1>&2
     echo "      $cmdname samplelist.txt chip-seq hg38 Database/Ensembl-GRCh38" 1>&2
 }
@@ -19,7 +19,7 @@ function usage()
 binsize=100
 pdir=parse2wigdir+
 post_predefined=""
-chdir="./"
+chdir="Churros_result"
 
 while getopts b:d:y:D: option
 do
@@ -46,10 +46,22 @@ odir=$2
 build=$3
 gt=$4
 
+if test ! -e $samplepairlist; then
+    echo "Error: $samplepairlist does not exist."
+    exit 1
+fi
+
 pdir=$chdir/$pdir
 logdir=$chdir/log
-mkdir -p $logdir
 odir=$chdir/$odir
+mkdir -p $logdir $odir
+
+if test ! -e $gt; then
+    echo "Error: $gt does not exist."
+    exit 1
+fi
+
+echo "output directory: $odir"
 
 if test "$post_predefined" = ""; then
     post=-bowtie2-$build-raw-GR

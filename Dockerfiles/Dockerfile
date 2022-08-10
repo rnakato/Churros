@@ -76,6 +76,10 @@ COPY scripts/ /opt/scripts
 RUN make -C /opt/scripts/MOSAiCS_mappability/ \
     && chmod +x /opt/scripts/*
 
+# NextFlow
+RUN curl -s https://get.nextflow.io | bash \
+    && mv nextflow /opt/scripts
+
 ENV PATH ${PATH}:/opt/scripts:/opt/SSP/bin:/opt/DROMPAplus/bin:/opt/DROMPAplus/submodules/cpdf/Linux-Intel-64bit:/opt/DROMPAplus/otherbins:/opt:/opt/bwa-0.7.17:/opt/bowtie-1.3.1-linux-x86_64:/opt/bowtie2-2.4.5-linux-x86_64::/opt/HOMER/bin/
 
 CMD ["/bin/bash"]

@@ -15,7 +15,7 @@ function usage()
     echo '      -p: show p-value distribution instead of read distribution' 1>&2
     echo '      -P : additional parameters for DROMPA+ (shouled be quated)' 1>&2
     echo '      -G : genome-wide view (100kbp)' 1>&2
-    echo '      -D outputdir: output dir (defalt: ./)' 1>&2
+    echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
     echo "   Example:" 1>&2
     echo "      $cmdname samplelist.txt chip-seq hg38 Database/Ensembl-GRCh38" 1>&2
 }
@@ -27,7 +27,7 @@ post_predefined=""
 GV=0
 showpvalue=0
 param=""
-chdir="./"
+chdir="Churros_result"
 
 while getopts P:b:l:d:o:y:pGD: option
 do
@@ -57,10 +57,12 @@ samplepairlist=$1
 prefix=$2
 build=$3
 Ddir=$4
-
 pdir=$chdir/$pdir
-logdir=$chdir/log
-mkdir -p $logdir
+
+if test ! -e $samplepairlist; then
+    echo "Error: $samplepairlist does not exist."
+    exit 1
+fi
 
 if test "$post_predefined" = ""; then
     post=-bowtie2-$build-raw-GR
@@ -75,6 +77,10 @@ fi
 ex(){ echo $1; eval $1; }
 
 gt=$Ddir/genometable.txt
+if test ! -e $gt; then
+    echo "Error: $gt does not exist. Please make it by 'download_genomedata.sh'."
+    exit 1
+fi
 
 if test $GV -eq 1; then
     # GV mode
@@ -98,7 +104,9 @@ if test $GV -eq 1; then
     done < $samplepairlist
 
     head=`basename $prefix`
-    ex "drompa+ GV $param $sGV -o $prefix.GV.100000 --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 500000 >& $logdir/drompa+.$head.GV.100000"
+    echo "Command:"
+    echo "drompa+ GV $param $sGV -o $prefix.GV.100000 --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 50000 >& $prefix.GV.100000.log" > $prefix.GV.100000.log
+    ex "drompa+ GV $param $sGV -o $prefix.GV.100000 --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 500000 >> $prefix.GV.100000.log"
 else
     s=""
 #    while IFS=, read chip input label mode peak; do
@@ -118,6 +126,9 @@ else
 
     gene=$Ddir/gtf_chrUCSC/chr.gene.refFlat
     head=`basename $prefix`
-    ex "drompa+ PC_SHARP $param $s -o $prefix.PCSHARP.$binsize --gt $gt -g $gene --ls $linesize --showchr --callpeak >& $logdir/drompa+.$head.PCSHARP.$binsize"
+
+    echo "Command:"
+    echo "drompa+ PC_SHARP $param $s -o $prefix.PCSHARP.$binsize --gt $gt -g $gene --ls $linesize --showchr --callpeak >& $prefix.PCSHARP.$binsize.log" > $prefix.PCSHARP.$binsize.log
+    ex "drompa+ PC_SHARP $param $s -o $prefix.PCSHARP.$binsize --gt $gt -g $gene --ls $linesize --showchr --callpeak >> $prefix.PCSHARP.$binsize.log"
     rm $prefix.PCSHARP.$binsize.pdf
 fi

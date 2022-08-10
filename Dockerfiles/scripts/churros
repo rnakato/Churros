@@ -22,6 +22,7 @@ function usage()
     echo '      -P "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
     echo '      -p : number of CPUs (default: 12)' 1>&2
     echo '      -w : output ChIP/Input -log(p) distribution as a begraph format' 1>&2
+    echo '      -D outputdir: output dir (defalt: "Churros_result")' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname exec chip.fastq.gz chip hg38 Database/Ensembl-GRCh38" 1>&2
 }
@@ -39,7 +40,9 @@ ncore=12
 qval=0.05
 mdir=macs
 
-while getopts cb:mnf:P:p:q:d:w option
+chdir="Churros_result"
+
+while getopts cb:mnf:P:p:q:d:wD: option
 do
     case ${option} in
 	c) format=CRAM
@@ -54,6 +57,7 @@ do
 	q) qval=${OPTARG};;
         d) mdir=${OPTARG};;
 	w) outputpval=1;;
+        D) chdir=${OPTARG};;
 	*)
 	    usage
 	    exit 1
@@ -71,6 +75,16 @@ samplelist=$1
 samplepairlist=$2
 build=$3
 Ddir=$4
+
+if test ! -e $samplelist; then
+    echo "Error: $samplelist does not exist."
+    exit 1
+fi
+if test ! -e $samplepairlist; then
+    echo "Error: $samplepairlist does not exist."
+    exit 1
+fi
+
 
 if [[ ${samplelist} =~ ^/.+$ ]]; then
     n=1 # dummy
@@ -92,8 +106,6 @@ else
     parseparam=""
 fi
 
-pwd=`pwd`
-chdir=$pwd/Churros_result
 mkdir -p $chdir
 
 while read LINE; do
@@ -141,14 +153,16 @@ done < $samplepairlist
 churros_callpeak -b $chdir/bam -p $ncore -q $qval -d $chdir/$mdir $samplepairlist_withflen $build
 
 if test $outputpval -eq 1; then
-    mkdir -p drompa+.pval
+    echo "generate Pvalue bedGraph file..."
     gt=$Ddir/genometable.txt
     churros_genPvalwig -D $chdir $samplepairlist drompa+.pval $build $gt
 fi
 
 pdfdir=$chdir/pdf
 mkdir -p $pdfdir
+echo "generate pdf files by drompa+..."
 churros_visualize -D $chdir $chdir/$mdir/samplepairlist.txt $pdfdir/drompa+.macspeak $build $Ddir
 churros_visualize -D $chdir -b 5000 -l 8000 -P "--scale_tag 100" $samplepairlist $pdfdir/drompa+.bin5M $build $Ddir
 churros_visualize -D $chdir -b 5000 -l 8000 -p -P "--pthre_enrich 3 --scale_pvalue 3" $samplepairlist $pdfdir/drompa+.pval.bin5M $build $Ddir
 churros_visualize -D $chdir -G $samplepairlist $pdfdir/drompa+ $build $Ddir
+echo "done."
