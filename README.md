@@ -26,7 +26,7 @@ This command mounts `/work` directory.
 
 ## 2. Usage
 
-See the [Manual](https://churros.readthedocs.io/en/latest/).
+See [Manual](https://churros.readthedocs.io/en/latest/).
 
 ## 2. Tutorial
 
