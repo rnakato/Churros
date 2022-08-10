@@ -25,7 +25,19 @@ This command mounts `/work` directory.
 
 ## 2. Quickstart
 
+``churros`` command executes all steps from mapping to visualization.
 
+    # download Churros/tutorial directory
+    git clone https://github.com/rnakato/Churros.git
+    cd Churros/tutorial/
+    
+    # download fastq and genome data and make index
+    bash 00_getdata.sh
+    
+    # Execute Churros pipeline
+    bash Quickstart.sh
+
+Then the results are output in `Churros_result` directory.
 
 ## 3. Usage
 
