@@ -134,27 +134,43 @@ if test $command = "map" -o $command = "exec"; then
     fi
     echo "done."
 fi
+
 if test $command = "postprocess" -o $command = "exec"; then
+    flen=0
     if test $format = "CRAM"; then
-       mapfile=$chdir/$bamdir/$head.sort.cram
+        mapfile=$chdir/$bamdir/$head.sort.cram
+    else
+        mapfile=$chdir/$bamdir/$head.sort.bam
+    fi
+
+    if test $nopp != 1; then
+        echo -e "quality check by SSP..."
+        ssp.sh -t $ncore $pair -D $chdir $mapfile $head $build $gt;
+        echo "done."
+	flen=`cut -f5 $chdir/sspout/$head.stats.txt | tail -n1`
+	parseparam="$parseparam -l $flen"
+    fi
+
+    if test $format = "CRAM"; then
        echo "parse mapfile by parse2wig+..."
        parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir
     else
-       mapfile=$chdir/$bamdir/$head.sort.bam
        if test "$peak" != ""; then
-	   echo "parse mapfile by parse2wig+..."
+           echo "parse mapfile by parse2wig+..."
            parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir
        else
-           echo "execute MACS2 without Input to estimate FRiP..."
-           macs.sh -d $chdir/macs $mapfile none ${prefix}_forFRiP $build sharp
-	   echo "parse mapfile by parse2wig+..."
-           parse2wig+.sh $parseparam -b $binsize -z $chdir/macs/${prefix}_forFRiP_peaks.narrowPeak $mapfile $head $build $Ddir
+           macspeak="$chdir/macs/${prefix}_forFRiP_peaks.narrowPeak"
+           if test ! -e $macspeak; then
+               echo "execute MACS2 without Input to estimate FRiP..."
+               macs.sh -d $chdir/macs $mapfile none ${prefix}_forFRiP $build sharp
+           fi
+           echo "parse mapfile by parse2wig+..."
+           parse2wig+.sh $parseparam -b $binsize -z $macspeak $mapfile $head $build $Ddir
        fi
     fi
-    echo "quality check by SSP..."
-    if test $nopp != 1; then ssp.sh -t $ncore $pair -D $chdir $mapfile $head $build $gt; fi
     echo "done."
 fi
+
 if test $command = "stats"; then
     logdir=$chdir/log
     a=`parsebowtielog2.pl $pair $logdir/bowtie2-$head | grep -v Sample`

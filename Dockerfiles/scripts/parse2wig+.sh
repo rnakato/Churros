@@ -11,6 +11,7 @@ function usage()
     echo '      -a: also outout raw read distribution' 1>&2
     echo '      -b: binsize of parse2wig+ (defalt: 100)' 1>&2
     echo '      -z: peak file for FRiP calculation (BED format)' 1>&2
+    echo '      -l: predefined fragment length (default: estimated by trand-shift profile)' 1>&2
     echo '      -m: consider genome mappability' 1>&2
     echo '      -k: read length (36 or 50) for mappability calculation (default: 50)' 1>&2
     echo '      -p: for paired-end file' 1>&2
@@ -22,6 +23,7 @@ function usage()
     echo '               2: bedGraph (.bedGraph)' 1>&2
     echo '               3: bigWig (.bw)' 1>&2
     echo '      -D outputdir: output dir (defalt: ./)' 1>&2
+    echo '      -F: overwrite files if exist (defalt: skip)' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname chip.sort.bam chip hg38 Database/Ensembl-GRCh38" 1>&2
     echo "      For paired-end: $cmdname -p chip.sort.bam chip hg38 Database/Ensembl-GRCh38" 1>&2
@@ -35,10 +37,12 @@ of=3
 pair=""
 mp=0
 peak=""
+param_flen=""
 ncore=4
 chdir="./"
+force=0
 
-while getopts ab:z:mk:o:f:pt:D: option
+while getopts ab:z:l:mk:o:f:pt:D:F option
 do
     case ${option} in
 	a) all=1;;
@@ -51,6 +55,7 @@ do
 	       peak="--bed $peak"
 	   fi
 	   ;;
+	l) param_flen="--nomodel --flen ${OPTARG}";;
 	m) mp=1;;
 	k) k=${OPTARG};;
 	o) pdir=${OPTARG};;
@@ -58,6 +63,7 @@ do
 	p) pair="--pair";;
 	t) ncore=${OPTARG};;
         D) chdir=${OPTARG};;
+	F) force=1;;
         *)
 	    usage
 	    exit 1
@@ -103,13 +109,13 @@ else
 fi
 mpparam="--mptable $mptable"
 
-parse2wigparam="--gt $gt -i $bam $mpparam $pair $peak --odir $pdir --outputformat $of -p $ncore"
+parse2wigparam="--gt $gt -i $bam $mpparam $pair $peak --odir $pdir --outputformat $of -p $ncore $param_flen"
 
 func(){
     if test $all = 1; then
-#	if test ! -e $pdir/$prefix-raw$mppost.$binsize.tsv; then
+	if test ! -e $pdir/$prefix-raw$mppost.$binsize.tsv -o $force -eq 1; then
 	    ex "parse2wig+ $parse2wigparam -o $prefix-raw$mppost --binsize $binsize"
-#	fi
+	fi
     fi
 
     if test $build = "scer" -o $build = "pombe"; then
@@ -118,14 +124,14 @@ func(){
 	bins="$binsize 5000 100000"
     fi
     for b in $bins; do
-#	if test ! -e $pdir/$prefix-raw$mppost-GR.$b.tsv; then
+	if test ! -e $pdir/$prefix-raw$mppost-GR.$b.tsv -o $force -eq 1; then
 	    ex "parse2wig+ $parse2wigparam -o $prefix-raw$mppost-GR -n GR --binsize $b"
-#	fi
+	fi
     done
     if test "$mp" -eq 1; then
-#	if test ! -e $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv; then
+	if test ! -e $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv -o $force -eq 1; then
 	    ex "parse2wig+ $parse2wigparam -o $prefix-GC-depthoff$mppost-GR -n GR --chrdir $chrpath $mpbin --binsize 100000 --gcdepthoff"
-#	fi
+	fi
 	parsestats4DROMPAplus.pl $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv >& $logdir/parsestats-$prefix.GC.100000
     fi
 }
