@@ -11,6 +11,8 @@ Docker image is available at `DockerHub <https://hub.docker.com/r/rnakato/churro
 - SAMtools version 1.15.1
 - DROMPA+ version 1.15.1
 - SSP version 1.2.5
+- ChromHMM version 1.23
+- ChromImpute version 1.0.3
 
 Docker
 ++++++++++++++
@@ -23,7 +25,7 @@ To use docker command, type:
    docker pull rnakato/churros
    # execute a command
    docker run -it --rm rnakato/churros <command>
-   
+
 Singularity
 +++++++++++++++++++++++
 
@@ -36,7 +38,7 @@ Singularity can also be used to execute the docker image:
    # execute a command
    singularity exec churros.sif <command>
 
-Singularity mounts the current directory automatically. If you access the files in the other directory, 
+Singularity mounts the current directory automatically. If you access the files in the other directory,
 mount it by ``--bind`` option:
 
 .. code-block:: bash

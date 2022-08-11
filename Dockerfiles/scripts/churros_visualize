@@ -4,7 +4,7 @@ function usage()
 {
     echo "$cmdname [Options] <samplepairlist> <prefix> <build> <Ddir>" 1>&2
     echo '   <samplepairlist>: text file of ChIP/Input sample pairs' 1>&2
-    echo '   <prefix>: output prefix' 1>&2
+    echo '   <prefix>: output prefix (directory will be omitted)' 1>&2
     echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   <Ddir>: directory of bowtie2 index' 1>&2
     echo '   Options:' 1>&2
@@ -82,6 +82,9 @@ if test ! -e $gt; then
     exit 1
 fi
 
+pdfdir=$chdir/pdf
+mkdir -p $pdfdir
+
 if test $GV -eq 1; then
     # GV mode
     ideogram=/opt/DROMPAplus/data/ideogram/$build.tsv
@@ -104,9 +107,10 @@ if test $GV -eq 1; then
     done < $samplepairlist
 
     head=`basename $prefix`
+
     echo "Command:"
-    echo "drompa+ GV $param $sGV -o $prefix.GV.100000 --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 50000 >& $prefix.GV.100000.log" > $prefix.GV.100000.log
-    ex "drompa+ GV $param $sGV -o $prefix.GV.100000 --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 500000 >> $prefix.GV.100000.log"
+    echo "drompa+ GV $param $sGV -o $pdfdir/$head.GV.100000 --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 50000 >& $pdfdir/$head.GV.100000.log" > $pdfdir/$head.GV.100000.log
+    ex "drompa+ GV $param $sGV -o $pdfdir/$head.GV.100000 --gt $gt --ideogram $ideogram --GC $GC --gcsize 500000 --GD $GD --gdsize 500000 >> $pdfdir/$head.GV.100000.log"
 else
     s=""
 #    while IFS=, read chip input label mode peak; do
@@ -128,7 +132,7 @@ else
     head=`basename $prefix`
 
     echo "Command:"
-    echo "drompa+ PC_SHARP $param $s -o $prefix.PCSHARP.$binsize --gt $gt -g $gene --ls $linesize --showchr --callpeak >& $prefix.PCSHARP.$binsize.log" > $prefix.PCSHARP.$binsize.log
-    ex "drompa+ PC_SHARP $param $s -o $prefix.PCSHARP.$binsize --gt $gt -g $gene --ls $linesize --showchr --callpeak >> $prefix.PCSHARP.$binsize.log"
+    echo "drompa+ PC_SHARP $param $s -o $pdfdir/$head.PCSHARP.$binsize --gt $gt -g $gene --ls $linesize --showchr --callpeak >& $pdfdir/$head.PCSHARP.$binsize.log" > $pdfdir/$head.PCSHARP.$binsize.log
+    ex "drompa+ PC_SHARP $param $s -o $pdfdir/$head.PCSHARP.$binsize --gt $gt -g $gene --ls $linesize --showchr --callpeak >> $pdfdir/$head.PCSHARP.$binsize.log"
     rm $prefix.PCSHARP.$binsize.pdf
 fi
