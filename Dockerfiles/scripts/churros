@@ -146,7 +146,7 @@ while read LINE; do
     input=${LINE[1]}
     label=${LINE[2]}
     mode=${LINE[3]}
-    flen=`cut -f5 sspout/${chip}$post-$build.stats.txt | tail -n1`
+    flen=`cut -f5 $chdir/sspout/${chip}$post-$build.stats.txt | tail -n1`
     echo "$chip,$input,$label,$mode,$peak,$flen" >> $samplepairlist_withflen
 done < $samplepairlist
 
