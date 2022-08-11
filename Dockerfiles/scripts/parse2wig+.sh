@@ -113,7 +113,11 @@ parse2wigparam="--gt $gt -i $bam $mpparam $pair $peak --odir $pdir --outputforma
 
 func(){
     if test $all = 1; then
-	if test ! -e $pdir/$prefix-raw$mppost.$binsize.tsv -o $force -eq 1; then
+	file=$pdir/$prefix-raw$mppost.$binsize.bw
+	if test -e "$file" && test 1000 -lt `wc -c < $file` && $force -eq 0 ; then
+	    echo "$file already exist. quit"
+	else
+#	if test ! -e $pdir/$prefix-raw$mppost.$binsize.tsv -o $force -eq 1; then
 	    ex "parse2wig+ $parse2wigparam -o $prefix-raw$mppost --binsize $binsize"
 	fi
     fi
@@ -124,12 +128,20 @@ func(){
 	bins="$binsize 5000 100000"
     fi
     for b in $bins; do
-	if test ! -e $pdir/$prefix-raw$mppost-GR.$b.tsv -o $force -eq 1; then
+	file=$pdir/$prefix-raw$mppost-GR.$b.bw
+	if test -e "$file" && test 1000 -lt `wc -c < $file` && $force -eq 0 ; then
+            echo "$file already exist. quit"
+	else
+#	if test ! -e $pdir/$prefix-raw$mppost-GR.$b.tsv -o $force -eq 1; then
 	    ex "parse2wig+ $parse2wigparam -o $prefix-raw$mppost-GR -n GR --binsize $b"
 	fi
     done
     if test "$mp" -eq 1; then
-	if test ! -e $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv -o $force -eq 1; then
+	file=$pdir/$prefix-GC-depthoff$mppost-GR.100000.bw
+	if test -e "$file" && test 1000 -lt `wc -c < $file` && $force -eq 0 ; then
+            echo "$file already exist. quit"
+	else
+#	if test ! -e $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv -o $force -eq 1; then
 	    ex "parse2wig+ $parse2wigparam -o $prefix-GC-depthoff$mppost-GR -n GR --chrdir $chrpath $mpbin --binsize 100000 --gcdepthoff"
 	fi
 	parsestats4DROMPAplus.pl $pdir/$prefix-GC-depthoff$mppost-GR.100000.tsv >& $logdir/parsestats-$prefix.GC.100000

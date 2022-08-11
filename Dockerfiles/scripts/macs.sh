@@ -68,12 +68,30 @@ fi
 
 param_sharp=""
 param_broad="--broad-cutoff 0.1"
-#--shift $flen
 mkdir -p $mdir
-if   test $mode = "sharp";         then ex "$macs $param_sharp -n $mdir/$prefix >& $mdir/log.$prefix.$mode"
-elif test $mode = "sharp-nomodel"; then ex "$macs $param_sharp -n $mdir/$prefix --nomodel --extsize `expr ${flen} / 2` >& $mdir/log.$prefix.$mode"
-elif test $mode = "broad";         then ex "$macs $param_broad -n $mdir/$prefix --broad >& $mdir/log.$prefix.$mode"
-elif test $mode = "broad-nomodel"; then ex "$macs $param_broad -n $mdir/$prefix --broad --nomodel --extsize `expr ${flen} / 2` >& $mdir/log.$prefix.$mode"
+
+if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
+    peak=$mdir/${prefix}_peaks.narrowPeak
+else
+    peak=$mdir/${prefix}_peaks.broadPeak
+fi
+
+if test $mode = "sharp"; then
+    if test ! -e $peak; then
+	ex "$macs $param_sharp -n $mdir/$prefix >& $mdir/log.$prefix.$mode"
+    fi
+elif test $mode = "sharp-nomodel"; then
+    if test ! -e $peak; then
+	ex "$macs $param_sharp -n $mdir/$prefix --nomodel --extsize `expr ${flen} / 2` >& $mdir/log.$prefix.$mode"
+    fi
+elif test $mode = "broad"; then
+    if test ! -e $peak; then
+	ex "$macs $param_broad -n $mdir/$prefix --broad >& $mdir/log.$prefix.$mode"
+    fi
+elif test $mode = "broad-nomodel"; then
+    if test ! -e $peak; then
+	ex "$macs $param_broad -n $mdir/$prefix --broad --nomodel --extsize `expr ${flen} / 2` >& $mdir/log.$prefix.$mode"
+    fi
 else
     echo "Error: specify [sharp|broad|sharp-nomodel|broad-nomodel] for mode."
     exit 1

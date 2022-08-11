@@ -47,6 +47,8 @@ fi
 
 ex(){ echo $1; eval $1; }
 
+echo "Churros callpeak: $samplepairlist"
+
 mkdir -p $mdir
 newlist=$mdir/samplepairlist.txt
 rm -rf $newlist
@@ -87,18 +89,17 @@ do_macs(){
     IPbam=$bamdir/$chip-bowtie2-$build.sort.bam
     Inputbam=$bamdir/$input-bowtie2-$build.sort.bam
 
-    if test "$mode" = ""; then
-	mode="sharp"
-    fi
+    if test "$mode" = ""; then mode="sharp"; fi
+
     if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
 	peak=$mdir/${label}_peaks.narrowPeak
-	if $flen != ""; then
+	if test "$flen" != ""; then
 	    mode="sharp-nomodel"
 	    flen="-f $flen"
 	fi
     else
 	peak=$mdir/${label}_peaks.broadPeak
-	if $flen != ""; then
+	if test "$flen" != ""; then
 	    mode="broad-nomodel"
 	    flen="-f $flen"
 	fi
@@ -112,3 +113,5 @@ do_macs(){
 export -f do_macs
 
 echo ${array[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval"
+
+echo "churros_callpeak done."

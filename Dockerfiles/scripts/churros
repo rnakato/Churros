@@ -139,6 +139,7 @@ while read LINE; do
 done < $samplelist
 
 samplepairlist_withflen=$chdir/churros.samplepairlist.withflen.txt
+rm $samplepairlist_withflen
 post="-bowtie2"`echo $bowtieparam | tr -d ' '`
 while read LINE; do
     LINE=(${LINE//,/ })
@@ -147,10 +148,14 @@ while read LINE; do
     label=${LINE[2]}
     mode=${LINE[3]}
     flen=`cut -f5 $chdir/sspout/${chip}$post-$build.stats.txt | tail -n1`
-    echo "$chip,$input,$label,$mode,$peak,$flen" >> $samplepairlist_withflen
+    echo "$chip,$input,$label,$mode,$flen" >> $samplepairlist_withflen
 done < $samplepairlist
 
-churros_callpeak -b $chdir/bam -p $ncore -q $qval -d $chdir/$mdir $samplepairlist_withflen $build
+if test ! -e $samplepairlist_withflen; then
+   churros_callpeak -b $chdir/bam -p $ncore -q $qval -d $chdir/$mdir $samplepairlist $build
+else
+   churros_callpeak -b $chdir/bam -p $ncore -q $qval -d $chdir/$mdir $samplepairlist_withflen $build
+fi
 
 if test $outputpval -eq 1; then
     echo "generate Pvalue bedGraph file..."
