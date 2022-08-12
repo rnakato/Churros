@@ -163,10 +163,9 @@ if test $outputpval -eq 1; then
     churros_genPvalwig -D $chdir $samplepairlist drompa+.pval $build $gt
 fi
 
-pdfdir=$chdir/pdf
-mkdir -p $pdfdir
+pdfdir=pdf
 echo "generate pdf files by drompa+..."
-churros_visualize -D $chdir $chdir/$mdir/samplepairlist.txt $pdfdir/drompa+.macspeak $build $Ddir
+churros_visualize -D $chdir $mdir/samplepairlist.txt $pdfdir/drompa+.macspeak $build $Ddir
 churros_visualize -D $chdir -b 5000 -l 8000 -P "--scale_tag 100" $samplepairlist $pdfdir/drompa+.bin5M $build $Ddir
 churros_visualize -D $chdir -b 5000 -l 8000 -p -P "--pthre_enrich 3 --scale_pvalue 3" $samplepairlist $pdfdir/drompa+.pval.bin5M $build $Ddir
 churros_visualize -D $chdir -G $samplepairlist $pdfdir/drompa+ $build $Ddir
