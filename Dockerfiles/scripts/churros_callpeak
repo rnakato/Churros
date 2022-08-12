@@ -10,6 +10,7 @@ function usage()
     echo '      -q : threshould of MACS2 (defalt: 0.05)' 1>&2
     echo '      -b : bam direcoty (defalt: "bam")' 1>&2
     echo '      -d : output direcoty (defalt: "macs")' 1>&2
+    echo '      -F : overwrite MACS2 resilts if exist (defalt: skip)' 1>&2
     echo '      -p : number of CPUs (defalt: 4)' 1>&2
 }
 
@@ -18,8 +19,9 @@ mdir=macs
 bamdir=bam
 ncore=4
 chdir="Churros_result"
+force=""
 
-while getopts D:b:q:d:p: option
+while getopts D:b:q:d:p:F option
 do
     case ${option} in
 	D) chdir=${OPTARG};;
@@ -27,6 +29,7 @@ do
 	q) qval=${OPTARG};;
 	d) mdir=${OPTARG};;
 	p) ncore=${OPTARG};;
+	F) force="-F";;
         *)
 	    usage
 	    exit 1
@@ -85,6 +88,7 @@ do_macs(){
     mdir=$4
     newlist=$5
     qval=$6
+    force=$7
 
     LINE=(${LINE//,/ })
     chip=${LINE[0]}
@@ -111,13 +115,13 @@ do_macs(){
 	fi
     fi
     if test "$input" = ""; then
-	macs.sh -q $qval -d $mdir $flen $IPbam none $label $build $mode
+	macs.sh $force -q $qval -d $mdir $flen $IPbam none $label $build $mode
     else
-	macs.sh -q $qval -d $mdir $flen $IPbam $Inputbam $label $build $mode
+	macs.sh $force -q $qval -d $mdir $flen $IPbam $Inputbam $label $build $mode
     fi
 }
 export -f do_macs
 
-echo ${array[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval"
+echo ${array[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval $force"
 
 echo "churros_callpeak done."

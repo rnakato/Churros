@@ -1,18 +1,32 @@
 #!/bin/bash
+cmdname=`basename $0`
 function usage()
 {
-    echo "macs.sh [-f fraglen] [-q qvalue] [-d outputdir] <IP bam> <Input bam> <prefix> <build> [sharp|broad|sharp-nomodel|broad-nomodel]" 1>&2
+    echo "$cmdname [Options] <IP bam> <Input bam> <prefix> <build> <mode>" 1>&2
+    echo '   <IP bam>: BAM for for ChIP (treat) sample' 1>&2
+    echo '   <Input bam>: BAM for for Input (control) sample: specify "none" if unavailable' 1>&2
+    echo '   <prefix>: prefix of output file' 1>&2
+    echo '   <build>: genome build (e.g., hg38)' 1>&2
+    echo '   <mode>: peak mode ([sharp|broad|sharp-nomodel|broad-nomodel])' 1>&2
+    echo '   Options:' 1>&2
+    echo '      -f <int>: predefined fragment length (defalt: estimated in MACS2)' 1>&2
+    echo '      -q <float>: threshould of MACS2 (defalt: 0.05)' 1>&2
+    echo '      -d <str>: output directory (defalt: "macs")' 1>&2
+    echo '      -F: overwrite files if exist (defalt: skip)' 1>&2
 }
 
 flen=200
 qval=0.05
 mdir=macs
-while getopts f:q:d: option
+force=0
+
+while getopts f:q:d:F option
 do
     case ${option} in
 	f) flen=${OPTARG};;
 	q) qval=${OPTARG};;
 	d) mdir=${OPTARG};;
+	F) force=1;;
 	*)
 	    usage
 	    exit 1
@@ -25,8 +39,6 @@ if test $# -ne 5; then
     usage
     exit 0
 fi
-
-if test ! -e $mdir; then mkdir $mdir; fi
 
 IP=$1
 Input=$2
@@ -48,7 +60,6 @@ else
     sp="1e8"
 fi
 
-
 if test -e $IP && test -s $IP ; then
     n=1 # dummy
 else
@@ -68,6 +79,7 @@ fi
 
 param_sharp=""
 param_broad="--broad-cutoff 0.1"
+
 mkdir -p $mdir
 
 if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
@@ -76,23 +88,19 @@ else
     peak=$mdir/${prefix}_peaks.broadPeak
 fi
 
-if test $mode = "sharp"; then
-    if test ! -e $peak; then
-	ex "$macs $param_sharp -n $mdir/$prefix >& $mdir/log.$prefix.$mode"
-    fi
-elif test $mode = "sharp-nomodel"; then
-    if test ! -e $peak; then
-	ex "$macs $param_sharp -n $mdir/$prefix --nomodel --extsize `expr ${flen} / 2` >& $mdir/log.$prefix.$mode"
-    fi
-elif test $mode = "broad"; then
-    if test ! -e $peak; then
-	ex "$macs $param_broad -n $mdir/$prefix --broad >& $mdir/log.$prefix.$mode"
-    fi
-elif test $mode = "broad-nomodel"; then
-    if test ! -e $peak; then
-	ex "$macs $param_broad -n $mdir/$prefix --broad --nomodel --extsize `expr ${flen} / 2` >& $mdir/log.$prefix.$mode"
-    fi
+if test -e "$peak" -a $force -eq 0 ; then
+    echo "$peak already exist. Skipping"
 else
-    echo "Error: specify [sharp|broad|sharp-nomodel|broad-nomodel] for mode."
-    exit 1
+    if test $mode = "sharp"; then
+	ex "$macs $param_sharp -n $mdir/$prefix >& $mdir/log.$prefix.$mode"
+    elif test $mode = "sharp-nomodel"; then
+    	ex "$macs $param_sharp -n $mdir/$prefix --nomodel --extsize `expr ${flen} / 2` >& $mdir/log.$prefix.$mode"
+    elif test $mode = "broad"; then
+    	ex "$macs $param_broad -n $mdir/$prefix --broad >& $mdir/log.$prefix.$mode"
+    elif test $mode = "broad-nomodel"; then
+    	ex "$macs $param_broad -n $mdir/$prefix --broad --nomodel --extsize `expr ${flen} / 2` >& $mdir/log.$prefix.$mode"
+    else
+	echo "Error: specify [sharp|broad|sharp-nomodel|broad-nomodel] for mode."
+	exit 1
+    fi
 fi
