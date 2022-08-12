@@ -6,6 +6,7 @@ function usage()
     echo '   <samplepairlist>: text file of ChIP/Input sample pairs' 1>&2
     echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   Options:' 1>&2
+    echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
     echo '      -q : threshould of MACS2 (defalt: 0.05)' 1>&2
     echo '      -b : bam direcoty (defalt: "bam")' 1>&2
     echo '      -d : output direcoty (defalt: "macs")' 1>&2
@@ -16,10 +17,12 @@ qval=0.05
 mdir=macs
 bamdir=bam
 ncore=4
+chdir="Churros_result"
 
-while getopts b:q:d:p: option
+while getopts D:b:q:d:p: option
 do
     case ${option} in
+	D) chdir=${OPTARG};;
 	b) bamdir=${OPTARG};;
 	q) qval=${OPTARG};;
 	d) mdir=${OPTARG};;
@@ -48,6 +51,9 @@ fi
 ex(){ echo $1; eval $1; }
 
 echo "Churros callpeak: $samplepairlist"
+
+mdir=$chdir/`basename $mdir`
+bamdir=$chdir/`basename $bamdir`
 
 mkdir -p $mdir
 newlist=$mdir/samplepairlist.txt

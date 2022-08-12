@@ -152,9 +152,9 @@ while read LINE; do
 done < $samplepairlist
 
 if test ! -e $samplepairlist_withflen; then
-   churros_callpeak -b $chdir/bam -p $ncore -q $qval -d $chdir/$mdir $samplepairlist $build
+   churros_callpeak -b bam -p $ncore -q $qval -d $mdir $samplepairlist $build
 else
-   churros_callpeak -b $chdir/bam -p $ncore -q $qval -d $chdir/$mdir $samplepairlist_withflen $build
+   churros_callpeak -b bam -p $ncore -q $qval -d $mdir $samplepairlist_withflen $build
 fi
 
 if test $outputpval -eq 1; then
