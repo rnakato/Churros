@@ -8,10 +8,16 @@ function usage()
     echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   <Ddir>: directory of bowtie2 index' 1>&2
     echo '   Options:' 1>&2
+    echo '      -f <int>: Input file format (default: 3)' 1>&2
+    echo '                 0: compressed wig (.wig.gz)' 1>&2
+    echo '                 1: uncompressed wig (.wig)' 1>&2
+    echo '                 2: bedGraph (.bedGraph)' 1>&2
+    echo '                 3: bigWig (.bw)' 1>&2
     echo '      -b <int>: binsize (defalt: 100)' 1>&2
     echo '      -l <int>: line size for each page (defalt: 1000 (kbp))' 1>&2
+    echo '      -m: consider genome mappability in parse2wig+' 1>&2
     echo '      -d <str>: directory of parse2wig+ (default: parse2wigdir+)' 1>&2
-    echo '      -y <str>: postfix of .bw files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
+    echo '      -y <str>: param string of parse2wig+ files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
     echo '      -p: show p-value distribution instead of read distribution' 1>&2
     echo '      -P : additional parameters for DROMPA+ (shouled be quated)' 1>&2
     echo '      -G : genome-wide view (100kbp)' 1>&2
@@ -26,15 +32,19 @@ pdir=parse2wigdir+
 post_predefined=""
 GV=0
 showpvalue=0
+mp=0
 param=""
 chdir="Churros_result"
+wigformat=3
 
-while getopts P:b:l:d:o:y:pGD: option
+while getopts f:P:b:l:md:o:y:pGD: option
 do
     case ${option} in
-	P) param=${OPTARG};;
+        f) wigformat=${OPTARG};;
+        P) param=${OPTARG};;
         b) binsize=${OPTARG};;
         l) linesize=${OPTARG};;
+        m) mp=1;;
         d) pdir=${OPTARG};;
         y) post_predefined=${OPTARG};;
 	p) showpvalue=1;;
@@ -59,13 +69,28 @@ build=$3
 Ddir=$4
 pdir=$chdir/$pdir
 
+if test "$wigformat" = "0"; then
+    postfix="wig.gz"
+elif test "$wigformat" = "1"; then
+    postfix="wig"
+elif test "$wigformat" = "2"; then
+    postfix="bedGraph"
+elif test "$wigformat" = "3"; then
+    postfix="bw"
+else
+fi
+
 if test ! -e $samplepairlist; then
     echo "Error: $samplepairlist does not exist."
     exit 1
 fi
 
 if test "$post_predefined" = ""; then
-    post=-bowtie2-$build-raw-GR
+    if test $mp -eq 1; then
+        post=-bowtie2-$build-raw-mpbl-GR
+    else
+        post=-bowtie2-$build-raw-GR
+    fi
 else
     post=$post_predefined
 fi
@@ -100,7 +125,7 @@ if test $GV -eq 1; then
         label=${LINE[2]}
 
         if test "$input" != ""; then
-            sGV="$sGV -i $pdir/$chip$post.100000.bw,$pdir/$input$post.100000.bw,$label"
+            sGV="$sGV -i $pdir/$chip$post.100000.$postfix,$pdir/$input$post.100000.$postfix,$label"
         else
             echo "sample $chip does not have the input sample. skipped.."
         fi
@@ -126,9 +151,9 @@ else
         fi
 
         if test "$input" != ""; then
-            s="$s -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,$label,$peak"
+            s="$s -i $pdir/$chip$post.$binsize.$postfix,$pdir/$input$post.$binsize.$postfix,$label,$peak"
         else
-            s="$s -i $pdir/$chip$post.$binsize.bw,,$label,$peak"
+            s="$s -i $pdir/$chip$post.$binsize.$postfix,,$label,$peak"
         fi
     done < $samplepairlist
 
@@ -138,5 +163,5 @@ else
     echo -en "Command: "
     echo "drompa+ PC_SHARP $param $s -o $pdfdir/$head.PCSHARP.$binsize --gt $gt -g $gene --ls $linesize --showchr --callpeak >& $pdfdir/$head.PCSHARP.$binsize.log" > $pdfdir/$head.PCSHARP.$binsize.log
     ex "drompa+ PC_SHARP $param $s -o $pdfdir/$head.PCSHARP.$binsize --gt $gt -g $gene --ls $linesize --showchr --callpeak | tee -a $pdfdir/$head.PCSHARP.$binsize.log"
-    rm $prefix.PCSHARP.$binsize.pdf
+    rm $pdfdir/$head.PCSHARP.$binsize.pdf
 fi
