@@ -78,6 +78,7 @@ elif test "$wigformat" = "2"; then
 elif test "$wigformat" = "3"; then
     postfix="bw"
 else
+    echo "Error: specify [0-3] for '-f' option."
 fi
 
 if test ! -e $samplepairlist; then
