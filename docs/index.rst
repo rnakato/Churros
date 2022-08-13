@@ -15,7 +15,7 @@ Contents:
 
    content/Install
    content/Tutorial
-   content/OtherExamples
+   content/Appendix
    content/Commands
 
 
