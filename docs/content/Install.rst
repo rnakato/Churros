@@ -5,6 +5,8 @@ Docker image is available at `DockerHub <https://hub.docker.com/r/rnakato/churro
 
 **Churros** internally uses the tools including:
 
+- FastQC v0.11.9
+- MultiQC v1.12
 - Bowtie2 version 2.4.5
 - BWA version 0.7.17
 - MACS2 version 2.2.6
