@@ -110,6 +110,22 @@ fi
 
 mkdir -p $chdir
 
+### FASTQC
+mkdir -p $chdir/fastqc
+while read LINE; do
+    LINE=($LINE)
+    prefix=${LINE[0]}
+    fq1=${LINE[1]}
+    fq2=${LINE[2]}
+    fqarray=`echo $fq1 $fq2 | sed -e "s/,/ /g"`
+    for fq in $fqarray
+    do
+	fastqc -t 4 -o $chdir/fastqc $fq
+    done
+done < $samplelist
+rm $chdir/fastqc/*fastqc.zip
+
+### mapping
 while read LINE; do
     LINE=($LINE)
     prefix=${LINE[0]}
@@ -159,6 +175,11 @@ else
    churros_callpeak -b bam -p $ncore -q $qval -d $mdir $samplepairlist_withflen $build
 fi
 
+
+### MultiQC
+multiqc $chdir/
+
+### generate P-value bedGraph
 if test $outputpval -eq 1; then
     echo "generate Pvalue bedGraph file..."
     gt=$Ddir/genometable.txt
@@ -166,6 +187,7 @@ if test $outputpval -eq 1; then
 fi
 
 
+### make pdf files
 echo "generate pdf files by drompa+..."
 if test $mp -eq 1; then
     pdfparam="-D $chdir -m"

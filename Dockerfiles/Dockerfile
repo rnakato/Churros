@@ -3,6 +3,7 @@ FROM rnakato/database:Ensembl106
 MAINTAINER Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>
 
 WORKDIR /opt
+USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-c"]
@@ -10,6 +11,7 @@ SHELL ["/bin/bash", "-c"]
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     build-essential \
+    fastqc \
     libboost-all-dev \
     libbz2-dev \
     libcurl4-gnutls-dev \
@@ -58,6 +60,12 @@ COPY ChromHMM.jar /opt/ChromatinState/ChromHMM.jar
 # ChromImpute v1.0.3
 COPY ChromImpute.jar /opt/ChromatinState/ChromImpute.jar
 
+RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeker', 'Rsamtools'))" \
+    && R -e "install.packages(c('snow','snowfall','bitops','caTools'))"
+
+# Epilogos (https://github.com/meuleman/epilogos)
+RUN pip install --no-cache-dir epilogos
+
 RUN mkdir HOMER && cd HOMER \
     && mkdir bin cpp update \
     && wget http://homer.ucsd.edu/homer/configureHomer.pl \
@@ -73,9 +81,6 @@ RUN git clone --recursive https://github.com/rnakato/DROMPAplus \
     && git submodule foreach git pull origin master \
     && make
 
-RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeker', 'Rsamtools'))" \
-    && R -e "install.packages(c('snow','snowfall','bitops','caTools'))"
-
 COPY scripts/ /opt/scripts
 RUN make -C /opt/scripts/MOSAiCS_mappability/ \
     && chmod +x /opt/scripts/*
@@ -84,10 +89,7 @@ RUN make -C /opt/scripts/MOSAiCS_mappability/ \
 #RUN curl -s https://get.nextflow.io | bash \
 #    && mv nextflow /opt/scripts
 
-### 0.2.0
-# Epilogos (https://github.com/meuleman/epilogos)
-#RUN pip install epilogos
-
 ENV PATH ${PATH}:/opt/scripts:/opt/SSP/bin:/opt/DROMPAplus/bin:/opt/DROMPAplus/submodules/cpdf/Linux-Intel-64bit:/opt/DROMPAplus/otherbins:/opt:/opt/bwa-0.7.17:/opt/bowtie-1.3.1-linux-x86_64:/opt/bowtie2-2.4.5-linux-x86_64::/opt/HOMER/bin/
 
+USER ubuntu
 CMD ["/bin/bash"]
