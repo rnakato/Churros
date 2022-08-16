@@ -5,12 +5,10 @@ import os
 import argparse
 import pathlib
 import pandas as pd
-import subprocess
 
 
 def print_and_exec_shell(command):
     print (command)
-#    subprocess.call(command)
     os.system(command)
 
 def check_file(file):
@@ -40,13 +38,11 @@ def do_fastqc(chdir, samplelist):
         for fastq in fastqs.split(","):
             print_and_exec_shell('fastqc -t 4 -o ' + fastqcdir + ' ' + fastq)
 
-    print_and_exec_shell('rm ' + fastqcdir + '/*fastqc.zip')
-
-def do_mapping(args, post, build, chdir):
+def do_mapping(args, samplelist, post, build, chdir):
     if args.mpbl:
-        param_churros_mapping = "-D " + chdir + " -p " + args.threads + " -m"
+        param_churros_mapping = "-D " + chdir + " -p " + str(args.threads) + " -m"
     else:
-        param_churros_mapping = "-D " + chdir + " -p " + args.threads
+        param_churros_mapping = "-D " + chdir + " -p " + str(args.threads)
 
     # exec
     df = pd.read_csv(samplelist, sep="\t", header=None)
@@ -80,9 +76,10 @@ def do_mapping(args, post, build, chdir):
         fq1 = row[1]
         print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' stats "' + fq1 + '" ' + prefix  + ' ' + build + ' ' + args.Ddir + ' >> ' + chdir + '/churros.QCstats.tsv')
 
-def make_samplepairlist_withflen(samplepairlist, post, chdir):
+def make_samplepairlist_withflen(samplepairlist, post, build, chdir):
     samplepairlist_withflen = chdir + "/churros.samplepairlist.withflen.txt"
-    os.remove(samplepairlist_withflen)
+    if(os.path.isfile(samplepairlist_withflen)):
+        os.remove(samplepairlist_withflen)
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
     for index, row in df.iterrows():
@@ -95,7 +92,7 @@ def make_samplepairlist_withflen(samplepairlist, post, chdir):
         flen = int(sspstats["fragment length"])
 
         with open(samplepairlist_withflen, 'a') as f:
-            print(chip + "," + input + "," +label + "," +mode + "," + "flen", file=f)
+            print(chip + "," + input + "," +label + "," +mode + "," + str(flen), file=f)
 
     return samplepairlist_withflen
 
@@ -116,7 +113,6 @@ def exec_churros(args):
     mapparam = args.mapparam
     post = get_mapfile_postfix(mapparam)
 
-    chdir=args.Ddir
     os.makedirs(chdir, exist_ok=True)
 
     ### FASTQC
@@ -124,25 +120,26 @@ def exec_churros(args):
         do_fastqc(chdir, samplelist)
 
     ## churros_mapping
-    do_mapping(args, post, build, chdir)
+    do_mapping(args, samplelist, post, build, chdir)
 
     ## make samplepairlist_withflen
-    samplepairlist_withflen = make_samplepairlist_withflen(samplepairlist, post, chdir)
+    samplepairlist_withflen = make_samplepairlist_withflen(samplepairlist, post, build, chdir)
 
     ## churros_callpeak
+    param_macs=' -b bam -p ' + str(args.threads) + ' -q ' + str(args.qval) + ' -d ' + args.macsdir + ' -D ' + chdir
     if os.path.isfile(samplepairlist_withflen):
-        print_and_exec_shell('churros_callpeak -b bam -p ' + args.threads + ' -q ' + args.qval + ' -d ' + args.macsdir + ' ' + samplepairlist_withflen + ' ' + build)
+        print_and_exec_shell('churros_callpeak' + param_macs + ' ' + samplepairlist_withflen + ' ' + build)
     else:
-        print_and_exec_shell('churros_callpeak -b bam -p ' + args.threads + ' -q ' + args.qval + ' -d ' + args.macsdir + ' ' + samplepairlist + ' ' + build)
+        print_and_exec_shell('churros_callpeak' + param_macs + ' ' + samplepairlist + ' ' + build)
 
     ### MultiQC
-    print_and_exec_shell('multiqc ' + chdir)
+    print_and_exec_shell('multiqc -f -o ' + chdir + ' ' + chdir)
 
     ### generate P-value bedGraph
     if args.outputpvalue:
         print ("generate Pvalue bedGraph file...")
         gt = Ddir + '/genometable.txt'
-        print_and_exec_shell('churros_genPvalwig -D ' + chdir + ' ' + samplepairlist + ' drompa+.pval ' + build + ' ' + gt)
+        print_and_exec_shell('churros_genPvalwig -D ' + chdir + ' ' + str(samplepairlist) + ' drompa+.pval ' + build + ' ' + gt)
 
     ### make pdf files
     print ("generate pdf files by drompa+...")
@@ -152,12 +149,12 @@ def exec_churros(args):
     else:
         param_churros_visualize = "-D " + chdir
 
-    pdfdir = pdf
+    pdfdir = "pdf"
     print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' ' + chdir + '/' + args.macsdir + '/samplepairlist.txt ' + pdfdir + '/drompa+.macspeak ' + build + ' ' + Ddir)
-    print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -P "--scale_tag 100" ' + samplepairlist + ' ' + pdfdir + '/drompa+.bin5M ' + build + ' ' + Ddir)
+    print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -P "--scale_tag 100" ' + str(samplepairlist) + ' ' + pdfdir + '/drompa+.bin5M ' + build + ' ' + Ddir)
     print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -p -P "--pthre_enrich 3 --scale_pvalue 3" ' \
-                         + samplepairlist + ' ' + pdfdir + '/drompa+.pval.bin5M ' + build + ' ' + Ddir)
-    print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -G ' + samplepairlist + ' ' + pdfdir + '/drompa+ ' + build + ' ' + Ddir)
+                         + str(samplepairlist) + ' ' + pdfdir + '/drompa+.pval.bin5M ' + build + ' ' + Ddir)
+    print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -G ' + str(samplepairlist) + ' ' + pdfdir + '/drompa+ ' + build + ' ' + Ddir)
 
 if(__name__ == '__main__'):
     parser = argparse.ArgumentParser()
