@@ -83,7 +83,7 @@ build=$3
 Ddir=$4
 
 pdir=$chdir/$pdir
-logdir=$chdir/log
+logdir=$chdir/log/parse2wig+
 mkdir -p $logdir
 
 ex(){ echo $1; eval $1; }
@@ -146,7 +146,7 @@ func(){
 }
 
 echo "Parsing $bam by parse2wig+."
-func >& $logdir/parse2wig+-$prefix
+func >& $logdir/$prefix.txt
 
 parsestats4DROMPAplus.pl $pdir/$prefix-raw$mppost-GR.$binsize.tsv >& $logdir/parsestats-$prefix.$binsize
 

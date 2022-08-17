@@ -30,13 +30,26 @@ def get_mapfile_postfix(mapparam):
     return post
 
 def do_fastqc(chdir, samplelist):
-    fastqcdir = chdir + "/fastqc"
+    fastqcdir = chdir + "/fastqc/"
+    fastpdir =  chdir + "/fastp/"
     os.makedirs(fastqcdir, exist_ok=True)
+    os.makedirs(fastpdir, exist_ok=True)
 
     df = pd.read_csv(samplelist, sep="\t", header=None)
-    for fastqs in df[1]:
-        for fastq in fastqs.split(","):
+    for index, row in df.iterrows():
+        if (len(row)<2 or row[1] == ""):
+            print ("Error: specify fastq file in " + samplelist + ".")
+            exit()
+        prefix = row[0]
+        fq1 = row[1]
+        fq2 = ""
+        pair = ""
+        for fastq in fq1.split(","):
+            name = os.path.basename(fastq)
             print_and_exec_shell('fastqc -t 4 -o ' + fastqcdir + ' ' + fastq)
+            print_and_exec_shell('fastp -w 4 -q 15 -n 5 -i ' + fastq +
+                                 ' -o ' + fastpdir + name + '.fastq.gz' + ' -h ' + fastpdir + name + '.fastp.html'
+                                                                        + ' -j ' + fastpdir + name + '.fastp.json')
 
 def do_mapping(args, samplelist, post, build, chdir):
     if args.mpbl:
@@ -133,7 +146,7 @@ def exec_churros(args):
         print_and_exec_shell('churros_callpeak' + param_macs + ' ' + samplepairlist + ' ' + build)
 
     ### MultiQC
-    print_and_exec_shell('multiqc -f -o ' + chdir + ' ' + chdir)
+    print_and_exec_shell('multiqc -m fastqc -m fastp -m bowtie2 -m macs2 -f -o ' + chdir + ' ' + chdir)
 
     ### generate P-value bedGraph
     if args.outputpvalue:

@@ -87,6 +87,11 @@ COPY scripts/ /opt/scripts
 RUN make -C /opt/scripts/MOSAiCS_mappability/ \
     && chmod +x /opt/scripts/*
 
+RUN wget http://opengene.org/fastp/fastp \
+    && chmod a+x ./fastp \
+    && mv fastp /opt/scripts
+
+
 # NextFlow
 #RUN curl -s https://get.nextflow.io | bash \
 #    && mv nextflow /opt/scripts

@@ -91,14 +91,15 @@ fi
 if test -e "$peak" -a $force -eq 0 ; then
     echo "$peak already exist. Skipping"
 else
+    logfile=$mdir/$prefix.$mode.log
     if test $mode = "sharp"; then
-	ex "$macs $param_sharp -n $mdir/$prefix >& $mdir/log.$prefix.$mode"
+	ex "$macs $param_sharp -n $mdir/$prefix >& $logfile"
     elif test $mode = "sharp-nomodel"; then
-    	ex "$macs $param_sharp -n $mdir/$prefix --nomodel --extsize `expr ${flen} / 2` >& $mdir/log.$prefix.$mode"
+    	ex "$macs $param_sharp -n $mdir/$prefix --nomodel --extsize `expr ${flen} / 2` >& $logfile"
     elif test $mode = "broad"; then
-    	ex "$macs $param_broad -n $mdir/$prefix --broad >& $mdir/log.$prefix.$mode"
+    	ex "$macs $param_broad -n $mdir/$prefix --broad >& $logfile"
     elif test $mode = "broad-nomodel"; then
-    	ex "$macs $param_broad -n $mdir/$prefix --broad --nomodel --extsize `expr ${flen} / 2` >& $mdir/log.$prefix.$mode"
+    	ex "$macs $param_broad -n $mdir/$prefix --broad --nomodel --extsize `expr ${flen} / 2` >& $logfile"
     else
 	echo "Error: specify [sharp|broad|sharp-nomodel|broad-nomodel] for mode."
 	exit 1

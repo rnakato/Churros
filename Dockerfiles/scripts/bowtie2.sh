@@ -53,7 +53,7 @@ build=$3
 Ddir=$4
 post="-bowtie2"`echo $param | tr -d ' '`
 
-logdir=$chdir/log
+logdir=$chdir/log/bowtie2
 bamdir=$chdir/$bamdir
 mkdir -p $logdir $bamdir
 
@@ -86,4 +86,4 @@ ex_hiseq(){
 
 }
 
-ex_hiseq >& $logdir/bowtie2-$prefix$post-$build
+ex_hiseq >& $logdir/$prefix.txt

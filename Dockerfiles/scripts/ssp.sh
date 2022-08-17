@@ -53,7 +53,7 @@ odir=$chdir/$odir
 
 ex(){ echo $1; eval $1; }
 
-logdir=$chdir/log
+logdir=$chdir/log/ssp
 mkdir -p $logdir
 
 param=""
@@ -71,7 +71,7 @@ echo "Quality check of $input by ssp."
 
 if test -e $input && test -s $input ; then
     if test ! -e $odir/$prefix.stats.txt ; then
-	ex "ssp $param $pair -i $input -o $prefix --odir $odir --gt $gt --mptable $mptable -p $ncore >& $logdir/ssp-$prefix"
+	ex "ssp $param $pair -i $input -o $prefix --odir $odir --gt $gt --mptable $mptable -p $ncore >& $logdir/$prefix.txt"
     fi
 else
     echo "$input does not exist."
