@@ -173,7 +173,7 @@ fi
 
 if test $command = "stats"; then
     logdir=$chdir/log
-    a=`parsebowtielog2.pl $pair $logdir/bowtie2-$head | grep -v Sample`
+    a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | grep -v Sample`
     b=`cat $logdir/parse2wig+/parsestats-$head.$binsize | grep -v Sample | cut -f6,7,8,9`
     gcov=`cat $logdir/parse2wig+/parsestats-$head.$binsize | grep -v Sample | cut -f10`
     if test $mp -eq 1; then

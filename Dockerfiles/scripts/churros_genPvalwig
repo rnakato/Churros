@@ -52,7 +52,7 @@ if test ! -e $samplepairlist; then
 fi
 
 pdir=$chdir/$pdir
-logdir=$chdir/log
+logdir=$chdir/log/drompa+
 odir=$chdir/$odir
 mkdir -p $logdir $odir
 
@@ -78,8 +78,8 @@ while read LINE; do
     label=${LINE[2]}
 
     if test "$input" != ""; then
-	drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,${label}_up > $logdir/drompa+.GENWIG.$chip$post.up
-	drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$input$post.$binsize.bw,$pdir/$chip$post.$binsize.bw,${label}_down  > $logdir/drompa+.GENWIG.$chip$post.down
+	drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,${label}_up > $logdir/GENWIG.$chip$post.up
+	drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$input$post.$binsize.bw,$pdir/$chip$post.$binsize.bw,${label}_down  > $logdir/GENWIG.$chip$post.down
     else
 	echo "Error: input sample is not specified for the sample $chip."
 	exit 1
