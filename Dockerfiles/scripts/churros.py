@@ -29,6 +29,14 @@ def get_mapfile_postfix(mapparam):
     post = "-bowtie2" + mapparam.replace(' ', '')
     return post
 
+def do_qualitycheck_fastq(fastq, fastqcdir, fastpdir):
+    name = os.path.basename(fastq)
+    print_and_exec_shell('fastqc -t 4 -o ' + fastqcdir + ' ' + fastq)
+    print_and_exec_shell('fastp -w 4 -q 15 -n 5 -i ' + fastq
+                         + ' -o ' + fastpdir + name + '.fastq.gz'
+                         + ' -h ' + fastpdir + name + '.fastp.html'
+                         + ' -j ' + fastpdir + name + '.fastp.json')
+
 def do_fastqc(chdir, samplelist):
     fastqcdir = chdir + "/fastqc/"
     fastpdir =  chdir + "/fastp/"
@@ -40,16 +48,17 @@ def do_fastqc(chdir, samplelist):
         if (len(row)<2 or row[1] == ""):
             print ("Error: specify fastq file in " + samplelist + ".")
             exit()
+
         prefix = row[0]
         fq1 = row[1]
-        fq2 = ""
-        pair = ""
         for fastq in fq1.split(","):
-            name = os.path.basename(fastq)
-            print_and_exec_shell('fastqc -t 4 -o ' + fastqcdir + ' ' + fastq)
-            print_and_exec_shell('fastp -w 4 -q 15 -n 5 -i ' + fastq +
-                                 ' -o ' + fastpdir + name + '.fastq.gz' + ' -h ' + fastpdir + name + '.fastp.html'
-                                                                        + ' -j ' + fastpdir + name + '.fastp.json')
+            do_qualitycheck_fastq(fastq, fastqcdir, fastpdir)
+
+        if (len(row)>2): # for paired-end
+            fq2 = row[2]
+            for fastq in fq2.split(","):
+                do_qualitycheck_fastq(fastq, fastqcdir, fastpdir)
+
 
 def do_mapping(args, samplelist, post, build, chdir):
     if args.mpbl:
