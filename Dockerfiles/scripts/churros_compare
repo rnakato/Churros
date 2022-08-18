@@ -2,28 +2,20 @@
 cmdname=`basename $0`
 function usage()
 {
-    echo "$cmdname [Options] <samplepairlist> <build>" 1>&2
-    echo '   <samplepairlist>: text file of ChIP/Input sample pairs' 1>&2
-    echo '   <build>: genome build (e.g., hg38)' 1>&2
+    echo "$cmdname [Options] <samplelist>" 1>&2
+    echo '   <samplelist>: text file of samples' 1>&2
     echo '   Options:' 1>&2
-    echo '      -q : threshould of MACS2 (defalt: 0.05)' 1>&2
-    echo '      -b : bam direcoty (defalt: "bam")' 1>&2
-    echo '      -d : output direcoty (defalt: "macs")' 1>&2
-    echo '      -p : number of CPUs (defalt: 4)' 1>&2
+    echo '      -d : output direcoty (defalt: "compare")' 1>&2
+    echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
 }
 
-qval=0.05
-mdir=macs
-bamdir=bam
-ncore=4
-
-while getopts b:q:d:p: option
+odir=compare
+chdir="Churros_result"
+while getopts d:D: option
 do
     case ${option} in
-	b) bamdir=${OPTARG};;
-	q) qval=${OPTARG};;
-	d) mdir=${OPTARG};;
-	p) ncore=${OPTARG};;
+	d) odir=${OPTARG};;
+        D) chdir=${OPTARG};;
         *)
 	    usage
 	    exit 1
@@ -32,22 +24,47 @@ do
 done
 shift $((OPTIND - 1))
 
-if [ $# -ne 2 ]; then
+if [ $# -ne 1 ]; then
   usage
   exit 1
 fi
 
-samplepairlist=$1
-build=$2
+samplelist=$1
 
-if test ! -e $samplepairlist; then
+if test ! -e $samplelist; then
     echo "Error: $samplepairlist does not exist."
     exit 1
 fi
 
 ex(){ echo $1; eval $1; }
 
-echo "Churros comparepeak: $samplepairlist"
+echo "Churros compare: $samplelist"
+odir=$chdir/`basename $odir`
+mkdir -p $odir
+
+array=""
+while read LINE; do
+    LINE=($LINE)
+    prefix=${LINE[0]}
+    array="$array `ls $chdir/parse2wigdir+/$prefix*.100.bw`"
+done < $samplelist
+
+ofile=$odir/margedbin.npz
+multiBigwigSummary bins -b $array -o $ofile
+convertlabel_deeptools_npz.py $ofile  $odir/margedbin_renamed.npz
+mv $odir/margedbin_renamed.npz $ofile
+
+param="--corMethod spearman --skipZeros -in $ofile"
+plotCorrelation $param --plotTitle "Spearman Correlation (100-bp bin)" --whatToPlot scatterplot \
+                -o $odir/scatterplot_SpearmanCorr_bigwigScores.png \
+                --outFileCorMatrix $odir/SpearmanCorr_bigwigScores.tab
+plotCorrelation $param --plotTitle "Spearman Correlation (100-bp bin)" --whatToPlot heatmap --colorMap RdYlBu_r --plotNumbers \
+                -o $odir/heatmap_SpearmanCorr_readCounts.png \
+                --outFileCorMatrix $odir/SpearmanCorr_readCounts.tab
+
+
+exit
+#echo "Churros comparepeak: $samplepairlist"
 
 
 #####
