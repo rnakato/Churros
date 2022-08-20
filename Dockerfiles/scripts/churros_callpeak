@@ -62,6 +62,7 @@ mkdir -p $mdir
 newlist=$mdir/samplepairlist.txt
 rm -rf $newlist
 array=""
+peakarray=""
 while read LINE; do
     array="$array $LINE"
 
@@ -79,6 +80,7 @@ while read LINE; do
        peak=$mdir/${label}_peaks.broadPeak
     fi
     echo "$chip,$input,$label,$mode,$peak" >> $newlist
+    peakarray="$peakarray -f $peak -l $label"
 done < $samplepairlist
 
 do_macs(){
@@ -125,3 +127,19 @@ export -f do_macs
 echo ${array[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval $force"
 
 echo "churros_callpeak done."
+echo -en "churros peak comparison..."
+
+## all
+jaccard.pl $peakarray -n 10000000 > $mdir/jaccard.all.tsv
+Rscript /opt/scripts/matrix_heatmap.R -i=$mdir/jaccard.all.tsv -o=$mdir/jaccard.all -clst -fsize=1 -method=ward.D2 -k=2
+
+jaccard.pl $peakarray -n 10000 > $mdir/jaccard.10000.tsv
+Rscript /opt/scripts/matrix_heatmap.R -i=$mdir/jaccard.10000.tsv -o=$mdir/jaccard.10000 -clst -fsize=1 -method=ward.D2 -k=2
+
+#peak1=
+#peak2=
+#n1=`wc -l $peak1`
+#n2=`wc -l $peak2`
+#noverlap=` compare_bs  -1 $peak1 -2 $peak2 -and | grep -v \# | wc -l`
+
+echo "done."

@@ -10,8 +10,8 @@ function usage()
     echo '   <mode>: peak mode ([sharp|broad|sharp-nomodel|broad-nomodel])' 1>&2
     echo '   Options:' 1>&2
     echo '      -f <int>: predefined fragment length (defalt: estimated in MACS2)' 1>&2
-    echo '      -q <float>: threshould of MACS2 (defalt: 0.05)' 1>&2
     echo '      -d <str>: output directory (defalt: "macs")' 1>&2
+    echo '      -B: save extended fragment pileup, and local lambda tracks (two files) at every bp into a bedGraph file' 1>&2
     echo '      -F: overwrite files if exist (defalt: skip)' 1>&2
 }
 
@@ -19,13 +19,15 @@ flen=200
 qval=0.05
 mdir=macs
 force=0
+param_bdg=""
 
-while getopts f:q:d:F option
+while getopts f:q:d:BF option
 do
     case ${option} in
 	f) flen=${OPTARG};;
 	q) qval=${OPTARG};;
 	d) mdir=${OPTARG};;
+	B) param_bdg="-B";;
 	F) force=1;;
 	*)
 	    usage
@@ -48,7 +50,7 @@ mode=$5
 
 ex(){ echo $1; eval $1; }
 
-if test $build = "hg19" -o $build = "hg38"; then
+if test $build = "hg19" -o $build = "hg38" -o $build = "T2T"; then
     sp="hs"
 elif test $build = "mm9" -o $build = "mm10" -o $build = "mm39"; then
     sp="mm"
@@ -67,9 +69,9 @@ else
 fi
 
 if test $Input = "none"; then
-    macs="macs2 callpeak -t $IP -g $sp -f BAM -q $qval"
+    macs="macs2 callpeak -t $IP -g $sp -f BAM -q $qval $param_bdg"
 else
-    macs="macs2 callpeak -t $IP -c $Input -g $sp -f BAM"
+    macs="macs2 callpeak -t $IP -c $Input -g $sp -f BAM $param_bdg"
     if test -e $Input && test -s $Input; then
         n=1 # dummy
     else

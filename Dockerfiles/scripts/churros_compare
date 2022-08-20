@@ -2,20 +2,28 @@
 cmdname=`basename $0`
 function usage()
 {
-    echo "$cmdname [Options] <samplelist>" 1>&2
+    echo "$cmdname [Options] <samplelist> <build>" 1>&2
     echo '   <samplelist>: text file of samples' 1>&2
+    echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   Options:' 1>&2
     echo '      -d : output direcoty (defalt: "compare")' 1>&2
+    echo '      -m: consider genome mappability in parse2wig+' 1>&2
     echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
+    echo '      -y <str>: param string of parse2wig+ files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
 }
 
-odir=compare
+odir=comparison
 chdir="Churros_result"
-while getopts d:D: option
+mp=0
+post_predefined=""
+
+while getopts d:mD:y: option
 do
     case ${option} in
 	d) odir=${OPTARG};;
-        D) chdir=${OPTARG};;
+        m) mp=1;;
+	D) chdir=${OPTARG};;
+   	y) post_predefined=${OPTARG};;
         *)
 	    usage
 	    exit 1
@@ -24,12 +32,13 @@ do
 done
 shift $((OPTIND - 1))
 
-if [ $# -ne 1 ]; then
+if [ $# -ne 2 ]; then
   usage
   exit 1
 fi
 
 samplelist=$1
+build=$2
 
 if test ! -e $samplelist; then
     echo "Error: $samplepairlist does not exist."
@@ -42,26 +51,66 @@ echo "Churros compare: $samplelist"
 odir=$chdir/`basename $odir`
 mkdir -p $odir
 
-array=""
+if test "$post_predefined" = ""; then
+    if test $mp -eq 1; then
+        post=-bowtie2-$build-raw-mpbl-GR
+    else
+        post=-bowtie2-$build-raw-GR
+    fi
+else
+    post=$post_predefined
+fi
+
 while read LINE; do
     LINE=($LINE)
     prefix=${LINE[0]}
-    array="$array `ls $chdir/parse2wigdir+/$prefix*.100.bw`"
+    array="$array `ls $chdir/parse2wigdir+/$prefix$post.100.bw`"
+    array5k="$array5k `ls $chdir/parse2wigdir+/$prefix$post.5000.bw`"
+    array100k="$array100k `ls $chdir/parse2wigdir+/$prefix$post.100000.bw`"
 done < $samplelist
 
 ofile=$odir/margedbin.npz
 multiBigwigSummary bins -b $array -o $ofile
-convertlabel_deeptools_npz.py $ofile  $odir/margedbin_renamed.npz
+convertlabel_deeptools_npz.py $ofile $odir/margedbin_renamed.npz $post.100.bw
 mv $odir/margedbin_renamed.npz $ofile
 
 param="--corMethod spearman --skipZeros -in $ofile"
 plotCorrelation $param --plotTitle "Spearman Correlation (100-bp bin)" --whatToPlot scatterplot \
-                -o $odir/scatterplot_SpearmanCorr_bigwigScores.png \
-                --outFileCorMatrix $odir/SpearmanCorr_bigwigScores.tab
+                -o $odir/scatterplot_SpearmanCorr_bigwigScores.100bp.png \
+                --outFileCorMatrix $odir/SpearmanCorr_bigwigScores.100bp.tab
 plotCorrelation $param --plotTitle "Spearman Correlation (100-bp bin)" --whatToPlot heatmap --colorMap RdYlBu_r --plotNumbers \
-                -o $odir/heatmap_SpearmanCorr_readCounts.png \
-                --outFileCorMatrix $odir/SpearmanCorr_readCounts.tab
+                -o $odir/heatmap_SpearmanCorr_readCounts.100bp.png \
+                --outFileCorMatrix $odir/SpearmanCorr_readCounts.100bp.tab
 
+#if test "$array5k" != ""; then
+#ofile=$odir/margedbin.5k.npz
+#multiBigwigSummary bins -b $array5k -o $ofile
+#convertlabel_deeptools_npz.py $ofile $odir/margedbin_renamed.npz $post.5000.bw
+#mv $odir/margedbin_renamed.npz $ofile
+
+#param="--corMethod spearman --skipZeros -in $ofile"
+#plotCorrelation $param --plotTitle "Spearman Correlation (5-kbp bin)" --whatToPlot scatterplot \
+#                -o $odir/scatterplot_SpearmanCorr_bigwigScores.5kbp.png \
+#                --outFileCorMatrix $odir/SpearmanCorr_bigwigScores.5kbp.tab
+#plotCorrelation $param --plotTitle "Spearman Correlation (5-kbp bin)" --whatToPlot heatmap --colorMap RdYlBu_r --plotNumbers \
+#                -o $odir/heatmap_SpearmanCorr_readCounts.5kbp.png \
+#                --outFileCorMatrix $odir/SpearmanCorr_readCounts.5kbp.tab
+#fi
+
+if test "$array100k" != ""; then
+ofile=$odir/margedbin.100k.npz
+multiBigwigSummary bins -b $array100k -o $ofile
+convertlabel_deeptools_npz.py $ofile $odir/margedbin_renamed.npz $post.100000.bw
+mv $odir/margedbin_renamed.npz $ofile
+
+param="--corMethod spearman --skipZeros -in $ofile"
+plotCorrelation $param --plotTitle "Spearman Correlation (100-kbp bin)" --whatToPlot scatterplot \
+                -o $odir/scatterplot_SpearmanCorr_bigwigScores.100kbp.png \
+                --outFileCorMatrix $odir/SpearmanCorr_bigwigScores.100kbp.tab
+plotCorrelation $param --plotTitle "Spearman Correlation (100-kbp bin)" --whatToPlot heatmap --colorMap RdYlBu_r --plotNumbers \
+                -o $odir/heatmap_SpearmanCorr_readCounts.100kbp.png \
+                --outFileCorMatrix $odir/SpearmanCorr_readCounts.100kbp.tab
+fi
 
 exit
 #echo "Churros comparepeak: $samplepairlist"

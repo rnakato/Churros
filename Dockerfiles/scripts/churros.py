@@ -163,6 +163,14 @@ def exec_churros(args):
         gt = Ddir + '/genometable.txt'
         print_and_exec_shell('churros_genPvalwig -D ' + chdir + ' ' + str(samplepairlist) + ' drompa+.pval ' + build + ' ' + gt)
 
+    ### make corremation heatmap
+    if args.mpbl:
+        param_churros_compare = "-m"
+    else:
+        param_churros_compare = ""
+
+    print_and_exec_shell('churros_compare ' + param_churros_compare + ' ' + str(samplelist) + ' ' + build)
+
     ### make pdf files
     print ("generate pdf files by drompa+...")
 

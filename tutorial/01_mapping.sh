@@ -16,7 +16,7 @@ NAME=(
     "HepG2_H2A.Z"
 )
 
-sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.1.0.sif"
+sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.2.0.sif"
 build=hg38
 Ddir=Ensembl-GRCh38
 

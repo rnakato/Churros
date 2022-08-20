@@ -26,6 +26,7 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/list
 
+
 # BWA 0.7.17
 COPY bwa-0.7.17.tar.bz2 bwa-0.7.17.tar.bz2
 RUN tar xvfj bwa-0.7.17.tar.bz2 \
@@ -51,22 +52,26 @@ RUN unzip bowtie2-2.4.5-linux-x86_64.zip \
 # Chromap 0.2.1
 COPY chromap-0.2.1_x64-linux.tar.bz2 chromap-0.2.1_x64-linux.tar.bz2
 RUN tar xvfj chromap-0.2.1_x64-linux.tar.bz2 \
-     && rm chromap-0.2.1_x64-linux.tar.bz2
+    && rm chromap-0.2.1_x64-linux.tar.bz2 \
+    && mv chromap /opt/bin
 
-# ChromHMM v1.23
-RUN mkdir -p /opt/ChromatinState
-COPY ChromHMM.jar /opt/ChromatinState/ChromHMM.jar
+# ChromHMM v1.23, ChromImpute v1.0.3
+COPY ChromHMM.jar /opt/bin/ChromHMM.jar
+COPY ChromImpute.jar /opt/bin/ChromImpute.jar
 
-# ChromImpute v1.0.3
-COPY ChromImpute.jar /opt/ChromatinState/ChromImpute.jar
+# fastp, bedtools v2.30.0
+COPY fastp /opt/bin/fastp
+COPY bedtools /opt/bin/bedtools
+
+# NextFlow
+#RUN curl -s https://get.nextflow.io | bash \
+#    && mv nextflow /opt/bin
 
 RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeker', 'Rsamtools'))" \
     && R -e "install.packages(c('snow','snowfall','bitops','caTools'))"
 
 # Epilogos (https://github.com/meuleman/epilogos)
-RUN pip install --no-cache-dir epilogos multiqc
-
-#deeptools
+RUN pip install --no-cache-dir epilogos multiqc deeptools
 
 RUN mkdir HOMER && cd HOMER \
     && mkdir bin cpp update \
@@ -83,20 +88,13 @@ RUN git clone --recursive https://github.com/rnakato/DROMPAplus \
     && git submodule foreach git pull origin master \
     && make
 
+# scripts
 COPY scripts/ /opt/scripts
-RUN make -C /opt/scripts/MOSAiCS_mappability/ \
-    && chmod +x /opt/scripts/*
+RUN chmod a+x /opt/scripts/* /opt/bin/*
+# MOSAiCS
+RUN make -C /opt/scripts/MOSAiCS_mappability/
 
-RUN wget http://opengene.org/fastp/fastp \
-    && chmod a+x ./fastp \
-    && mv fastp /opt/scripts
-
-
-# NextFlow
-#RUN curl -s https://get.nextflow.io | bash \
-#    && mv nextflow /opt/scripts
-
-ENV PATH ${PATH}:/opt/scripts:/opt/SSP/bin:/opt/DROMPAplus/bin:/opt/DROMPAplus/submodules/cpdf/Linux-Intel-64bit:/opt/DROMPAplus/otherbins:/opt:/opt/bwa-0.7.17:/opt/bowtie-1.3.1-linux-x86_64:/opt/bowtie2-2.4.5-linux-x86_64::/opt/HOMER/bin/
+ENV PATH ${PATH}:/opt/scripts:/opt/SSP/bin:/opt/DROMPAplus/bin:/opt/DROMPAplus/submodules/cpdf/Linux-Intel-64bit:/opt/DROMPAplus/otherbins:/opt/bin:/opt/bwa-0.7.17:/opt/bowtie-1.3.1-linux-x86_64:/opt/bowtie2-2.4.5-linux-x86_64::/opt/HOMER/bin/
 
 USER ubuntu
 CMD ["/bin/bash"]
