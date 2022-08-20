@@ -1,0 +1,4 @@
+Scc1_DMSO,Input_Scc1_DMSO,Scc1_DMSO,sharp
+Scc1_thiolutin,Input_Scc1_thiolutin,Scc1_thiolutin,sharp
+RPO21_DMSO,Input_RPO21_DMSO,RPO21_DMSO,sharp
+RPO21_thiolutin,InputRPO21_thiolutin,RPO21_thiolutin,sharp

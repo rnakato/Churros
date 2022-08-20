@@ -56,8 +56,11 @@ elif test $build = "mm9" -o $build = "mm10" -o $build = "mm39"; then
     sp="mm"
 elif test $build = "ce11"; then
     sp="ce"
-elif test $build = "dm3" -o test $build = "dm6" -o test $build = "dm7"; then
+elif test $build = "dm3" -o $build = "dm6" -o $build = "dm7"; then
     sp="dm"
+elif test $build = "sacCer3" -o $build = "Spom"; then
+    sp="13e6"
+    param_yeast="--keep-dup all"
 else
     sp="1e8"
 fi
@@ -69,9 +72,9 @@ else
 fi
 
 if test $Input = "none"; then
-    macs="macs2 callpeak -t $IP -g $sp -f BAM -q $qval $param_bdg"
+    macs="macs2 callpeak -t $IP -g $sp -f BAM -q $qval $param_bdg $param_yeast"
 else
-    macs="macs2 callpeak -t $IP -c $Input -g $sp -f BAM $param_bdg"
+    macs="macs2 callpeak -t $IP -c $Input -g $sp -f BAM $param_bdg $param_yeast"
     if test -e $Input && test -s $Input; then
         n=1 # dummy
     else
