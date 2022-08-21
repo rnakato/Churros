@@ -41,7 +41,7 @@ Then the results are output in `Churros_result` directory.
 
 ## 3. Usage
 
-See [Manual](https://churros.readthedocs.io/en/latest/).
+See https://churros.readthedocs.io for the detailed Manual.
 
 
 ## 4. Build Docker image from Dockerfile
