@@ -30,12 +30,22 @@ def get_mapfile_postfix(mapparam):
     return post
 
 def do_qualitycheck_fastq(fastq, fastqcdir, fastpdir):
-    name = os.path.basename(fastq)
-    print_and_exec_shell('fastqc -t 4 -o ' + fastqcdir + ' ' + fastq)
-    print_and_exec_shell('fastp -w 4 -q 15 -n 5 -i ' + fastq
-                         + ' -o ' + fastpdir + name + '.fastq.gz'
-                         + ' -h ' + fastpdir + name + '.fastp.html'
-                         + ' -j ' + fastpdir + name + '.fastp.json')
+    prefix = os.path.basename(fastq).replace('.fastq', '').replace('.gz', '').replace('.fq', '')
+    fastqc_output = fastqcdir + prefix + "_fastqc.zip"
+    fastp_output = fastpdir + prefix + ".fastp.json"
+
+    if os.path.isfile(fastqc_output):
+        print (fastqc_output + " already created. skipping.")
+    else:
+        print_and_exec_shell('fastqc -t 4 -o ' + fastqcdir + ' ' + fastq)
+
+    if os.path.isfile(fastp_output):
+        print (fastp_output + " already created. skipping.")
+    else:
+        print_and_exec_shell('fastp -w 4 -q 15 -n 5 -i ' + fastq
+                             + ' -o ' + fastpdir + prefix + '.fastq.gz'
+                             + ' -h ' + fastpdir + prefix + '.fastp.html'
+                             + ' -j ' + fastpdir + prefix + '.fastp.json')
 
 def do_fastqc(chdir, samplelist):
     fastqcdir = chdir + "/fastqc/"
@@ -180,16 +190,18 @@ def exec_churros(args):
     print ("generate pdf files by drompa+...")
 
     if args.mpbl:
-        param_churros_visualize = "-D " + chdir + " -m"
+        param_churros_visualize = "-D " + chdir + " --mpbl"
     else:
         param_churros_visualize = "-D " + chdir
 
-    pdfdir = "pdf"
-    print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' ' + chdir + '/' + args.macsdir + '/samplepairlist.txt ' + pdfdir + '/drompa+.macspeak ' + build + ' ' + Ddir)
-    print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -P "--scale_tag 100" ' + str(samplepairlist) + ' ' + pdfdir + '/drompa+.bin5M ' + build + ' ' + Ddir)
-    print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -p -P "--pthre_enrich 3 --scale_pvalue 3" ' \
-                         + str(samplepairlist) + ' ' + pdfdir + '/drompa+.pval.bin5M ' + build + ' ' + Ddir)
-    print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -G ' + str(samplepairlist) + ' ' + pdfdir + '/drompa+ ' + build + ' ' + Ddir)
+    if args.preset != "scer":
+        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
+        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich --logratio ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
+    else:
+        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' ' + chdir + '/' + args.macsdir + '/samplepairlist.txt drompa+.macspeak ' + build + ' ' + Ddir)
+        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -P "--scale_tag 100" ' + str(samplepairlist) + ' drompa+.bin5M ' + build + ' ' + Ddir)
+        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -p -P "--pthre_enrich 3 --scale_pvalue 3" ' + str(samplepairlist) + ' drompa+.pval.bin5M ' + build + ' ' + Ddir)
+        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -G ' + str(samplepairlist) + ' ' + 'drompa+ ' + build + ' ' + Ddir)
 
 if(__name__ == '__main__'):
     parser = argparse.ArgumentParser()
@@ -208,9 +220,15 @@ if(__name__ == '__main__'):
     parser.add_argument("-p", "--threads", help="number of CPUs (default: 12)", type=int, default=12)
     parser.add_argument("--outputpvalue", help="output ChIP/Input -log(p) distribution as a begraph format", action="store_true")
     parser.add_argument("-D", "--outputdir", help="output directory (default: 'Churros_result')", type=str, default="Churros_result")
+    parser.add_argument("--preset", help="Preset parameters for mapping reads ([scer])", type=str, default="")
 
     args = parser.parse_args()
     print(args)
+
+    if args.preset != "":
+        if args.preset != "scer":
+            print ("Error: specify [scer] for --preset option.")
+            exit()
 
     exec_churros(args)
     print ("churros finished.")
