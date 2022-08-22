@@ -121,7 +121,7 @@ func(){
 	fi
     fi
 
-    if test $build = "scer" -o $build = "pombe"; then
+    if test $build = "scer" -o $build = "pombe" -o $build = "sacCer3" -o $build = "Spom"; then
 	bins="$binsize"
     else
 	bins="$binsize 5000 100000"

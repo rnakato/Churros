@@ -57,9 +57,7 @@ logdir=$chdir/log/ssp
 mkdir -p $logdir
 
 param=""
-if test $build = "scer"; then
-    param="--ng_from 10000 --ng_to 50000 --ng_step 500"
-elif test $build = "pombe"; then
+if test $build = "scer" -o $build = "pombe" -o $build = "sacCer3" -o $build = "Spom"; then
     param="--ng_from 10000 --ng_to 50000 --ng_step 500"
 else
     param=""

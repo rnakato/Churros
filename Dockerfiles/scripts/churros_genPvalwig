@@ -10,6 +10,7 @@ function usage()
     echo '   Options:' 1>&2
     echo '      -b <int>: binsize (defalt: 100)' 1>&2
     echo '      -d <str>: directory of parse2wig+ (default: parse2wigdir+)' 1>&2
+    echo '      -m: consider genome mappability in parse2wig+' 1>&2
     echo '      -y <str>: postfix of .bw files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
     echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
     echo "   Example:" 1>&2
@@ -18,14 +19,16 @@ function usage()
 
 binsize=100
 pdir=parse2wigdir+
+mp=0
 post_predefined=""
 chdir="Churros_result"
 
-while getopts b:d:y:D: option
+while getopts b:d:m:y:D: option
 do
     case ${option} in
         b) binsize=${OPTARG};;
         d) pdir=${OPTARG};;
+        m) mp=1;;
         y) post_predefined=${OPTARG};;
         D) chdir=${OPTARG};;
 	*)
@@ -62,9 +65,12 @@ if test ! -e $gt; then
 fi
 
 echo "output directory: $odir"
-
 if test "$post_predefined" = ""; then
-    post=-bowtie2-$build-raw-GR
+    if test $mp -eq 1; then
+        post=-bowtie2-$build-raw-mpbl-GR
+    else
+        post=-bowtie2-$build-raw-GR
+    fi
 else
     post=$post_predefined
 fi

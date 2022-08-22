@@ -55,7 +55,8 @@ ex(){ echo $1; eval $1; }
 
 echo "Churros callpeak: $samplepairlist"
 
-mdir=$chdir/`basename $mdir`
+mdir_original=`basename $mdir`
+mdir=$chdir/$mdir_original
 bamdir=$chdir/`basename $bamdir`
 
 mkdir -p $mdir
@@ -75,12 +76,14 @@ while read LINE; do
        mode="sharp"
     fi
     if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
-       peak=$mdir/${label}_peaks.narrowPeak
+       peak=$mdir_original/${label}_peaks.narrowPeak
+       peak_chdir=$mdir/${label}_peaks.narrowPeak
     else
-       peak=$mdir/${label}_peaks.broadPeak
+       peak=$mdir_original/${label}_peaks.broadPeak
+       peak_chdir=$mdir/${label}_peaks.broadPeak
     fi
     echo "$chip,$input,$label,$mode,$peak" >> $newlist
-    peakarray="$peakarray -f $peak -l $label"
+    peakarray="$peakarray -f $peak_chdir -l $label"
 done < $samplepairlist
 
 do_macs(){
@@ -135,11 +138,5 @@ Rscript /opt/scripts/matrix_heatmap.R -i=$mdir/jaccard.all.tsv -o=$mdir/jaccard.
 
 jaccard.pl $peakarray -n 10000 > $mdir/jaccard.10000.tsv
 Rscript /opt/scripts/matrix_heatmap.R -i=$mdir/jaccard.10000.tsv -o=$mdir/jaccard.10000 -clst -fsize=1 -method=ward.D2 -k=2
-
-#peak1=
-#peak2=
-#n1=`wc -l $peak1`
-#n2=`wc -l $peak2`
-#noverlap=` compare_bs  -1 $peak1 -2 $peak2 -and | grep -v \# | wc -l`
 
 echo "done."

@@ -161,7 +161,7 @@ if test $command = "postprocess" -o $command = "exec"; then
            macspeak="$chdir/macs/${prefix}_forFRiP_peaks.narrowPeak"
            if test ! -e $macspeak; then
                echo "execute MACS2 without Input to estimate FRiP..."
-               macs.sh -d $chdir/macs $mapfile none ${prefix}_forFRiP $build sharp
+               macs.sh -d $chdir/macs $mapfile none ${prefix}_forFRiP $build sharp-nomodel
 	       rm $chdir/macs/${prefix}_forFRiP_peaks.xls
            fi
            echo "parse mapfile by parse2wig+..."

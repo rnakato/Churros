@@ -134,6 +134,7 @@ def exec_churros(args):
 
     mapparam = args.mapparam
     post = get_mapfile_postfix(mapparam)
+    gt = Ddir + '/genometable.txt'
 
     os.makedirs(chdir, exist_ok=True)
 
@@ -159,9 +160,13 @@ def exec_churros(args):
 
     ### generate P-value bedGraph
     if args.outputpvalue:
+        if args.mpbl:
+            param_churros_genwig = " -m -D" + chdir + " "
+        else:
+            param_churros_genwig = " -D " + chdir + " "
+
         print ("generate Pvalue bedGraph file...")
-        gt = Ddir + '/genometable.txt'
-        print_and_exec_shell('churros_genPvalwig -D ' + chdir + ' ' + str(samplepairlist) + ' drompa+.pval ' + build + ' ' + gt)
+        print_and_exec_shell('churros_genPvalwig ' + param_churros_genwig + str(samplepairlist) + ' drompa+.pval ' + build + ' ' + gt)
 
     ### make corremation heatmap
     if args.mpbl:

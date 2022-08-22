@@ -15,7 +15,7 @@ function usage()
     echo '      -F: overwrite files if exist (defalt: skip)' 1>&2
 }
 
-flen=200
+flen=294
 qval=0.05
 mdir=macs
 force=0
