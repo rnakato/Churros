@@ -1,0 +1,4 @@
+H3K4me1,Input,H3K4me1,sharp
+H3K4me2,Input,H3K4me2,sharp
+CTCF,Input,CTCF,sharp
+Pol2,Input,Pol2,sharp

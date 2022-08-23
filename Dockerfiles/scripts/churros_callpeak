@@ -135,11 +135,13 @@ echo "churros_callpeak done."
 echo -en "churros peak comparison..."
 
 ## bedtools jaccard
-jaccard.pl $peakarray -n 10000000 > $mdir/jaccard.all.tsv
-Rscript /opt/scripts/matrix_heatmap.R -i=$mdir/jaccard.all.tsv -o=$mdir/jaccard.all -clst -fsize=1 -method=ward.D2 -k=2
+odir=$chdir/comparison
+mkdir -p $odir
+jaccard.pl $peakarray -n 10000000 > $odir/jaccard.all.tsv
+Rscript /opt/scripts/matrix_heatmap.R -i=$mdir/jaccard.all.tsv -o=$odir/jaccard.all -clst -fsize=1 -method=ward.D2 -k=2
 
-jaccard.pl $peakarray -n 10000 > $mdir/jaccard.10000.tsv
-Rscript /opt/scripts/matrix_heatmap.R -i=$mdir/jaccard.10000.tsv -o=$mdir/jaccard.10000 -clst -fsize=1 -method=ward.D2 -k=2
+jaccard.pl $peakarray -n 10000 > $odir/jaccard.10000.tsv
+Rscript /opt/scripts/matrix_heatmap.R -i=$mdir/jaccard.10000.tsv -o=$odir/jaccard.10000 -clst -fsize=1 -method=ward.D2 -k=2
 
 ## peak overlap simpson
 simpson_peak.sh -p $ncore -d $chdir/simpson_peak_results/ $peaklist_simpson

@@ -51,7 +51,7 @@ def setparam(args):
     param += " --gt " + gt
 
     if args.drompaparam != "":
-        param += args.drompaparam
+        param += " " + args.drompaparam + " "
 
     return param
 
@@ -103,8 +103,8 @@ def do_churros_visualize(args):
     else:
         visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, fileext, post, Ddir, chdir)
 
-def visualize_GV(args, samplepairlist, gt, pdir, pdfdir, fileext, post, Ddir, build):
-    param = args.drompaparam
+def visualize_GV(args, samplepairlist, pdir, pdfdir, fileext, post, Ddir, build):
+    param = " " + args.drompaparam + " "
     ideogram = "/opt/DROMPAplus/data/ideogram/" + build + ".tsv"
     GC = Ddir + "/GCcontents/"
     GD = Ddir + "/gtf_chrUCSC/genedensity"
@@ -148,6 +148,9 @@ def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, fileext, post,
 
     head = os.path.basename(args.prefix)
 
+    if args.preset != "scer":
+        param += " --showchr "
+
     outputprefix =  pdfdir + "/" + head + ".PCENRICH." + str(args.binsize)
     print_and_exec_shell("drompa+ PC_ENRICH " + param + " " + s + " -o " + outputprefix + " | tee -a " + outputprefix + ".log")
     print_and_exec_shell("drompa+ PC_ENRICH " + param + " --callpeak " + s + " -o " + outputprefix + ".callpeak | tee -a " + outputprefix + ".callpeak.log")
@@ -182,10 +185,13 @@ def visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, fileext, post, 
 
     head = os.path.basename(args.prefix)
 
-    param += " --showchr --callpeak"
+    param += " --callpeak"
+    if args.preset != "scer":
+        param += " --showchr "
+
     outputprefix =  pdfdir + "/" + head + ".PCSHARP." + str(args.binsize)
     print_and_exec_shell("drompa+ PC_SHARP " + param + " " + s + " -o " + outputprefix + " | tee -a " + outputprefix + ".log")
-    if args.preset != "yeast":
+    if args.preset != "scer":
         os.remove(outputprefix + ".pdf")
 
 if(__name__ == '__main__'):
@@ -209,7 +215,7 @@ if(__name__ == '__main__'):
     parser.add_argument("-D", "--outputdir", help="output directory (default: 'Churros_result')", type=str, default="Churros_result")
 
     args = parser.parse_args()
-    print(args)
+#    print(args)
 
     if args.preset != "":
         if args.preset != "scer":

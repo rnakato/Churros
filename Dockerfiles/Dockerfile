@@ -68,7 +68,7 @@ COPY bedtools /opt/bin/bedtools
 #    && mv nextflow /opt/bin
 
 RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeker', 'Rsamtools'))" \
-    && R -e "install.packages(c('snow','snowfall','bitops','caTools'))"
+    && R -e "install.packages(c('snow', 'snowfall', 'bitops', 'caTools', 'VennDiagram'))"
 
 # Epilogos (https://github.com/meuleman/epilogos)
 RUN pip install --no-cache-dir epilogos multiqc deeptools

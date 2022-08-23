@@ -99,14 +99,14 @@ def do_mapping(args, samplelist, post, build, chdir):
         print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' exec "' + fastq + '" ' + prefix  + ' ' + build + ' ' + args.Ddir)
 
     # header
-    print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' header "' + fastq + '" ' + prefix  + ' ' + build + ' ' + args.Ddir + ' > ' + chdir + '/churros.QCstats.tsv')
+    os.system('churros_mapping ' + param_churros_mapping + ' header "' + fastq + '" ' + prefix  + ' ' + build + ' ' + args.Ddir + ' > ' + chdir + '/churros.QCstats.tsv')
 
     # stats
     df = pd.read_csv(samplelist, sep="\t", header=None)
     for index, row in df.iterrows():
         prefix = row[0]
         fq1 = row[1]
-        print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' stats "' + fq1 + '" ' + prefix  + ' ' + build + ' ' + args.Ddir + ' >> ' + chdir + '/churros.QCstats.tsv')
+        os.system('churros_mapping ' + param_churros_mapping + ' stats "' + fq1 + '" ' + prefix  + ' ' + build + ' ' + args.Ddir + ' >> ' + chdir + '/churros.QCstats.tsv')
 
 def make_samplepairlist_withflen(samplepairlist, post, build, chdir):
     samplepairlist_withflen = chdir + "/churros.samplepairlist.withflen.txt"
@@ -194,13 +194,13 @@ def exec_churros(args):
     else:
         param_churros_visualize = "-D " + chdir
 
-    if args.preset != "scer":
+    if args.preset == "scer":
         print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
         print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich --logratio ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
     else:
         print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' ' + chdir + '/' + args.macsdir + '/samplepairlist.txt drompa+.macspeak ' + build + ' ' + Ddir)
         print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -P "--scale_tag 100" ' + str(samplepairlist) + ' drompa+.bin5M ' + build + ' ' + Ddir)
-        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -p -P "--pthre_enrich 3 --scale_pvalue 3" ' + str(samplepairlist) + ' drompa+.pval.bin5M ' + build + ' ' + Ddir)
+        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 --pvalue -P "--pthre_enrich 3 --scale_pvalue 3" ' + str(samplepairlist) + ' drompa+.pval.bin5M ' + build + ' ' + Ddir)
         print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -G ' + str(samplepairlist) + ' ' + 'drompa+ ' + build + ' ' + Ddir)
 
 if(__name__ == '__main__'):

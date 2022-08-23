@@ -47,7 +47,6 @@ fi
 
 ex(){ echo $1; eval $1; }
 
-echo "Churros compare: $samplelist"
 odir=$chdir/`basename $odir`
 mkdir -p $odir
 
@@ -65,9 +64,11 @@ while read LINE; do
     LINE=($LINE)
     prefix=${LINE[0]}
     array="$array `ls $chdir/parse2wigdir+/$prefix$post.100.bw`"
-    array5k="$array5k `ls $chdir/parse2wigdir+/$prefix$post.5000.bw`"
-    array100k="$array100k `ls $chdir/parse2wigdir+/$prefix$post.100000.bw`"
+
+    sample=`ls $chdir/parse2wigdir+/$prefix$post.100000.bw 2> /dev/null`
+    if test "$sample" != ""; then array100k="$array100k $sample"; fi
 done < $samplelist
+echo $array100k
 
 ofile=$odir/margedbin.npz
 multiBigwigSummary bins -b $array -o $ofile
@@ -82,124 +83,17 @@ plotCorrelation $param --plotTitle "Spearman Correlation (100-bp bin)" --whatToP
                 -o $odir/heatmap_SpearmanCorr_readCounts.100bp.png \
                 --outFileCorMatrix $odir/SpearmanCorr_readCounts.100bp.tab
 
-#if test "$array5k" != ""; then
-#ofile=$odir/margedbin.5k.npz
-#multiBigwigSummary bins -b $array5k -o $ofile
-#convertlabel_deeptools_npz.py $ofile $odir/margedbin_renamed.npz $post.5000.bw
-#mv $odir/margedbin_renamed.npz $ofile
-
-#param="--corMethod spearman --skipZeros -in $ofile"
-#plotCorrelation $param --plotTitle "Spearman Correlation (5-kbp bin)" --whatToPlot scatterplot \
-#                -o $odir/scatterplot_SpearmanCorr_bigwigScores.5kbp.png \
-#                --outFileCorMatrix $odir/SpearmanCorr_bigwigScores.5kbp.tab
-#plotCorrelation $param --plotTitle "Spearman Correlation (5-kbp bin)" --whatToPlot heatmap --colorMap RdYlBu_r --plotNumbers \
-#                -o $odir/heatmap_SpearmanCorr_readCounts.5kbp.png \
-#                --outFileCorMatrix $odir/SpearmanCorr_readCounts.5kbp.tab
-#fi
-
 if test "$array100k" != ""; then
-ofile=$odir/margedbin.100k.npz
-multiBigwigSummary bins -b $array100k -o $ofile
-convertlabel_deeptools_npz.py $ofile $odir/margedbin_renamed.npz $post.100000.bw
-mv $odir/margedbin_renamed.npz $ofile
+    ofile=$odir/margedbin.100k.npz
+    multiBigwigSummary bins -b $array100k -o $ofile
+    convertlabel_deeptools_npz.py $ofile $odir/margedbin_renamed.npz $post.100000.bw
+    mv $odir/margedbin_renamed.npz $ofile
 
-param="--corMethod spearman --skipZeros -in $ofile"
-plotCorrelation $param --plotTitle "Spearman Correlation (100-kbp bin)" --whatToPlot scatterplot \
-                -o $odir/scatterplot_SpearmanCorr_bigwigScores.100kbp.png \
-                --outFileCorMatrix $odir/SpearmanCorr_bigwigScores.100kbp.tab
-plotCorrelation $param --plotTitle "Spearman Correlation (100-kbp bin)" --whatToPlot heatmap --colorMap RdYlBu_r --plotNumbers \
-                -o $odir/heatmap_SpearmanCorr_readCounts.100kbp.png \
-                --outFileCorMatrix $odir/SpearmanCorr_readCounts.100kbp.tab
+    param="--corMethod spearman --skipZeros -in $ofile"
+    plotCorrelation $param --plotTitle "Spearman Correlation (100-kbp bin)" --whatToPlot scatterplot \
+                    -o $odir/scatterplot_SpearmanCorr_bigwigScores.100kbp.png \
+                    --outFileCorMatrix $odir/SpearmanCorr_bigwigScores.100kbp.tab
+    plotCorrelation $param --plotTitle "Spearman Correlation (100-kbp bin)" --whatToPlot heatmap --colorMap RdYlBu_r --plotNumbers \
+                    -o $odir/heatmap_SpearmanCorr_readCounts.100kbp.png \
+                    --outFileCorMatrix $odir/SpearmanCorr_readCounts.100kbp.tab
 fi
-
-exit
-#echo "Churros comparepeak: $samplepairlist"
-
-
-#####
-
-b1=peak1.bed
-b2=peak2.bed
-l1=Control
-l2=siRad21
-pdfname="Venn.pdf"
-
-compare_bs -1 $b1 -2 $b2 -nobs > temp
-n1=`parsecomparebs.pl temp | cut -f1`
-n2=`parsecomparebs.pl temp | cut -f2`
-o1=`parsecomparebs.pl temp | cut -f3`
-o2=`parsecomparebs.pl temp | cut -f7`
-
-R -e "library(VennDiagram); pdf('$pdfname'); draw.pairwise.venn(area1=$n1, area2=$n2, cross.area=$o2, category=c('$l1','$l2'), cat.pos=c(0,33), cat.dist=c(0.01,0.04), col=c(colors()[139],'blue') , alpha=0.5 , fill=c(colors()[72],'blue'), ext.pos=5); dev.off()"
-rm temp
-
-#####
-
-
-
-mkdir -p $mdir
-newlist=$mdir/samplepairlist.txt
-rm -rf $newlist
-array=""
-while read LINE; do
-    array="$array $LINE"
-
-    LINE=(${LINE//,/ })
-    chip=${LINE[0]}
-    input=${LINE[1]}
-    label=${LINE[2]}
-    mode=${LINE[3]}
-    if test "$mode" = ""; then
-       mode="sharp"
-    fi
-    if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
-       peak=$mdir/${label}_peaks.narrowPeak
-    else
-       peak=$mdir/${label}_peaks.broadPeak
-    fi
-    echo "$chip,$input,$label,$mode,$peak" >> $newlist
-done < $samplepairlist
-
-do_macs(){
-    LINE=$1
-    build=$2
-    bamdir=$3
-    mdir=$4
-    newlist=$5
-    qval=$6
-
-    LINE=(${LINE//,/ })
-    chip=${LINE[0]}
-    input=${LINE[1]}
-    label=${LINE[2]}
-    mode=${LINE[3]}
-    flen=${LINE[4]}
-    IPbam=$bamdir/$chip-bowtie2-$build.sort.bam
-    Inputbam=$bamdir/$input-bowtie2-$build.sort.bam
-
-    if test "$mode" = ""; then mode="sharp"; fi
-
-    if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
-	peak=$mdir/${label}_peaks.narrowPeak
-	if test "$flen" != ""; then
-	    mode="sharp-nomodel"
-	    flen="-f $flen"
-	fi
-    else
-	peak=$mdir/${label}_peaks.broadPeak
-	if test "$flen" != ""; then
-	    mode="broad-nomodel"
-	    flen="-f $flen"
-	fi
-    fi
-    if test "$input" = ""; then
-	macs.sh -q $qval -d $mdir $flen $IPbam none $label $build $mode
-    else
-	macs.sh -q $qval -d $mdir $flen $IPbam $Inputbam $label $build $mode
-    fi
-}
-export -f do_macs
-
-echo ${array[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval"
-
-echo "churros_callpeak done."

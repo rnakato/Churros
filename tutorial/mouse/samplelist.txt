@@ -1,0 +1,5 @@
+CTCF	fastq/SRR299029.fastq.gz
+H3K4me1	fastq/SRR299037.fastq.gz
+H3K4me2	fastq/SRR299038.fastq.gz
+Input	fastq/SRR299040.fastq.gz
+Pol2	fastq/SRR299042.fastq.gz

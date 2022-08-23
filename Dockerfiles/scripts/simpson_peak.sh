@@ -113,3 +113,26 @@ for peak1 in $peaklist; do
     done
     echo "" >> $outputfile
 done
+
+# draw Venn diagramm
+for peak1 in $peaklist; do
+    label1=`basename $peak1`
+    for peak2 in $peaklist; do
+        label2=`basename $peak2`
+        if test $npeak -gt 0; then
+	    list=$odir/compare_bs-$label1-$label2.top$npeak
+	    pdfname=$odir/Venn-$label1-$label2.top$npeak.pdf
+        else
+            list=$odir/compare_bs-$label1-$label2
+	    pdfname=$odir/Venn-$label1-$label2.all.pdf
+        fi
+	n1=`parsecomparebs.pl $list | cut -f1`
+	n2=`parsecomparebs.pl $list | cut -f2`
+	o1=`parsecomparebs.pl $list | cut -f3`
+	o2=`parsecomparebs.pl $list | cut -f7`
+
+	R -e "library(VennDiagram); pdf('$pdfname'); draw.pairwise.venn(area1=$n1, area2=$n2, cross.area=$o2, category=c('$label1','$label2'), cat.pos=c(0,33), cat.dist=c(0.01,0.04), col=c(colors()[139],'blue'), alpha=0.5 , fill=c(colors()[72],'blue'), ext.pos=5); dev.off()"
+	rm temp
+
+    done
+done
