@@ -89,12 +89,13 @@ RUN git clone --recursive https://github.com/rnakato/DROMPAplus \
     && make
 
 # scripts
-COPY scripts/ /opt/scripts
-RUN chmod a+x /opt/scripts/* /opt/bin/*
+ENV CDIR Churros
+COPY $CDIR /opt/$CDIR
+RUN chmod a+x /opt/$CDIR/* /opt/bin/*
 # MOSAiCS
-RUN make -C /opt/scripts/MOSAiCS_mappability/
+RUN make -C /opt/$CDIR/MOSAiCS_mappability/
 
-ENV PATH ${PATH}:/opt/scripts:/opt/SSP/bin:/opt/DROMPAplus/bin:/opt/DROMPAplus/submodules/cpdf/Linux-Intel-64bit:/opt/DROMPAplus/otherbins:/opt/bin:/opt/bwa-0.7.17:/opt/bowtie-1.3.1-linux-x86_64:/opt/bowtie2-2.4.5-linux-x86_64::/opt/HOMER/bin/
+ENV PATH ${PATH}:/opt/scripts:/opt/$CDIR:/opt/SSP/bin:/opt/DROMPAplus/bin:/opt/DROMPAplus/submodules/cpdf/Linux-Intel-64bit:/opt/DROMPAplus/otherbins:/opt/bin:/opt/bwa-0.7.17:/opt/bowtie-1.3.1-linux-x86_64:/opt/bowtie2-2.4.5-linux-x86_64::/opt/HOMER/bin/
 
 USER ubuntu
 CMD ["/bin/bash"]

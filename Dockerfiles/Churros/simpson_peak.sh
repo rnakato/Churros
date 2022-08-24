@@ -116,7 +116,7 @@ for peak1 in $peaklist; do
     echo "" >> $outputfile
 done
 
-Rscript /opt/scripts/matrix_heatmap.R -i=$outputfile -o=`echo $outputfile | sed 's/.tsv//g'` -clst -fsize=1 -method=ward.D2 -k=2
+Rscript /opt/Churros/matrix_heatmap.R -i=$outputfile -o=`echo $outputfile | sed 's/.tsv//g'` -clst -fsize=1 -method=ward.D2 -k=2
 
 # draw Venn diagramm
 for peak1 in $peaklist; do
@@ -135,7 +135,7 @@ for peak1 in $peaklist; do
 	    o2=`parsecomparebs.pl $list | cut -f7`
 	    pdfname=$list.VennDiagram.pdf
 
-	    R -e "library(VennDiagram); pdf('$pdfname'); draw.pairwise.venn(area1=$n1, area2=$n2, cross.area=$o2, category=c('$label1','$label2'), cat.pos=c(0,33), cat.dist=c(0.01,0.04), col=c(colors()[139],'blue'), alpha=0.5 , fill=c(colors()[72],'blue'), ext.pos=5); dev.off()"
+	    R -s -e "library(VennDiagram); pdf('$pdfname'); draw.pairwise.venn(area1=$n1, area2=$n2, cross.area=$o2, category=c('$label1','$label2'), cat.pos=c(0,33), cat.dist=c(0.01,0.04), col=c(colors()[139],'blue'), alpha=0.5 , fill=c(colors()[72],'blue'), ext.pos=5); dev.off()"
 	fi
     done
 done
