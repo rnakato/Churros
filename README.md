@@ -4,7 +4,7 @@
 
 Docker image is available at [DockerHub](https://hub.docker.com/r/rnakato/churros).
 
-### 1.1 Docker 
+### 1.1 Docker
 To use docker command, type:
 
     docker pull rnakato/churros
@@ -20,7 +20,7 @@ Singularity can also be used to execute the docker image:
 Singularity mounts the current directory automatically. If you access the files in the other directory, mount it by `--bind` option:
 
     singularity exec --bind /work churros.sif <command>
-    
+
 This command mounts `/work` directory.
 
 ## 2. Quickstart
@@ -30,10 +30,10 @@ This command mounts `/work` directory.
     # download Churros/tutorial directory
     git clone https://github.com/rnakato/Churros.git
     cd Churros/tutorial/
-    
+
     # download fastq and genome data and make index
     bash 00_getdata.sh
-    
+
     # Execute Churros pipeline
     bash Quickstart.sh
 
@@ -49,11 +49,11 @@ See https://churros.readthedocs.io for the detailed Manual.
 First clone and move to the repository
 
     git clone https://github.com/rnakato/Churros.git
-    cd Churros
+    cd Churros/Dockerfiles/
 
 Then type:
 
-    docker build -t <account>/churros
+    docker build -f Dokerfile.<version> -t <account>/churros
 
 ## 6. Contact
 

@@ -3,18 +3,20 @@ Installation
 
 Docker image is available at `DockerHub <https://hub.docker.com/r/rnakato/churros>`_.
 
-**Churros** internally uses the tools including:
+The latest version of **Churros** (``v0.2.0``) internally uses the tools including:
 
 - FastQC v0.11.9
+- fastp v0.23.2
 - MultiQC v1.12
-- Bowtie2 version 2.4.5
-- BWA version 0.7.17
-- MACS2 version 2.2.6
-- SAMtools version 1.15.1
-- DROMPA+ version 1.15.1
-- SSP version 1.2.5
-- ChromHMM version 1.23
-- ChromImpute version 1.0.3
+- Bowtie v1.1.2
+- Bowtie2 v2.4.5
+- BWA v0.7.17
+- MACS2 v2.2.6
+- SAMtools v1.15.1
+- DROMPA+ v1.15.3
+- SSP v1.2.5
+- ChromHMM v1.23
+- ChromImpute v1.0.3
 
 Docker
 ++++++++++++++

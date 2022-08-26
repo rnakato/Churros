@@ -1,15 +1,19 @@
 Tutorial
 =====================
 
-This tutorial assumes using singularity image.
-Please add ``singularity exec churros.sif`` before the commands.
+This page describes the tutorial how to get the results from FASTQ files. 
+While this tutorial uses human data, the sample scripts for human, mouse and `S. cerevisiae` are also available at `Chrros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial>`_.
 
-The sample scripts are also available at `Chrros GitHub <https://github.com/rnakato/Churros/tree/main/tutorial>`_.
+.. note::
+
+   | This tutorial assumes using the **Churros** singularity image (``churros.sif``). Please add ``singularity exec churros.sif`` before each command below.
+   | Example: ``singularity exec churros.sif download_genomedata.sh``
+
 
 Get data
 ------------------------
 
-Here we use five histone modification data of HepG2 cells (from `ENCODE Project <https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE29611>`_):
+Here we use five histone modification data of HepG2 cells from `ENCODE Project <https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE29611>`_.
 
 .. code-block:: bash
 
