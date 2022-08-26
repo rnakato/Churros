@@ -16,12 +16,12 @@ Ddir=Ensembl-GRCm38
 for ((i=0; i<${#FASTQ[@]}; i++))
 do
     echo ${NAME[$i]}
-    $sing churros_mapping exec "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir
+    $sing churros_mapping -m -k 36 exec "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir
 done
 
 # output QC stats
-$sing churros_mapping header "${FASTQ[$i]}" label $build $Ddir > churros.QCstats.tsv
+$sing churros_mapping -m header "${FASTQ[$i]}" label $build $Ddir > churros.QCstats.tsv
 for ((i=0; i<${#FASTQ[@]}; i++))
 do
-    $sing churros_mapping stats "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir >> churros.QCstats.tsv
+    $sing churros_mapping -m stats "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir >> churros.QCstats.tsv
 done
