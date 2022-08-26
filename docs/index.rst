@@ -15,8 +15,8 @@ Contents:
 
    content/Install
    content/Tutorial
-   content/Appendix
    content/Commands
+   content/Appendix
 
 
 Contact:

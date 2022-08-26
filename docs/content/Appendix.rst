@@ -22,6 +22,13 @@ While ``download_genomedata.sh`` uses the `Ensembl <https://asia.ensembl.org/ind
    "C. elegans", "WBcel235", "ce11"
    "S. serevisiae", "R64-1-1", "sacCer3"
 
+For example, to use human genome build GRCh38/hg38, specify GRCh38 for ``download_genomedata.sh`` and hg38 for ``churros``.
+
+.. code-block:: bash
+
+    download_genomedata.sh GRCh38 Ensembl-GRCh38/ 2>&1 | tee log/Ensembl-GRCh38
+    churros -p 24 --mpbl samplelist.txt samplepairlist.txt hg38 Ensembl-GRCh38/
+
 Make mappability files
 --------------------------------------------------
 
