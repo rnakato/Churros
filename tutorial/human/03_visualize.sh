@@ -1,6 +1,6 @@
 sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.2.0.sif"
 build=hg38
-Ddir=/work/Database/Database_fromDocker/Ensembl-GRCh38
+Ddir=Ensembl-GRCh38
 
 $sing churros_visualize --mpbl samplepairlist.txt drompa+ $build $Ddir
 $sing churros_visualize --mpbl -m macs/samplepairlist.txt drompa+.macspeak $build $Ddir
