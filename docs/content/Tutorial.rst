@@ -132,36 +132,16 @@ The mapped reads are then quality-checked and converted to BigWig files.
     churros_mapping exec fastq/SRR227598.fastq.gz,fastq/SRR227599.fastq.gz HepG2_H3K27me3 $build $Ddir
     churros_mapping exec fastq/SRR227639.fastq.gz,fastq/SRR227640.fastq.gz HepG2_H2A.Z    $build $Ddir
 
-Of course you can also use a shell loop:
+Or you can use the ``samplelist.txt`` as follows:
 
 .. code-block:: bash
 
-    FASTQ=(
-        "fastq/SRR227447.fastq.gz,fastq/SRR227448.fastq.gz"
-        "fastq/SRR227552.fastq.gz,fastq/SRR227553.fastq.gz"
-        "fastq/SRR227563.fastq.gz,fastq/SRR227564.fastq.gz"
-        "fastq/SRR227575.fastq.gz,fastq/SRR227576.fastq.gz"
-        "fastq/SRR227598.fastq.gz,fastq/SRR227599.fastq.gz"
-        "fastq/SRR227639.fastq.gz,fastq/SRR227640.fastq.gz"
-    )
-
-    NAME=(
-        "HepG2_H3K36me3"
-        "HepG2_Control"
-        "HepG2_H3K4me3"
-        "HepG2_H3K27ac"
-        "HepG2_H3K27me3"
-        "HepG2_H2A.Z"
-    )
-    build=hg38
-    Ddir=Ensembl-GRCh38
-    for ((i=0; i<${#FASTQ[@]}; i++))
-    do
-        echo ${NAME[$i]}
-        $sing churros_mapping exec "${FASTQ[$i]}" ${NAME[$i]} $build $Ddir
-    done
-
-
+    while read LINE; do
+        LINE=($LINE)
+        prefix=${LINE[0]}
+        fq1=${LINE[1]}
+        churros_mapping -p 12 exec $fq1 $prefix hg38 Ensembl-GRCh38
+    done < samplelist.txt
 
 
 Call peaks by MACS2
