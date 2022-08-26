@@ -5,14 +5,14 @@ function usage()
     echo "$cmdname" '[options] <command> <fastq> <prefix> <build> <Ddir>' 1>&2
     echo '   <command>:' 1>&2
     echo '      exec: map + postprocess' 1>&2
-    echo '      map: mapping by bowtie2' 1>&2
+    echo '      map: mapping reads' 1>&2
     echo '      postprocess: QC and generate wig files by ssp and parse2wig;' 1>&2
     echo '      stats: show mapping/QC stats;' 1>&2
     echo '      header: print header line of the stats' 1>&2
     echo '   <fastq>: fastq file' 1>&2
     echo '   <prefix>: output prefix' 1>&2
     echo '   <build>: genome build (e.g., hg38)' 1>&2
-    echo '   <Ddir>: directory of bowtie2 index' 1>&2
+    echo '   <Ddir>: directory of bowtie|bowtie2 index' 1>&2
     echo '   Options:' 1>&2
     echo '      -c: output as CRAM format (defalt: BAM)' 1>&2
     echo '      -b: binsize of parse2wig+ (defalt: 100)' 1>&2
@@ -20,12 +20,13 @@ function usage()
     echo '      -m: consider genome mappability in parse2wig+' 1>&2
     echo '      -k [36|50]: read length of mappability file (default:50)' 1>&2
     echo '      -n: omit ssp' 1>&2
+    echo '      -C: for SOLiD data (csfastq, defalt: fastq)' 1>&2
     echo '      -f: output format of parse2wig+ (default: 3)' 1>&2
     echo '               0: compressed wig (.wig.gz)' 1>&2
     echo '               1: uncompressed wig (.wig)' 1>&2
     echo '               2: bedGraph (.bedGraph)' 1>&2
     echo '               3: bigWig (.bw)' 1>&2
-    echo '      -P "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
+    echo '      -P "param": parameter of bowtie|bowtie2 (shouled be quated)' 1>&2
     echo '      -p : number of CPUs (default: 12)' 1>&2
     echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
     echo "   Example:" 1>&2
@@ -43,14 +44,16 @@ binsize=100
 k=50
 peak=""
 ncore=12
+csfasta=0
 chdir="Churros_result"
 
-while getopts cb:z:a:mk:nf:P:p:D: option
+while getopts cCb:z:a:mk:nf:P:p:D: option
 do
     case ${option} in
         c) format=CRAM
            bamdir=cram
            ;;
+        C) csfasta=1;;
         b) binsize=${OPTARG};;
         z) peak=${OPTARG}
            if test ! -e $peak; then
@@ -100,7 +103,11 @@ prefix=$3
 build=$4
 Ddir=$5
 
-post="-bowtie2"`echo $bowtieparam | tr -d ' '`
+if test $csfasta -eq 1; then
+    post="-bowtie"`echo $bowtieparam | tr -d ' '`
+else
+    post="-bowtie2"`echo $bowtieparam | tr -d ' '`
+fi
 head=$prefix$post-$build
 
 pair=""
@@ -126,11 +133,20 @@ else
 fi
 
 if test $command = "map" -o $command = "exec"; then
-    echo "mapping reads by bowtie2..."
-    if test $format = "CRAM"; then
-        bowtie2.sh -c -p $ncore -P "$bowtieparam" -D $chdir "$fastq" $prefix $build $Ddir
+    if test $csfasta -eq 1; then
+	echo "mapping reads by bowtie..."
+	if test $format = "CRAM"; then
+            bowtie.sh -t csfastq -c -p $ncore -P "$bowtieparam" -D $chdir "$fastq" $prefix $build $Ddir
+	else
+            bowtie.sh -t csfastq    -p $ncore -P "$bowtieparam" -D $chdir "$fastq" $prefix $build $Ddir
+	fi
     else
-        bowtie2.sh    -p $ncore -P "$bowtieparam" -D $chdir "$fastq" $prefix $build $Ddir
+	echo "mapping reads by bowtie2..."
+	if test $format = "CRAM"; then
+	    bowtie2.sh -c -p $ncore -P "$bowtieparam" -D $chdir "$fastq" $prefix $build $Ddir
+	else
+            bowtie2.sh    -p $ncore -P "$bowtieparam" -D $chdir "$fastq" $prefix $build $Ddir
+	fi
     fi
     echo "done."
 fi
@@ -173,7 +189,11 @@ fi
 
 if test $command = "stats"; then
     logdir=$chdir/log
-    a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | grep -v Sample`
+    if test $csfasta -eq 1; then
+	a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | grep -v Sample`
+    else
+	a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | grep -v Sample`
+    fi
     b=`cat $logdir/parse2wig+/parsestats-$head.$binsize | grep -v Sample | cut -f6,7,8,9`
     gcov=`cat $logdir/parse2wig+/parsestats-$head.$binsize | grep -v Sample | cut -f10`
     if test $mp -eq 1; then
