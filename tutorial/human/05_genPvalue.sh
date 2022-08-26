@@ -1,8 +1,9 @@
 sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.2.0.sif"
 build=hg38
-gt=
+Ddir=Ensembl-GRCh38
+gt=$Ddir/genometable.txt
 
-$sing churros_genPvalwig samplelist.txt $build $gt
+$sing churros_genPvalwig samplepairlist.txt drompa+.pval $build $gt
 
 # consider mappability
-$sing churros_genPvalwig -m samplelist.txt $build $gt
+$sing churros_genPvalwig -m samplepairlist.txt drompa+.pval $build $gt
