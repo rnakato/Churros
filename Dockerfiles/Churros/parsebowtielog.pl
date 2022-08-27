@@ -22,6 +22,7 @@ my $filename=shift;
 pod2usage(2) unless $filename;
 
 print "Sample\treads\tmapped unique\t%\tmapped >= 2\t%\tmapped total\t%\tunmapped\t%\n";
+my $version="";
 my $sample="";
 my $num_total="";
 my $num_mapped="";
@@ -39,6 +40,9 @@ while(<$fh>){
 	next;
     }
     chomp;
+    if($_ =~ /bowtie version (.+)/){
+	$version = $1;
+    }
     if($_ =~ /bowtie (.+)[>|samtools sort -] (.+)/){
 	if($sample ne ""){
 	    if($num_filtered ne ""){
@@ -70,6 +74,7 @@ while(<$fh>){
 }
 $fh->close;
 
+print "bowtie version $version\t";
 
 if($sample ne ""){
     if($num_filtered ne ""){

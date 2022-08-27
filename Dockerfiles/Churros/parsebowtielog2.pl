@@ -15,6 +15,8 @@ use warnings;
 use autodie;
 use Path::Class;
 use Getopt::Long;
+use File::Basename 'basename', 'dirname';
+
 use Pod::Usage qw/pod2usage/;
 my $pair=0;
 GetOptions('pair' => \$pair);
@@ -76,7 +78,7 @@ while(<$fh>){
 	    $num_unaligned="";
 	    $num_filtered="";
 	}
-	$sample = $5;
+	$sample = basename $5;
     }elsif($_ =~ /(.+) reads; of these:/){
 	$num_total=$1;
     }elsif($_ =~ /Warning: Could not open read file/){

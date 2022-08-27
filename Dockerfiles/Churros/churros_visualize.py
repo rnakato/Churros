@@ -11,6 +11,10 @@ def print_and_exec_shell(command):
     print (command)
     os.system(command)
 
+def echo_and_print_and_exec_shell(command, logfile):
+    os.system("echo '" + command + "' >" + logfile)
+    print_and_exec_shell(command)
+
 def check_file(file):
     if os.path.isfile(file):
         pass
@@ -127,7 +131,11 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, fileext, post, Ddir, build)
     head = os.path.basename(args.prefix)
 
     outputprefix =  pdfdir + "/" + head + ".GV.100000"
-    print_and_exec_shell("drompa+ GV " + param + " " + sGV + " -o " + outputprefix + " | tee -a " + outputprefix + ".log")
+    command = "drompa+ GV " + param + " " + sGV + " -o " + outputprefix + " | tee -a " + outputprefix + ".log"
+    echo_and_print_and_exec_shell(command, outputprefix + ".log")
+#    os.system("echo '" + command + "' >" + outputprefix + ".log")
+#    print_and_exec_shell(command)
+
 
 def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, fileext, post, Ddir):
     if args.pvalue:
@@ -152,8 +160,12 @@ def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, fileext, post,
         param += " --showchr "
 
     outputprefix =  pdfdir + "/" + head + ".PCENRICH." + str(args.binsize)
-    print_and_exec_shell("drompa+ PC_ENRICH " + param + " " + s + " -o " + outputprefix + " | tee -a " + outputprefix + ".log")
-    print_and_exec_shell("drompa+ PC_ENRICH " + param + " --callpeak " + s + " -o " + outputprefix + ".callpeak | tee -a " + outputprefix + ".callpeak.log")
+
+    command = "drompa+ PC_ENRICH " + param + " " + s + " -o " + outputprefix + " | tee -a " + outputprefix + ".log"
+    echo_and_print_and_exec_shell(command, outputprefix + ".log")
+    command = "drompa+ PC_ENRICH " + param + " --callpeak " + s + " -o " + outputprefix + ".callpeak | tee -a " + outputprefix + ".callpeak.log"
+    echo_print_and_exec_shell(command, outputprefix + ".callpeak.log")
+
     if args.preset != "scer":
         os.remove(outputprefix + ".pdf")
         os.remove(outputprefix + ".callpeak.pdf")
@@ -190,7 +202,10 @@ def visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, fileext, post, 
         param += " --showchr "
 
     outputprefix =  pdfdir + "/" + head + ".PCSHARP." + str(args.binsize)
-    print_and_exec_shell("drompa+ PC_SHARP " + param + " " + s + " -o " + outputprefix + " | tee -a " + outputprefix + ".log")
+    command = "drompa+ PC_SHARP " + param + " " + s + " -o " + outputprefix + " | tee -a " + outputprefix + ".log"
+    echo_and_print_and_exec_shell(command, outputprefix + ".log")
+
+
     if args.preset != "scer":
         os.remove(outputprefix + ".pdf")
 
