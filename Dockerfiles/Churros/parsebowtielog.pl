@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
 
 =head1 DESCRIPTION
- 
+
     Parse stats output by bowtie1.
- 
+
 =head1 SYNOPSIS
 
     parsebowtielog.pl <file>
@@ -16,6 +16,7 @@ use autodie;
 use Path::Class;
 use Getopt::Long qw/:config posix_default no_ignore_case bundling auto_help/;
 use Pod::Usage qw/pod2usage/;
+use File::Basename 'basename', 'dirname';
 
 my $filename=shift;
 pod2usage(2) unless $filename;
@@ -54,7 +55,7 @@ while(<$fh>){
 	    $num_filtered="";
 	    $num_pcrfiltered=" -";
 	}
-	$sample = $2;
+	$sample = basename $2;
     }elsif($_ =~ /# reads processed: (.+)/){
 	$num_total=$1;
     }elsif($_ =~ /# reads with at least one reported alignment: (.+) (\(.+\))/){

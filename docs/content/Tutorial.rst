@@ -195,11 +195,35 @@ Supply ``--pvalue`` option to visualize -log10(p) distribution of ChIP/input enr
 To visualize genome-wide view, supply ``-G`` option.
 
 .. code-block:: bash
+
     churros_visualize -G Churros_result/macs/samplepairlist.txt drompa+ hg38 Ensembl-GRCh38
 
 - Output
 
     - pdf/ ... the pdf files and corresponding peak lists.
+
+
+(Optional) modify parameter sets for visualization manually
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+``churros_visualize`` also outputs a log file of pdf files generation 
+(e.g., ``drompa+.PCSHARP.100.log`` for ``Churros_result/pdf/drompa+.PCSHARP.100.*.pdf``). 
+This log file contains the command of DROMPA+ to make the pdf file at the top.
+
+.. code-block:: bash
+
+    head -n1 Churros_result/pdf/drompa+.PCSHARP.100.log
+    drompa+ PC_SHARP  --ls 1000 -g Ensembl-GRCh38/gtf_chrUCSC/chr.gene.refFlat --gt Ensembl-GRCh38/genometable.txt --callpeak --showchr   -i Churros_result/parse2wigdir+/HepG2_H2A.Z-bowtie2-hg38-raw-mpbl-GR.100.bw,Churros_result/parse2wigdir+/HepG2_Control-bowtie2-hg38-raw-mpbl-GR.100.bw,HepG2_H2A.Z, -i Churros_result/parse2wigdir+/HepG2_H3K4me3-bowtie2-hg38-raw-mpbl-GR.100.bw,Churros_result/parse2wigdir+/HepG2_Control-bowtie2-hg38-raw-mpbl-GR.100.bw,HepG2_H3K4me3, -i Churros_result/parse2wigdir+/HepG2_H3K27ac-bowtie2-hg38-raw-mpbl-GR.100.bw,Churros_result/parse2wigdir+/HepG2_Control-bowtie2-hg38-raw-mpbl-GR.100.bw,HepG2_H3K27ac, -i Churros_result/parse2wigdir+/HepG2_H3K27me3-bowtie2-hg38-raw-mpbl-GR.100.bw,Churros_result/parse2wigdir+/HepG2_Control-bowtie2-hg38-raw-mpbl-GR.100.bw,HepG2_H3K27me3, -i Churros_result/parse2wigdir+/HepG2_H3K36me3-bowtie2-hg38-raw-mpbl-GR.100.bw,Churros_result/parse2wigdir+/HepG2_Control-bowtie2-hg38-raw-mpbl-GR.100.bw,HepG2_H3K36me3, -o Churros_result/pdf/drompa+.PCSHARP.100 | tee -a Churros_result/pdf/drompa+.PCSHARP.100.log
+
+Therefore, you can modify the resulting pdf files by directly modifying this command.
+For example, if you want to change the y-axis scale to 50, add ``--scale_tag 50`` and execute:
+
+.. code-block:: bash
+
+    drompa+ PC_SHARP --scale_tag 50 --ls 1000 (...) -o Churros_result/pdf/drompa+.PCSHARP.100.modified
+
+See `DROMPAplus manual <https://drompaplus.readthedocs.io/en/latest/index.html>`_ for the detailed usage of DROMPA+.
+
 
 churros_compare: compare peaks among ChIP samples
 --------------------------------------------------------------------
