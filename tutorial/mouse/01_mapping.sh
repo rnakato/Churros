@@ -8,7 +8,9 @@ FASTQ=(
 
 NAME=("CTCF" "H3K4me1" "H3K4me2" "Input" "Pol2")
 
-sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.2.0.sif"
+#sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.2.0.sif"
+sing="singularity exec churros.0.2.0.sif"
+
 build=mm10
 Ddir=Ensembl-GRCm38
 
