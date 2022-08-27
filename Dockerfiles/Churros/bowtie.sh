@@ -14,8 +14,9 @@ function usage()
     echo '      -P "STR": parameter of bowtie (shouled be quated, default: "-n2 -m1")' 1>&2
     echo '      -D: output dir (defalt: ./)' 1>&2
     echo "   Example:" 1>&2
-    echo "      For single-end: $cmdname -p \"--very-sensitive\" chip.fastq.gz chip hg38" 1>&2
-    echo "      For paired-end: $cmdname \"\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz\" chip hg38" 1>&2
+    echo "      For single-end: $cmdname -P \"-n2 -m1\" chip.fastq.gz chip hg38 Ensembl-GRCh38" 1>&2
+    echo "      For paired-end: $cmdname \"\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz\" chip hg38 Ensembl-GRCh38" 1>&2
+    echo "      For SOLiD data: $cmdname -t csfastq -P \"-n2 -m1\" chip.csfastq.gz chip hg38 Ensembl-GRCh38" 1>&2
 }
 
 type=fastq
@@ -23,6 +24,7 @@ format=BAM
 bamdir=bam
 ncore=12
 chdir="./"
+param=""
 
 while getopts ct:P:p:D: option
 do
