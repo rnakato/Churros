@@ -54,4 +54,6 @@ For example, if you want to make the mappability files for genome build hg38 wit
 
 Then the data is created in ``Ensembl-GRCm38/mappability_Mosaics_75mer`` and ``Ensembl-GRCm38/mappability_Mosaics_100mer``.
 
-Note: this command takes long time for computation. Set large number for ``-p`` (e.g., 64).
+.. note::
+
+   This command takes long time for computation. Set large number for ``-p`` (e.g., 64).
