@@ -15,6 +15,7 @@ Contents:
 
    content/Install
    content/Tutorial
+   content/Tutorial.scer
    content/Commands
    content/Appendix
 

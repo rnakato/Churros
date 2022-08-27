@@ -1,4 +1,4 @@
-Tutorial
+Tutorial (human)
 =====================
 
 This page describes the tutorial how to get the results from FASTQ files.
