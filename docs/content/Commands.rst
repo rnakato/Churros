@@ -7,7 +7,6 @@ download_genomedata.sh
 ``download_genomedata.sh`` downloads the genome and gene annotation files of the genome build specified.
 **Churros** assumes the reference data is downloaded by this command.
 
-
 .. code-block:: bash
 
     download_genomedata.sh <build> <outputdir>
@@ -45,7 +44,7 @@ churros
 --------------------------------------------
 
 ``churros`` command internally implements ``churros_mapping``, ``churros_callpeak``, ``churros_visualize``, ``churros_compare`` and ``churros_genPvalwig``.
-``churros`` also check the quality of FASTQ files using fastqc and fastp in addition to the qualich check of map files by ``churros_mapping``. The result is summarized in the stats file (``Churros_result/churros.QCstats.tsv``) and html by MULTIQC (``multiqc_report.html``).
+``churros`` also check the quality of FASTQ files using fastqc and fastp in addition to the quality check of map files by ``churros_mapping``. The result is summarized in the stats file in text format (``Churros_result/churros.QCstats.tsv``) and HTML format by MULTIQC (``multiqc_report.html``).
 
 .. code-block:: bash
 
@@ -81,6 +80,17 @@ churros
       -D OUTPUTDIR, --outputdir OUTPUTDIR
                             output directory (default: 'Churros_result')
       --preset PRESET       Preset parameters for mapping reads ([scer])
+
+- Several points:
+
+   - We recommend considering genome mappability by supplying ``--mpbl`` option as long as mappability files are available. 
+
+       - ``download_genomedata.sh`` generates mappability files for the read lengths 28, 36, and 50. Specify the read length closest to your data.
+       - If the data is unavailable, consider generating the mappability files (see :doc:`Appendix`).
+   - ``--outputpvalue`` option generates the bedGraph of -log10(p). By specifying ChIP files in two conditions (e.g., before and after stimulation) in ``samplepairlist``, you can generate and analyze the p-value distribution itself.
+   - The appropriate parameter setting depends on the species to be investigated. ``churros`` has ``--preset`` option to tune the parameter set for each species. 
+
+       - In version 0.2.0, there is ``--preset scer`` option only (for `S. cerevisiae`). When applying ``chuross`` to `S. serevisiae`, try ``--preset scer`` option.
 
 churros_mapping
 --------------------------------------------
@@ -280,5 +290,5 @@ chromImpute.sh:
 ------------------------------------------------
 
 You can use chromImpute using ``chromImpute.sh <command>``, e.g., ``chromImpute.sh Convert``.
-See the `ChromHMM website <https://ernstlab.biolchem.ucla.edu/ChromImpute/>`_ for the detail.
+See the `chromImpute website <https://ernstlab.biolchem.ucla.edu/ChromImpute/>`_ for the detail.
 
