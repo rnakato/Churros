@@ -14,7 +14,7 @@ function usage()
     echo '      -y <str>: postfix of .bw files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
     echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
     echo "   Example:" 1>&2
-    echo "      $cmdname samplelist.txt chip-seq hg38 Database/Ensembl-GRCh38" 1>&2
+    echo "      $cmdname samplelist.txt chip-seq hg38 Ensembl-GRCh38" 1>&2
 }
 
 binsize=100
