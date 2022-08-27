@@ -160,10 +160,12 @@ If input samples are omitted, peaks are called using ChIP samples only.
 
     churros_callpeak -p 8 samplepairlist.txt hg38
 
+``churros_callpeak`` also outputs the correlation scores (Simpson index) and heatmaps.
+
 - Output
 
     - macs/ ... peak files called by MACS2. ``*_forFRiP`` is called without Input files for calculating FRiP scores. The log files are stored in *log. ``samplepairlist.txt`` in macs/ directory includes the filename of peak files that is used in ``churros_visualize``.
-
+    - simpson_peak_results/ ... results of one-by-one comparion (overlapped peak list and Venn diagram) and the heatmap of Simposon index of peak overlap for all peaks and top-ranked 2000 peaks
 
 churros_visualize: visualize read distributions by DROMPA+
 --------------------------------------------------------------------
@@ -237,7 +239,10 @@ churros_compare: compare peaks among ChIP samples
 - Output
 
     - comparison/ ... Spearman correlation of read distributon in 100-bp and 100-kbp bins by `deepTools plotCorrelation <https://deeptools.readthedocs.io/en/develop/content/tools/plotCorrelation.html>`_ and jaccard index of peak overlap by `bedtools jaccard <https://bedtools.readthedocs.io/en/latest/content/tools/jaccard.html>`_ (for all peaks and top-ranked 2000 peaks)
-    - simpson_peak_results/ ... results of one-by-one comparion (overlapped peak list and Venn diagram) and the heatmap of Simposon index of peak overlap for all peaks and top-ranked 2000 peaks
+
+.. note::
+
+   Unlike the peak comparison implemented in ``churros_callpeak``, ``churros_compare`` evaluates the similarity of whole genome including non-peak regions. Therefore the results may reflect the genome-wide features (e.g., GC bias and copy number variations) rather than peak overlap.
 
 
 churros_genPvalwig: generate P-value distribution as bedGraph
