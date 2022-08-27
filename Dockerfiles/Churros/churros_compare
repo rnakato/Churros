@@ -6,7 +6,7 @@ function usage()
     echo '   <samplelist>: text file of samples' 1>&2
     echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   Options:' 1>&2
-    echo '      -d : output direcoty (defalt: "compare")' 1>&2
+    echo '      -d : output directory (defalt: "compare")' 1>&2
     echo '      -m: consider genome mappability in parse2wig+' 1>&2
     echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
     echo '      -y <str>: param string of parse2wig+ files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
