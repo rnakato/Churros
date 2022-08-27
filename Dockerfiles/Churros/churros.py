@@ -216,7 +216,7 @@ if(__name__ == '__main__'):
     parser.add_argument("-q", "--qval", help="threshould of MACS2 (default: 0.05)", type=float, default=0.05)
     parser.add_argument("--macsdir", help="output direcoty of macs2 (default: 'macs2')", type=str, default="macs")
     parser.add_argument("-f", "--format", help="output format of parse2wig+ 0: compressed wig (.wig.gz)\n 1: uncompressed wig (.wig)\n 2: bedGraph (.bedGraph) \n 3 (default): bigWig (.bw)", type=int, default=3)
-    parser.add_argument("--mapparam", help="parameter of bowtie2 (shouled be quated)", type=str, default="")
+    parser.add_argument("--mapparam", help="parameter of bowtie|bowtie2 (shouled be quated)", type=str, default="")
     parser.add_argument("-p", "--threads", help="number of CPUs (default: 12)", type=int, default=12)
     parser.add_argument("--outputpvalue", help="output ChIP/Input -log(p) distribution as a begraph format", action="store_true")
     parser.add_argument("-D", "--outputdir", help="output directory (default: 'Churros_result')", type=str, default="Churros_result")
