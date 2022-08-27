@@ -59,7 +59,6 @@ logdir=$chdir/log/bowtie
 bamdir=$chdir/$bamdir
 mkdir -p $logdir $bamdir
 
-
 if test $format = "BAM"; then
     file=$bamdir/$prefix$post-$build.sort.bam
 else
@@ -139,7 +138,7 @@ ex_csfastq(){
     fi
 }
 
-log=$logdir/bowtie-$prefix$post-$build
+log=$logdir/$prefix.txt
 if test $type = "csfasta"; then  ex_csfasta >& $log;
 elif test $type = "csfastq"; then  ex_csfastq >& $log;
 else ex_hiseq >& $log
