@@ -6,7 +6,6 @@ import argparse
 import pathlib
 import pandas as pd
 
-
 def print_and_exec_shell(command):
     print (command)
     os.system(command)
@@ -89,10 +88,14 @@ def do_churros_visualize(args):
     if args.postfix != "":
         post = args.postfix
     else:
-        if args.mpbl:
-            post = "-bowtie2-" + build + "-raw-mpbl-GR"
+        if args.bowtie1:
+            bstr = "-bowtie-"
         else:
-            post = "-bowtie2-" + build + "-raw-GR"
+            bstr = "-bowtie2-"
+        if args.mpbl:
+            post = bstr + build + "-raw-mpbl-GR"
+        else:
+            post = bstr + build + "-raw-GR"
 
     # DROMPA+ param
     pdfdir = chdir + "/pdf"
@@ -222,6 +225,7 @@ if(__name__ == '__main__'):
     parser.add_argument("-d", help="directory of parse2wig+ (default: parse2wigdir+)", type=str, default="parse2wigdir+")
     parser.add_argument("--postfix", help="param string of parse2wig+ files to be used (default: '-bowtie2-<build>-raw-GR')", type=str, default="")
     parser.add_argument("--pvalue", help="show p-value distribution instead of read distribution", action="store_true")
+    parser.add_argument("--bowtie1", help="specified bowtie1", action="store_true")
     parser.add_argument("-P","--drompaparam", help="additional parameters for DROMPA+ (shouled be quated)", type=str, default="")
     parser.add_argument("-G", help="genome-wide view (100kbp)", action="store_true")
     parser.add_argument("--enrich", help="PC_ENRICH: show ChIP/Input ratio (preferred for yeast)", action="store_true")
