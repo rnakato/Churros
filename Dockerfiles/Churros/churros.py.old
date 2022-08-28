@@ -77,13 +77,37 @@ def do_mapping(args, samplelist, post, build, chdir):
     else:
         param_churros_mapping = "-D " + chdir + " -p " + str(args.threads)
 
-    print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' exec ' + str(samplelist) + ' ' + build + ' ' + args.Ddir)
+    # exec
+    df = pd.read_csv(samplelist, sep="\t", header=None)
+    for index, row in df.iterrows():
+        if (len(row)<2 or row[1] == ""):
+            print ("Error: specify fastq file in " + samplelist + ".")
+            exit()
+
+        prefix = row[0]
+        fq1 = row[1]
+        fq2 = ""
+        pair = ""
+        if (len(row)>2): # for paired-end
+            fq2 = row[2]
+            pair = "-p"
+            fastq = "-1 " + fq1 + " -2 " + fq2
+        else:
+            fastq = fq1
+
+        head = prefix + post + "-" + build
+
+        print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' exec "' + fastq + '" ' + prefix  + ' ' + build + ' ' + args.Ddir)
 
     # header
-    os.system('churros_mapping ' + param_churros_mapping + ' header > ' + chdir + '/churros.QCstats.tsv')
+    os.system('churros_mapping ' + param_churros_mapping + ' header "' + fastq + '" ' + prefix  + ' ' + build + ' ' + args.Ddir + ' > ' + chdir + '/churros.QCstats.tsv')
 
     # stats
-    os.system('churros_mapping ' + param_churros_mapping + ' stats ' + str(samplelist) + ' ' + build + ' ' + args.Ddir + ' >> ' + chdir + '/churros.QCstats.tsv')
+    df = pd.read_csv(samplelist, sep="\t", header=None)
+    for index, row in df.iterrows():
+        prefix = row[0]
+        fq1 = row[1]
+        os.system('churros_mapping ' + param_churros_mapping + ' stats "' + fq1 + '" ' + prefix  + ' ' + build + ' ' + args.Ddir + ' >> ' + chdir + '/churros.QCstats.tsv')
 
 def make_samplepairlist_withflen(samplepairlist, post, build, chdir):
     samplepairlist_withflen = chdir + "/churros.samplepairlist.withflen.txt"
@@ -202,6 +226,10 @@ if(__name__ == '__main__'):
 
     args = parser.parse_args()
     #    print(args)
+
+    if args.version:
+        os.system("cat version.h")
+        exit()
 
     if args.preset != "":
         if args.preset != "scer":

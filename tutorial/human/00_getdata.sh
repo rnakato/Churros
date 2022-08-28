@@ -4,8 +4,8 @@ do
     fastq-dump --gzip $id -O fastq
 done
 
-#sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.2.0.sif"
-sing="singularity exec churros.0.2.0.sif"
+#sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.3.0.sif"
+sing="singularity exec churros.0.3.0.sif"
 
 mkdir -p log
 build=GRCh38
