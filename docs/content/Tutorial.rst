@@ -125,23 +125,12 @@ The mapped reads are then quality-checked and converted to BigWig files.
 
     build=hg38
     Ddir=Ensembl-GRCh38
-    churros_mapping exec fastq/SRR227447.fastq.gz,fastq/SRR227448.fastq.gz HepG2_H3K36me3 $build $Ddir
-    churros_mapping exec fastq/SRR227552.fastq.gz,fastq/SRR227553.fastq.gz HepG2_Control  $build $Ddir
-    churros_mapping exec fastq/SRR227563.fastq.gz,fastq/SRR227564.fastq.gz HepG2_H3K4me3  $build $Ddir
-    churros_mapping exec fastq/SRR227575.fastq.gz,fastq/SRR227576.fastq.gz HepG2_H3K27ac  $build $Ddir
-    churros_mapping exec fastq/SRR227598.fastq.gz,fastq/SRR227599.fastq.gz HepG2_H3K27me3 $build $Ddir
-    churros_mapping exec fastq/SRR227639.fastq.gz,fastq/SRR227640.fastq.gz HepG2_H2A.Z    $build $Ddir
-
-Or you can use the ``samplelist.txt`` for while loop as follows:
-
-.. code-block:: bash
-
-    while read LINE; do
-        LINE=($LINE)
-        prefix=${LINE[0]}
-        fq1=${LINE[1]}
-        churros_mapping -p 12 exec $fq1 $prefix hg38 Ensembl-GRCh38
-    done < samplelist.txt
+    
+    # mapping 
+    $sing churros_mapping -p 12 exec samplelist.txt $build $Ddir
+    # output QC stats
+    $sing churros_mapping header > churros.QCstats.tsv
+    $sing churros_mapping stats samplelist.txt $build $Ddir >> churros.QCstats.tsv
 
 - Output
     - bam/    ... map files (BAM format in default) and index files
