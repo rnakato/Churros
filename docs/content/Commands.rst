@@ -173,6 +173,7 @@ The results are output in ``pdf`` directory by default.
 
    If you supply ``-m`` option in ``churros_mapping`` (consider genome mappability), supply ``--mpbl`` optoon in ``churros_visualize`` to use the generated mappability-normalized bigWig files.
 
+
 .. code-block:: bash
 
    churros_visualize [-h] [-f WIGFORMAT] [-b BINSIZE] [-l LINESIZE]
