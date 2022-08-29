@@ -206,8 +206,8 @@ if(__name__ == '__main__'):
     #    print(args)
 
     if args.preset != "":
-        if args.preset != "scer":
-            print ("Error: specify [scer] for --preset option.")
+        if args.preset != "scer" and args.preset != "T2T":
+            print ("Error: specify [scer|T2T] for --preset option.")
             exit()
 
     exec_churros(args)

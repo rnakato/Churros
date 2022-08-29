@@ -242,7 +242,7 @@ if(__name__ == '__main__'):
 
     if args.preset != "":
         if args.preset != "scer" and args.preset != "T2T":
-            print ("Error: specify [scer] for --preset option.")
+            print ("Error: specify [scer|T2T] for --preset option.")
             exit()
 
     do_churros_visualize(args)
