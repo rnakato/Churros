@@ -117,7 +117,11 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, fileext, post, Ddir, build)
     GD = Ddir + "/gtf_chrUCSC/genedensity"
     gt = Ddir + "/genometable.txt"
     check_file(gt)
-    param += " --gt " + gt + " --ideogram " + ideogram + " --GC " + GC + " --gcsize 500000 --GD " + GD + " --gdsize 500000"
+
+    if args.preset == "T2T":
+        param += " --gt " + gt
+    else:
+        param += " --gt " + gt + " --ideogram " + ideogram + " --GC " + GC + " --gcsize 500000 --GD " + GD + " --gdsize 500000"
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
     sGV = ""
@@ -230,14 +234,14 @@ if(__name__ == '__main__'):
     parser.add_argument("-G", help="genome-wide view (100kbp)", action="store_true")
     parser.add_argument("--enrich", help="PC_ENRICH: show ChIP/Input ratio (preferred for yeast)", action="store_true")
     parser.add_argument("--logratio", help="(for PC_ENRICH) show log-scaled ChIP/Input ratio", action="store_true")
-    parser.add_argument("--preset", help="Preset parameters for mapping reads ([scer])", type=str, default="")
+    parser.add_argument("--preset", help="Preset parameters for mapping reads ([scer|T2T])", type=str, default="")
     parser.add_argument("-D", "--outputdir", help="output directory (default: 'Churros_result')", type=str, default="Churros_result")
 
     args = parser.parse_args()
 #    print(args)
 
     if args.preset != "":
-        if args.preset != "scer":
+        if args.preset != "scer" and args.preset != "T2T":
             print ("Error: specify [scer] for --preset option.")
             exit()
 

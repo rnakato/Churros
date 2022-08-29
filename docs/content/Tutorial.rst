@@ -61,7 +61,7 @@ Multiple fastq files can be specified by separateing with ``,``.
 samplepairlist.txt
 ++++++++++++++++++++++++++
 
-``samplelist.txt`` is a **comma-delimited** file (CSV) that describes the ChIP/Input pairs as follows:
+``samplepairlist.txt`` is a **comma-delimited** file (CSV) that describes the ChIP/Input pairs as follows:
 
 - ChIP-sample label
 - Input-sample label
@@ -125,8 +125,8 @@ The mapped reads are then quality-checked and converted to BigWig files.
 
     build=hg38
     Ddir=Ensembl-GRCh38
-    
-    # mapping 
+
+    # mapping
     $sing churros_mapping -p 12 exec samplelist.txt $build $Ddir
     # output QC stats
     $sing churros_mapping header > churros.QCstats.tsv
@@ -181,7 +181,7 @@ To visualize genome-wide view, supply ``-G`` option.
 Highlight peak regions
 +++++++++++++++++++++++++++++++++
 
-| ``churros_visualize`` can highlight peak regions if the peak file is specified in ``samplepairlist.txt``. 
+| ``churros_visualize`` can highlight peak regions if the peak file is specified in ``samplepairlist.txt``.
 | (i.e., the column of ``samplepairlist.txt`` for ``churros_visualize`` is ``<ChIP-sample>,<Input-sample>,<prefix>,<peakfile>``).
 | Because ``churros_callpeak`` generated ``macs/samplepairlist.txt`` that includes the peak files, ``churros_visualize`` highlights the peak regions by the command below:
 
@@ -202,8 +202,8 @@ Supply ``--pvalue`` option to visualize -log10(p) distribution of ChIP/input enr
 (Optional) modify parameter sets for visualization manually
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-``churros_visualize`` also outputs a log file of pdf files generation 
-(e.g., ``drompa+.PCSHARP.100.log`` for ``Churros_result/pdf/drompa+.PCSHARP.100.*.pdf``). 
+``churros_visualize`` also outputs a log file of pdf files generation
+(e.g., ``drompa+.PCSHARP.100.log`` for ``Churros_result/pdf/drompa+.PCSHARP.100.*.pdf``).
 This log file contains the command of DROMPA+ to make the pdf file at the top.
 
 .. code-block:: bash
@@ -248,7 +248,7 @@ churros_genPvalwig: generate P-value distribution as bedGraph
     Ddir=Ensembl-GRCh38
     gt=$Ddir/genometable.txt
     churros_genPvalwig samplepairlist.txt drompa+.pval hg38 $gt
-    
+
     # consider mappability
     churros_genPvalwig -m samplepairlist.txt drompa+.pval hg38 $gt
 

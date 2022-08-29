@@ -170,6 +170,8 @@ def exec_churros(args):
         param_churros_visualize = "-D " + chdir + " --mpbl"
     else:
         param_churros_visualize = "-D " + chdir
+    if args.preset == "T2T":
+        param_churros_visualize += " --preset T2T "
 
     if args.preset == "scer":
         print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
