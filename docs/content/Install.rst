@@ -18,6 +18,7 @@ The latest version of **Churros** (``v0.2.0``) internally uses the tools includi
 - ChromHMM v1.23
 - ChromImpute v1.0.3
 - SRA Toolkit v3.0.0
+- Intervene version 0.6.5
 
 Docker
 ++++++++++++++

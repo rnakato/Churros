@@ -71,7 +71,8 @@ RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeke
     && R -e "install.packages(c('snow', 'snowfall', 'bitops', 'caTools', 'VennDiagram'))"
 
 # Epilogos (https://github.com/meuleman/epilogos)
-RUN pip install --no-cache-dir epilogos multiqc deeptools
+# MultiQC, deepTools, intervene
+RUN pip install --no-cache-dir epilogos multiqc deeptools intervene
 
 RUN mkdir HOMER && cd HOMER \
     && mkdir bin cpp update \
