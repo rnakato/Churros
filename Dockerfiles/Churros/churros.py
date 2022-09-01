@@ -157,9 +157,9 @@ def exec_churros(args):
 
     ### make corremation heatmap
     if args.mpbl:
-        param_churros_compare = "-m"
+        param_churros_compare = "-m -D" + chdir + " "
     else:
-        param_churros_compare = ""
+        param_churros_compare = " -D " + chdir + " "
 
     print_and_exec_shell('churros_compare ' + param_churros_compare + ' ' + str(samplelist) + ' ' + build)
 
