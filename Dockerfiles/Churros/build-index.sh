@@ -94,5 +94,5 @@ elif test $program = "bwa" ; then
     command="$binary index -p $indexdir/$name $fa"
     command_version="$binary"
     ex $program $name "$command" "$command_version"
-    ln -rsf $fa $indexdir/$name.fa
+    ln -rsf $fa $indexdir/$name
 fi
