@@ -72,15 +72,16 @@ do_compare_bs(){
     label2=${LINE[3]}
 
     if test $npeak -gt 0; then
-        ex " compare_bs -1 $odir/$label1.top$npeak -2 $odir/$label2.top$npeak -and > $odir/compare_bs-$label1-$label2.top$npeak"
+        compare_bs -1 $odir/$label1.top$npeak -2 $odir/$label2.top$npeak -and > $odir/compare_bs-$label1-$label2.top$npeak
     else
-        ex " compare_bs -1 $peak1 -2 $peak2 -and > $odir/compare_bs-$label1-$label2"
+        compare_bs -1 $peak1 -2 $peak2 -and > $odir/compare_bs-$label1-$label2
     fi
 }
 export -f do_compare_bs
 
-ncore=8
+echo "comparing peaks ... ncore: $ncore"
 echo ${array[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "do_compare_bs {} $npeak $odir"
+echo "done."
 
 for peak1 in $peaklist; do
     label1=`basename $peak1`
