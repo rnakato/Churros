@@ -121,7 +121,23 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, fileext, post, Ddir, build)
     if args.preset == "T2T":
         param += " --gt " + gt
     else:
-        param += " --gt " + gt + " --ideogram " + ideogram + " --GC " + GC + " --gcsize 500000 --GD " + GD + " --gdsize 500000"
+        param += " --gt " + gt
+        if os.path.isfile(ideogram):
+            param += " --ideogram " + ideogram
+        else:
+            print (ideogram + " does not exist. skipping.")
+        if os.path.isdir(GC):
+            param += " --GC " + GC + " --gcsize 500000"
+        else:
+            print (GC + " does not exist. skipping.")
+        if os.path.isdir(GD):
+            param += " --GD " + GD + " --gdsize 500000"
+        else:
+            print (GD + " does not exist. skipping.")
+
+    chdir = args.outputdir
+    logdir = chdir + "/log/"
+    os.makedirs(logdir, exist_ok=True)
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
     sGV = ""
@@ -131,17 +147,18 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, fileext, post, Ddir, build)
         label = row[2]
 
         if input != "":
-            sGV += " -i " + pdir + chip + post + ".100000." + fileext + "," + pdir + input + post + ".100000." + fileext + "," + label
+            sGV += " -i " + pdir + chip  + post + ".100000." + fileext + ","
+                          + pdir + input + post + ".100000." + fileext + ","
+                          + label
         else:
             print ("sample " + chip + " does not have the input sample. skipped..")
 
     head = os.path.basename(args.prefix)
-
     outputprefix =  pdfdir + "/" + head + ".GV.100000"
-    command = "drompa+ GV " + param + " " + sGV + " -o " + outputprefix + " | tee -a " + outputprefix + ".log"
-    echo_and_print_and_exec_shell(command, outputprefix + ".log")
-#    os.system("echo '" + command + "' >" + outputprefix + ".log")
-#    print_and_exec_shell(command)
+    logfile = logdir + head + ".GV.100000.log"
+
+    command = "drompa+ GV " + param + " " + sGV + " -o " + outputprefix + " | tee -a " + logfile
+    echo_and_print_and_exec_shell(command, logfile)
 
 
 def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, fileext, post, Ddir):
@@ -149,29 +166,34 @@ def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, fileext, post,
         param += " --showpenrich 1"
     if args.logratio:
         param += " --showratio 2"
+    if args.preset != "scer":
+        param += " --showchr "
+
+    chdir = args.outputdir
+    logdir = chdir + "/log/"
+    os.makedirs(logdir, exist_ok=True)
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
-    s=""
+    s = ""
     for index, row in df.iterrows():
         chip  = row[0]
         input = row[1]
         label = row[2]
         if input != "":
-            s += " -i " + pdir + chip + post + "." + str(args.binsize) + "." + fileext + "," + pdir + input + post + "." + str(args.binsize) + "." + fileext + "," + label
+            s += " -i " + pdir + chip  + post + "." + str(args.binsize) + "." + fileext + ","
+                        + pdir + input + post + "." + str(args.binsize) + "." + fileext + ","
+                        + label
         else:
             print ("sample " + chip + " does not have the input sample. skipped..")
 
     head = os.path.basename(args.prefix)
-
-    if args.preset != "scer":
-        param += " --showchr "
-
     outputprefix =  pdfdir + "/" + head + ".PCENRICH." + str(args.binsize)
+    logfile_prefix = logdir + head + ".PCENRICH." + str(args.binsize)
 
-    command = "drompa+ PC_ENRICH " + param + " " + s + " -o " + outputprefix + " | tee -a " + outputprefix + ".log"
-    echo_and_print_and_exec_shell(command, outputprefix + ".log")
-    command = "drompa+ PC_ENRICH " + param + " --callpeak " + s + " -o " + outputprefix + ".callpeak | tee -a " + outputprefix + ".callpeak.log"
-    echo_print_and_exec_shell(command, outputprefix + ".callpeak.log")
+    command = "drompa+ PC_ENRICH " + param + " " + s + " -o " + outputprefix + " | tee -a " + logfile_prefix + ".log"
+    echo_and_print_and_exec_shell(command, logfile_prefix + ".log")
+    command = "drompa+ PC_ENRICH " + param + " --callpeak " + s + " -o " + outputprefix + ".callpeak | tee -a " + logfile_prefix + ".callpeak.log"
+    echo_print_and_exec_shell(command, logfile_prefix + ".callpeak.log")
 
     if args.preset != "scer":
         os.remove(outputprefix + ".pdf")
@@ -182,8 +204,16 @@ def visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, fileext, post, 
     if args.pvalue:
         param += " --showctag 0 --showpenrich 1"
 
+    param += " --callpeak"
+    if args.preset != "scer":
+        param += " --showchr "
+
+    chdir = args.outputdir
+    logdir = chdir + "/log/"
+    os.makedirs(logdir, exist_ok=True)
+
     df = pd.read_csv(samplepairlist, sep=",", header=None)
-    s=""
+    s = ""
     for index, row in df.iterrows():
         chip  = row[0]
         input = row[1]
@@ -198,20 +228,19 @@ def visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, fileext, post, 
                 peak = ""
 
         if input != "":
-            s += " -i " + pdir + chip + post + "." + str(args.binsize) + "." + fileext + "," + pdir + input + post + "." + str(args.binsize) + "." + fileext + "," + label + "," + peak
+            s += " -i " + pdir + chip  + post + "." + str(args.binsize) + "." + fileext + ","
+                        + pdir + input + post + "." + str(args.binsize) + "." + fileext + ","
+                        + label + "," + peak
         else:
-            s += " -i " + pdir + chip + post + "." + str(args.binsize) + "." + fileext + ",," + label + "," + peak
+            s += " -i " + pdir + chip + post + "." + str(args.binsize) + "." + fileext + ",,"
+                        + label + "," + peak
 
     head = os.path.basename(args.prefix)
-
-    param += " --callpeak"
-    if args.preset != "scer":
-        param += " --showchr "
-
     outputprefix =  pdfdir + "/" + head + ".PCSHARP." + str(args.binsize)
-    command = "drompa+ PC_SHARP " + param + " " + s + " -o " + outputprefix + " | tee -a " + outputprefix + ".log"
-    echo_and_print_and_exec_shell(command, outputprefix + ".log")
+    logfile = logdir + head + ".PCSHARP." + str(args.binsize) + ".log"
 
+    command = "drompa+ PC_SHARP " + param + " " + s + " -o " + outputprefix + " | tee -a " + logfile
+    echo_and_print_and_exec_shell(command, logfile)
 
     if args.preset != "scer":
         os.remove(outputprefix + ".pdf")

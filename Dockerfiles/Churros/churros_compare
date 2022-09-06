@@ -2,13 +2,15 @@
 cmdname=`basename $0`
 function usage()
 {
-    echo "$cmdname [Options] <samplelist> <build>" 1>&2
+    echo "$cmdname [Options] <samplelist> <samplepairlist> <build>" 1>&2
     echo '   <samplelist>: text file of samples' 1>&2
     echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   Options:' 1>&2
-    echo '      -d : output directory (defalt: "compare")' 1>&2
+    echo '      -o: output directory (defalt: "comparison")' 1>&2
+    echo '      -d: peak direcoty (defalt: "macs")' 1>&2
     echo '      -m: consider genome mappability in parse2wig+' 1>&2
-    echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
+    echo '      -D: directory for execution (defalt: "Churros_result")' 1>&2
+    echo '      -p : number of CPUs (default: 8)' 1>&2
     echo '      -y <str>: param string of parse2wig+ files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
 }
 
@@ -16,14 +18,18 @@ odir=comparison
 chdir="Churros_result"
 mp=0
 post_predefined=""
+mdir=macs
+ncore=8
 
-while getopts d:mD:y: option
+while getopts o:d:mD:p:y: option
 do
     case ${option} in
-	d) odir=${OPTARG};;
+	o) odir=${OPTARG};;
+	o) mdir=${OPTARG};;
         m) mp=1;;
 	D) chdir=${OPTARG};;
-   	y) post_predefined=${OPTARG};;
+        p) ncore=${OPTARG};;
+        y) post_predefined=${OPTARG};;
         *)
 	    usage
 	    exit 1
@@ -32,15 +38,21 @@ do
 done
 shift $((OPTIND - 1))
 
-if [ $# -ne 2 ]; then
+if [ $# -ne 3 ]; then
   usage
   exit 1
 fi
 
 samplelist=$1
-build=$2
+samplepairlist=$2
+build=$3
 
 if test ! -e $samplelist; then
+    echo "Error: $samplelist does not exist."
+    exit 1
+fi
+
+if test ! -e $samplepairlist; then
     echo "Error: $samplepairlist does not exist."
     exit 1
 fi
@@ -49,6 +61,7 @@ ex(){ echo $1; eval $1; }
 
 odir=$chdir/`basename $odir`
 mkdir -p $odir
+mdir=$chdir/`basename $mdir`
 
 if test "$post_predefined" = ""; then
     if test $mp -eq 1; then
@@ -70,6 +83,7 @@ while read LINE; do
 done < $samplelist
 echo $array100k
 
+echo -en "churros bigWig comparison..."
 ofile=$odir/margedbin.npz
 multiBigwigSummary bins -b $array -o $ofile
 convertlabel_deeptools_npz.py $ofile $odir/margedbin_renamed.npz $post.100.bw
@@ -97,3 +111,41 @@ if test "$array100k" != ""; then
                     -o $odir/heatmap_SpearmanCorr_readCounts.100kbp.png \
                     --outFileCorMatrix $odir/SpearmanCorr_readCounts.100kbp.tab
 fi
+
+
+# peak comparison
+echo -en "churros peak comparison..."
+peakarray=""
+peaklist_simpson=""
+while read LINE; do
+    array="$array $LINE"
+
+    LINE=(${LINE//,/ })
+    chip=${LINE[0]}
+    input=${LINE[1]}
+    label=${LINE[2]}
+    mode=${LINE[3]}
+    if test "$mode" = ""; then
+       mode="sharp"
+    fi
+    if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
+       peak=$mdir/${label}_peaks.narrowPeak
+    else
+       peak=$mdir/${label}_peaks.broadPeak
+    fi
+    peakarray="$peakarray -f $peak -l $label"
+    peaklist_simpson="$peaklist_simpson $peak"
+done < $samplepairlist
+
+## bedtools jaccard
+jaccard.pl $peakarray -n 10000000 > $odir/jaccard.all.tsv
+Rscript /opt/Churros/matrix_heatmap.R -i=$odir/jaccard.all.tsv -o=$odir/jaccard.all -clst -fsize=1 -method=ward.D2 -k=2
+
+jaccard.pl $peakarray -n 2000 > $odir/jaccard.2000.tsv
+Rscript /opt/Churros/matrix_heatmap.R -i=$odir/jaccard.2000.tsv -o=$odir/jaccard.2000 -clst -fsize=1 -method=ward.D2 -k=2
+
+## peak overlap simpson
+simpson_peak.sh -p $ncore -d $chdir/simpson_peak_results/ $peaklist_simpson
+simpson_peak.sh -p $ncore -n 2000 -d $chdir/simpson_peak_results/ $peaklist_simpson
+
+echo "done."

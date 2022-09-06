@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import argparse
 import pathlib
 import pandas as pd
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 def print_and_exec_shell(command):
     print (command)
@@ -105,6 +106,26 @@ def make_samplepairlist_withflen(samplepairlist, post, build, chdir):
 
     return samplepairlist_withflen
 
+def ask_to_proceed_with_overwrite(filepath):
+    """Produces a prompt asking about overwriting a file.
+
+    # Arguments
+        filepath: the path to the file to be overwritten.
+
+    # Returns
+        True if we can proceed with overwrite, False otherwise.
+    """
+    get_input = input
+    if sys.version_info[:2] <= (2, 7):
+        get_input = raw_input
+    overwrite = get_input('[WARNING] the output directory "%s" already exists - overwrite? '
+                          '[y/n]' % (filepath))
+    while overwrite not in ['y', 'n']:
+        overwrite = get_input('Enter "y" (overwrite) or "n" (cancel).')
+    if overwrite == 'n':
+        return False
+    return True
+
 def exec_churros(args):
     samplelist = args.samplelist
     samplepairlist = args.samplepairlist
@@ -114,6 +135,10 @@ def exec_churros(args):
 
     check_file(samplelist)
     check_file(samplepairlist)
+
+    if os.path.isdir(chdir) and args.force != True:
+        if ask_to_proceed_with_overwrite(chdir) == False:
+            exit()
 
     # To absolute path
     samplelist = pathlib.Path(samplelist).resolve()
@@ -136,7 +161,7 @@ def exec_churros(args):
     samplepairlist_withflen = make_samplepairlist_withflen(samplepairlist, post, build, chdir)
 
     ## churros_callpeak
-    param_macs=' -b bam -p ' + str(args.threads) + ' -q ' + str(args.qval) + ' -d ' + args.macsdir + ' -D ' + chdir
+    param_macs=' -b bam -p ' + str(args.threads_callpeak) + ' -q ' + str(args.qval) + ' -d ' + args.macsdir + ' -D ' + chdir
     if os.path.isfile(samplepairlist_withflen):
         print_and_exec_shell('churros_callpeak' + param_macs + ' ' + samplepairlist_withflen + ' ' + build)
     else:
@@ -156,12 +181,13 @@ def exec_churros(args):
         print_and_exec_shell('churros_genPvalwig ' + param_churros_genwig + str(samplepairlist) + ' drompa+.pval ' + build + ' ' + gt)
 
     ### make corremation heatmap
-    if args.mpbl:
-        param_churros_compare = "-m -D" + chdir + " "
-    else:
-        param_churros_compare = " -D " + chdir + " "
+    if args.comparative:
+        if args.mpbl:
+            param_churros_compare = "-m -D" + chdir + " -p " + str(args.threads_callpeak) + " "
+        else:
+            param_churros_compare = " -D " + chdir + " -p " + str(args.threads_callpeak) + " "
 
-    print_and_exec_shell('churros_compare ' + param_churros_compare + ' ' + str(samplelist) + ' ' + build)
+        print_and_exec_shell('churros_compare ' + param_churros_compare + ' ' + str(samplelist) + ' ' + build)
 
     ### make pdf files
     print ("generate pdf files by drompa+...")
@@ -189,15 +215,18 @@ if(__name__ == '__main__'):
     parser.add_argument("build", help="genome build (e.g., hg38)", type=str)
     parser.add_argument("Ddir", help="directory of reference data", type=str)
     parser.add_argument("--cram", help="output as CRAM format (default: BAM)", action="store_true")
+    parser.add_argument("-f", "--force", help="overwrite if the output directory already exists", action="store_true")
     parser.add_argument("-b", "--binsize", help="binsize of parse2wig+ (default: 100)", type=int, default=100)
     parser.add_argument("--mpbl", help="consider genome mappability in drompa+", action="store_true")
     parser.add_argument("--nofastqc", help="omit FASTQC", action="store_true")
     parser.add_argument("-q", "--qval", help="threshould of MACS2 (default: 0.05)", type=float, default=0.05)
     parser.add_argument("--macsdir", help="output direcoty of macs2 (default: 'macs2')", type=str, default="macs")
-    parser.add_argument("-f", "--format", help="output format of parse2wig+ 0: compressed wig (.wig.gz)\n 1: uncompressed wig (.wig)\n 2: bedGraph (.bedGraph) \n 3 (default): bigWig (.bw)", type=int, default=3)
+#    parser.add_argument("-f", "--format", help="output format of parse2wig+ 0: compressed wig (.wig.gz)\n 1: uncompressed wig (.wig)\n 2: bedGraph (.bedGraph) \n 3 (default): bigWig (.bw)", type=int, default=3)
     parser.add_argument("--mapparam", help="parameter of bowtie|bowtie2 (shouled be quated)", type=str, default="")
     parser.add_argument("-p", "--threads", help="number of CPUs (default: 12)", type=int, default=12)
+    parser.add_argument("--threads_callpeak", help="number of CPUs (default: 8)", type=int, default=4)
     parser.add_argument("--outputpvalue", help="output ChIP/Input -log(p) distribution as a begraph format", action="store_true")
+    parser.add_argument("--comparative", help="compare bigWigs and peaks among samples by churros_compare", action="store_true")
     parser.add_argument("-D", "--outputdir", help="output directory (default: 'Churros_result')", type=str, default="Churros_result")
     parser.add_argument("--preset", help="Preset parameters for mapping reads ([scer])", type=str, default="")
     parser.add_argument("-v", "--version", help="print version information and quit", action='version', version=__version__)

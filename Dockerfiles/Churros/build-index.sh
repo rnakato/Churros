@@ -29,6 +29,13 @@ if [ $# -ne 2 ]; then
   exit 1
 fi
 
+if expr "$ncore" : "[0-9]*$" >&/dev/null; then
+    echo "ncore: $ncore"
+else
+    echo "Error: illegal number specified to -p: $ncore"
+    exit
+fi
+
 ex(){
     program=$1
     name=$2

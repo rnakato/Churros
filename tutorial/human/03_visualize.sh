@@ -1,8 +1,8 @@
-#sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.3.0.sif"
-sing="singularity exec churros.0.3.0.sif"
+sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.4.0.sif"
+#sing="singularity exec churros.0.4.0.sif"
 
 build=hg38
-Ddir=Ensembl-GRCh38
+Ddir=Referencedata_$build
 
 $sing churros_visualize --mpbl samplepairlist.txt drompa+ $build $Ddir
 $sing churros_visualize --mpbl -m macs/samplepairlist.txt drompa+.macspeak $build $Ddir

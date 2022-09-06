@@ -63,8 +63,8 @@ mkdir -p $mdir
 newlist=$mdir/samplepairlist.txt
 rm -rf $newlist
 array=""
-peakarray=""
-peaklist_simpson=""
+#peakarray=""
+#peaklist_simpson=""
 while read LINE; do
     array="$array $LINE"
 
@@ -78,14 +78,14 @@ while read LINE; do
     fi
     if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
        peak=$mdir_original/${label}_peaks.narrowPeak
-       peak_chdir=$mdir/${label}_peaks.narrowPeak
+#       peak_chdir=$mdir/${label}_peaks.narrowPeak
     else
        peak=$mdir_original/${label}_peaks.broadPeak
-       peak_chdir=$mdir/${label}_peaks.broadPeak
+#       peak_chdir=$mdir/${label}_peaks.broadPeak
     fi
     echo "$chip,$input,$label,$mode,$peak" >> $newlist
-    peakarray="$peakarray -f $peak_chdir -l $label"
-    peaklist_simpson="$peaklist_simpson $peak_chdir"
+#    peakarray="$peakarray -f $peak_chdir -l $label"
+#    peaklist_simpson="$peaklist_simpson $peak_chdir"
 done < $samplepairlist
 
 do_macs(){
@@ -132,19 +132,22 @@ export -f do_macs
 echo ${array[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval $force"
 
 echo "churros_callpeak done."
-echo -en "churros peak comparison..."
+
+
+
+#echo -en "churros peak comparison..."
 
 ## bedtools jaccard
-odir=$chdir/comparison
-mkdir -p $odir
-jaccard.pl $peakarray -n 10000000 > $odir/jaccard.all.tsv
-Rscript /opt/Churros/matrix_heatmap.R -i=$odir/jaccard.all.tsv -o=$odir/jaccard.all -clst -fsize=1 -method=ward.D2 -k=2
+#odir=$chdir/comparison
+#mkdir -p $odir
+#jaccard.pl $peakarray -n 10000000 > $odir/jaccard.all.tsv
+#Rscript /opt/Churros/matrix_heatmap.R -i=$odir/jaccard.all.tsv -o=$odir/jaccard.all -clst -fsize=1 -method=ward.D2 -k=2
 
-jaccard.pl $peakarray -n 2000 > $odir/jaccard.2000.tsv
-Rscript /opt/Churros/matrix_heatmap.R -i=$odir/jaccard.2000.tsv -o=$odir/jaccard.2000 -clst -fsize=1 -method=ward.D2 -k=2
+#jaccard.pl $peakarray -n 2000 > $odir/jaccard.2000.tsv
+#Rscript /opt/Churros/matrix_heatmap.R -i=$odir/jaccard.2000.tsv -o=$odir/jaccard.2000 -clst -fsize=1 -method=ward.D2 -k=2
 
 ## peak overlap simpson
-simpson_peak.sh -p $ncore -d $chdir/simpson_peak_results/ $peaklist_simpson
-simpson_peak.sh -p $ncore -n 2000 -d $chdir/simpson_peak_results/ $peaklist_simpson
+#simpson_peak.sh -p $ncore -d $chdir/simpson_peak_results/ $peaklist_simpson
+#simpson_peak.sh -p $ncore -n 2000 -d $chdir/simpson_peak_results/ $peaklist_simpson
 
-echo "done."
+#echo "done."

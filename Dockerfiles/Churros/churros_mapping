@@ -128,14 +128,14 @@ func_map(){
     fi
 
     if test $csfasta -eq 1; then
-       echo "mapping reads by bowtie..."
+       echo "mapping by bowtie: $fastq"
        if test $format = "CRAM"; then
             bowtie.sh -t csfastq -c -p $ncore -P "$bowtieparam" -D $chdir "$fastq" $prefix $build $Ddir
        else
             bowtie.sh -t csfastq    -p $ncore -P "$bowtieparam" -D $chdir "$fastq" $prefix $build $Ddir
        fi
     else
-       echo "mapping reads by bowtie2..."
+       echo "mapping by bowtie2: $fastq"
        if test $format = "CRAM"; then
            bowtie2.sh -c -p $ncore -P "$bowtieparam" -D $chdir "$fastq" $prefix $build $Ddir
        else
@@ -205,6 +205,7 @@ func_postprocess(){
            fi
            echo "parse mapfile by parse2wig+..."
            parse2wig+.sh $parseparam -b $binsize -z $macspeak $mapfile $head $build $Ddir
+	   rm $chdir/macs/${prefix}_forFRiP_peaks*
        fi
     fi
     echo "done."

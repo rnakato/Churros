@@ -1,12 +1,14 @@
-#sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.3.0.sif"
-sing="singularity exec churros.0.3.0.sif"
+sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.4.0.sif"
+#sing="singularity exec churros.0.4.0.sif"
 
 build=hg38
-Ddir=Ensembl-GRCh38/
-ncore=12
+Ddir=Referencedata_$build
+ncore=48
 
+#$sing churros -D results0.4.0 -p $ncore samplelist.txt samplepairlist.txt $build $Ddir
 $sing churros -p $ncore samplelist.txt samplepairlist.txt $build $Ddir
 
+exit
 # consider mappability
 $sing churros -p $ncore --mpbl samplelist.txt samplepairlist.txt $build $Ddir
 

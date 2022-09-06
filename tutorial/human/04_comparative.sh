@@ -1,6 +1,6 @@
-#sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.3.0.sif"
-sing="singularity exec churros.0.3.0.sif"
+sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.4.0.sif"
+#sing="singularity exec churros.0.4.0.sif"
 
 build=hg38
 
-$sing churros_compare -m samplelist.txt $build
+$sing churros_compare -p 8 -m samplelist.txt samplepairlist.txt $build

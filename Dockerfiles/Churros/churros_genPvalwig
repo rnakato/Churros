@@ -23,7 +23,7 @@ mp=0
 post_predefined=""
 chdir="Churros_result"
 
-while getopts b:d:m:y:D: option
+while getopts b:d:my:D: option
 do
     case ${option} in
         b) binsize=${OPTARG};;
