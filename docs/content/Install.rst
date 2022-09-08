@@ -11,12 +11,16 @@ The latest version of **Churros** (``v0.2.0``) internally uses the tools includi
 - Bowtie v1.1.2
 - Bowtie2 v2.4.5
 - BWA v0.7.17
+- chromap v0.2.1
 - MACS2 v2.2.6
 - SAMtools v1.15.1
 - DROMPA+ v1.15.3
 - SSP v1.2.5
 - ChromHMM v1.23
 - ChromImpute v1.0.3
+
+Several utility tools are also included:
+
 - SRA Toolkit v3.0.0
 - Intervene version 0.6.5
 

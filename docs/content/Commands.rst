@@ -9,20 +9,20 @@ download_genomedata.sh
 
 .. code-block:: bash
 
-    download_genomedata.sh <build> <outputdir>
-      build:
-             human (GRCh38, GRCh37, T2T)
-             mouse (GRCm39, GRCm38)
-             rat (mRatBN7.2)
-             fly (BDGP6)
-             zebrafish (GRCz11)
-             chicken (GRCg6a)
-             African clawed frog (xenLae2)
-             C. elegans (WBcel235)
-             S. serevisiae (R64-1-1)
-             S. pombe (SPombe)
+   download_genomedata.sh <build> <outputdir>
+      build (Ensembl|UCSC, you can specify either):
+         human (GRCh38|hg38, GRCh37|hg19, T2T)
+         mouse (GRCm39|mm39, GRCm38|mm10)
+         rat (mRatBN7.2|rn7)
+         fly (BDGP6|dm6)
+         zebrafish (GRCz11|danRer11)
+         chicken (GRCg6a|galGal6)
+         African clawed frog (Xenopus_tropicalis|xenLae2)
+         C. elegans (WBcel235|ce11)
+         S. cerevisiae (R64-1-1|sacCer3)
+         S. pombe (SPombe)
       Example:
-             download_genomedata.sh GRCh38 Ensembl-GRCh38
+         download_genomedata.sh hg38 Referencedata_hg38
 
 
 build-index.sh
@@ -136,8 +136,9 @@ The mapped reads are then quality-checked and converted to BigWig files.
           -p : number of CPUs (default: 12)
           -D : directory for execution (defalt: "Churros_result")
        Example:
-         For single-end: churros_mapping exec chip.fastq.gz chip hg38 Database/Ensembl-GRCh38
-          For paired-end: churros_mapping exec "-1 chip_1.fastq.gz -2 chip_2.fastq.gz" chip hg38 Database/Ensembl-GRCh38
+         For single-end: churros_mapping exec chip.fastq.gz chip hg38 Referencedata_hg38
+          For paired-end: churros_mapping exec "-1 chip_1.fastq.gz -2 chip_2.fastq.gz" chip hg38 Referencedata_hg38
+
 
 churros_callpeak
 -------------------------------------
@@ -159,9 +160,6 @@ The results are output in ``macs`` directory by default.
          -F : overwrite MACS2 resilts if exist (defalt: skip)
          -p : number of CPUs (defalt: 4)
 
-.. note::
-
-   While the Jaccard index stored in ``comparison`` results evaluates the basepair-level overlap using ``bedtools jaccard`` command, the Simpson index stored in ``simpson_peak_results`` evaluates the peak-number-level overlap. If all samples are sharp peaks (e.g., transcription factors), the Simpson index may be reasonable. If the samples contain broad peaks (e.g., histone modification such as H3K27me3), the Jaccard index may provide more reasonable results because multiple sharp peaks can be overlapped with one broad peak.
 
 churros_visualize
 -------------------------------------
@@ -212,6 +210,7 @@ The results are output in ``pdf`` directory by default.
      -D OUTPUTDIR, --outputdir OUTPUTDIR
                            output directory (default: 'Churros_result')
 
+
 - Key points:
    - The default setting (100-bp bin and 1-Mbp page width) is adjusted to typical transcription factor analysis for human/mouse.
    - For the broad mark analysis (e.g., H3K27me3 and H3K9me3, which are distributed more than 100 kbp), macro-scale visualization is useful. For example, ``-b 5000 -l 8000`` option generates 5-kbp bin, 8-Mbp page width. The scale of the y-axis can be changed by ``-P`` option, for example, ``-P "--scale_tag 100"``.
@@ -238,7 +237,12 @@ churros_compare
 
 .. note::
 
+   While the Jaccard index stored in ``comparison`` results evaluates the basepair-level overlap using ``bedtools jaccard`` command, the Simpson index stored in ``simpson_peak_results`` evaluates the peak-number-level overlap. If all samples are sharp peaks (e.g., transcription factors), the Simpson index may be reasonable. If the samples contain broad peaks (e.g., histone modification such as H3K27me3), the Jaccard index may provide more reasonable results because multiple sharp peaks can be overlapped with one broad peak.
+
+.. note::
+
    Unlike the peak comparison implemented in ``churros_callpeak``, ``churros_compare`` evaluates the similarity of whole genome including non-peak regions. Therefore the results may reflect the genome-wide features (e.g., GC bias and copy number variations) rather than peak overlap.
+
 
 churros_genPvalwig
 ----------------------------------------
@@ -260,10 +264,11 @@ As ``churros_visualize`` can visualize -log10(p) of ChIP/Input enrichment distri
          -b <int>: binsize (defalt: 100)
          -d <str>: directory of parse2wig+ (default: parse2wigdir+)
          -m: consider genome mappability in parse2wig+
-         -y <str>: postfix of .bw files to be used (default: "-bowtie2-<build>-raw-GR")
+         -y <str>: postfix of .bw files to be used (default: "-raw-GR")
         -D : directory for execution (defalt: "Churros_result")
       Example:
-         churros_genPvalwig samplelist.txt chip-seq hg38 Ensembl-GRCh38
+         churros_genPvalwig samplelist.txt chip-seq hg38 Referencedata_hg38
+
 
 bowtie.sh
 ------------------------------------------------
@@ -272,10 +277,9 @@ bowtie.sh
 
 .. code-block:: bash
 
-    bowtie.sh [Options] <fastq> <prefix> <build> <Ddir>
+    bowtie.sh [Options] <fastq> <prefix> <Ddir>
        <fastq>: fastq file
        <prefix>: output prefix
-       <build>: genome build (e.g., hg38)
        <Ddir>: directory of bowtie index
        Options:
           -t STR: for SOLiD data ([fastq|csfata|csfastq], defalt: fastq)
@@ -284,9 +288,9 @@ bowtie.sh
           -P "STR": parameter of bowtie (shouled be quated, default: "-n2 -m1")
           -D: output dir (defalt: ./)
        Example:
-          For single-end: bowtie.sh -P "-n2 -m1" chip.fastq.gz chip hg38 Ensembl-GRCh38
-          For paired-end: bowtie.sh "\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz" chip hg38 Ensembl-GRCh38
-          For SOLiD data: bowtie.sh -t csfastq -P "-n2 -m1" chip.csfastq.gz chip hg38 Ensembl-GRCh38
+          For single-end: bowtie.sh -P "-n2 -m1" chip.fastq.gz chip Referencedata_hg38
+          For paired-end: bowtie.sh "\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz" chip Referencedata_hg38
+          For SOLiD data: bowtie.sh -t csfastq -P "-n2 -m1" chip.csfastq.gz chip Referencedata_hg38
 
 
 bowtie2.sh
@@ -296,10 +300,9 @@ bowtie2.sh
 
 .. code-block:: bash
 
-    bowtie2.sh [Options] <fastq> <prefix> <build> <Ddir>
+    bowtie2.sh [Options] <fastq> <prefix> <Ddir>
        <fastq>: fastq file
        <prefix>: output prefix
-       <build>: genome build (e.g., hg38)
        <Ddir>: directory of bowtie2 index
        Options:
           -c: output as CRAM format (defalt: BAM)
@@ -307,8 +310,8 @@ bowtie2.sh
           -P "bowtie2 param": parameter of bowtie2 (shouled be quated)
           -D: output dir (defalt: ./)
        Example:
-          For single-end: bowtie2.sh -p "--very-sensitive" chip.fastq.gz chip hg38
-          For paired-end: bowtie2.sh "\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz" chip hg38
+          For single-end: bowtie2.sh -p "--very-sensitive" chip.fastq.gz chip Referencedata_hg38
+          For paired-end: bowtie2.sh "\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz" chip Referencedata_hg38
 
 macs.sh
 ------------------------------------------------
@@ -338,31 +341,32 @@ When ``-m`` option is supplied, ``parse2wig+.sh`` also normalizes the read based
 
 .. code-block:: bash
 
-    parse2wig+.sh [options] <mapfile> <prefix> <build> <Ddir>
-       <mapfile>: mapfile (SAM|BAM|CRAM|TAGALIGN format)
-       <prefix>: output prefix
-       <build>: genome build (e.g., hg38)
-       <Ddir>: directory of bowtie2 index
-       Options:
-          -a: also outout raw read distribution
-          -b: binsize of parse2wig+ (defalt: 100)
-          -z: peak file for FRiP calculation (BED format)
-          -l: predefined fragment length (default: estimated by trand-shift profile)
-          -m: consider genome mappability
-          -k: read length (36 or 50) for mappability calculation (default: 50)
-          -p: for paired-end file
-          -t: number of CPUs (default: 4)
-          -o: output directory (default: parse2wigdir+)
-          -f: output format of parse2wig+ (default: 3)
-                   0: compressed wig (.wig.gz)
-                   1: uncompressed wig (.wig)
-                   2: bedGraph (.bedGraph)
-                   3: bigWig (.bw)
-          -D outputdir: output dir (defalt: ./)
-          -F: overwrite files if exist (defalt: skip)
-       Example:
-          For single-end: parse2wig+.sh chip.sort.bam chip hg38 Ensembl-GRCh38
-          For paired-end: parse2wig+.sh -p chip.sort.bam chip hg38 Ensembl-GRCh38
+   parse2wig+.sh [options] <mapfile> <prefix> <build> <Ddir>
+      <mapfile>: mapfile (SAM|BAM|CRAM|TAGALIGN format)
+      <prefix>: output prefix
+      <build>: genome build (e.g., hg38)
+      <Ddir>: directory of bowtie2 index
+      Options:
+         -a: also outout raw read distribution
+         -b: binsize of parse2wig+ (defalt: 100)
+         -z: peak file for FRiP calculation (BED format)
+         -l: predefined fragment length (default: estimated by trand-shift profile)
+         -m: consider genome mappability
+         -k: read length (36 or 50) for mappability calculation (default: 50)
+         -p: for paired-end file
+         -t: number of CPUs (default: 4)
+         -o: output directory (default: parse2wigdir+)
+         -s: stats directory (default: log/parse2wig+)
+         -f: output format of parse2wig+ (default: 3)
+                  0: compressed wig (.wig.gz)
+                  1: uncompressed wig (.wig)
+                  2: bedGraph (.bedGraph)
+                  3: bigWig (.bw)
+         -D outputdir: output dir (defalt: ./)
+         -F: overwrite files if exist (defalt: skip)
+      Example:
+         For single-end: parse2wig+.sh chip.sort.bam chip hg38 Referencedata_hg38
+         For paired-end: parse2wig+.sh -p chip.sort.bam chip hg38 Referencedata_hg38
 
 simpson_peak.sh
 -------------------------------------
