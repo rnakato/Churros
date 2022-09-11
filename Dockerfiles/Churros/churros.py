@@ -188,7 +188,7 @@ def exec_churros(args):
         else:
             param_churros_compare = " -D " + chdir + " -p " + str(args.threads_callpeak) + " "
 
-        print_and_exec_shell('churros_compare ' + param_churros_compare + ' ' + str(samplelist) + ' ' + build)
+        print_and_exec_shell('churros_compare ' + param_churros_compare + ' ' + str(samplelist) + ' ' + str(samplepairlist) + ' ' + build)
 
     ### make pdf files
     print ("generate pdf files by drompa+...")
