@@ -3,4 +3,4 @@ sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.4.0
 
 build=hg38
 
-$sing churros_compare -p 8 -m samplelist.txt samplepairlist.txt $build
+$sing churros_compare samplelist.txt samplepairlist.txt $build

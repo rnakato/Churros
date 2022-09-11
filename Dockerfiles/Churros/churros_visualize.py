@@ -184,7 +184,7 @@ def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, logdir, fileex
     command = "drompa+ PC_ENRICH " + param + " " + s + " -o " + outputprefix + " | tee -a " + logfile_prefix + ".log"
     echo_and_print_and_exec_shell(command, logfile_prefix + ".log")
     command = "drompa+ PC_ENRICH " + param + " --callpeak " + s + " -o " + outputprefix + ".callpeak | tee -a " + logfile_prefix + ".callpeak.log"
-    echo_print_and_exec_shell(command, logfile_prefix + ".callpeak.log")
+    echo_and_print_and_exec_shell(command, logfile_prefix + ".callpeak.log")
 
     if args.preset != "scer":
         os.remove(outputprefix + ".pdf")
