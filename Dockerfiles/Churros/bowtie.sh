@@ -2,10 +2,10 @@
 cmdname=`basename $0`
 function usage()
 {
-    echo "$cmdname [Options] <fastq> <prefix> <build> <Ddir>" 1>&2
+    echo "$cmdname [Options] <fastq> <prefix> <Ddir>" 1>&2
     echo '   <fastq>: fastq file' 1>&2
     echo '   <prefix>: output prefix' 1>&2
-    echo '   <build>: genome build (e.g., hg38)' 1>&2
+#    echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   <Ddir>: directory of bowtie index' 1>&2
     echo '   Options:' 1>&2
     echo '      -t STR: for SOLiD data ([fastq|csfata|csfastq], defalt: fastq)' 1>&2
@@ -14,9 +14,9 @@ function usage()
     echo '      -P "STR": parameter of bowtie (shouled be quated, default: "-n2 -m1")' 1>&2
     echo '      -D: output dir (defalt: ./)' 1>&2
     echo "   Example:" 1>&2
-    echo "      For single-end: $cmdname -P \"-n2 -m1\" chip.fastq.gz chip hg38 Ensembl-GRCh38" 1>&2
-    echo "      For paired-end: $cmdname \"\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz\" chip hg38 Ensembl-GRCh38" 1>&2
-    echo "      For SOLiD data: $cmdname -t csfastq -P \"-n2 -m1\" chip.csfastq.gz chip hg38 Ensembl-GRCh38" 1>&2
+    echo "      For single-end: $cmdname -P \"-n2 -m1\" chip.fastq.gz chip Referencedata_hg38" 1>&2
+    echo "      For paired-end: $cmdname \"\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz\" chip Referencedata_hg38" 1>&2
+    echo "      For SOLiD data: $cmdname -t csfastq -P \"-n2 -m1\" chip.csfastq.gz chip Referencedata_hg38" 1>&2
 }
 
 type=fastq
@@ -33,7 +33,9 @@ do
            bamdir=cram
            ;;
         t) type=${OPTARG};;
-        p) ncore=${OPTARG};;
+        p) ncore=${OPTARG}
+           isnumber.sh $ncore "-p" || exit 1
+           ;;
         P) param=${OPTARG};;
         D) chdir=${OPTARG};;
         *)
@@ -44,25 +46,27 @@ do
 done
 shift $((OPTIND - 1))
 
-if [ $# -ne 4 ]; then
+if [ $# -ne 3 ]; then
   usage
   exit 1
 fi
 
 fastq=$1
 prefix=$2
-build=$3
-Ddir=$4
-post="-bowtie"`echo $param | tr -d ' '`
+#build=$3
+Ddir=$3
+post=`echo $param | tr -d ' '`
 
 logdir=$chdir/log/bowtie
 bamdir=$chdir/$bamdir
 mkdir -p $logdir $bamdir
 
 if test $format = "BAM"; then
-    file=$bamdir/$prefix$post-$build.sort.bam
+#    file=$bamdir/$prefix$post-$build.sort.bam
+    file=$bamdir/$prefix$post.sort.bam
 else
-    file=$bamdir/$prefix$post-$build.sort.cram
+#    file=$bamdir/$prefix$post-$build.sort.cram
+    file=$bamdir/$prefix$post.sort.cram
 fi
 
 if test -e $file && test 1000 -lt `wc -c < $file` ; then

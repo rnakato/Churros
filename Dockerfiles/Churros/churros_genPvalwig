@@ -9,26 +9,26 @@ function usage()
     echo '   <gt>: genome_table file' 1>&2
     echo '   Options:' 1>&2
     echo '      -b <int>: binsize (defalt: 100)' 1>&2
-    echo '      -d <str>: directory of parse2wig+ (default: parse2wigdir+)' 1>&2
-    echo '      -m: consider genome mappability in parse2wig+' 1>&2
-    echo '      -y <str>: postfix of .bw files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
+    echo '      -d <str>: directory of bigWig files (default: TotalReadNormalized/)' 1>&2
+    echo '      -n: do not consider genome mappability' 1>&2
+    echo '      -y <str>: postfix of .bw files to be used (default: "-raw-GR")' 1>&2
     echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
     echo "   Example:" 1>&2
-    echo "      $cmdname samplelist.txt chip-seq hg38 Ensembl-GRCh38" 1>&2
+    echo "      $cmdname samplelist.txt chip-seq hg38 genometable.hg38.txt" 1>&2
 }
 
 binsize=100
-pdir=parse2wigdir+
-mp=0
+pdir=TotalReadNormalized/
+mp=1
 post_predefined=""
 chdir="Churros_result"
 
-while getopts b:d:my:D: option
+while getopts b:d:ny:D: option
 do
     case ${option} in
         b) binsize=${OPTARG};;
         d) pdir=${OPTARG};;
-        m) mp=1;;
+        n) mp=0;;
         y) post_predefined=${OPTARG};;
         D) chdir=${OPTARG};;
 	*)
@@ -49,13 +49,16 @@ odir=$2
 build=$3
 gt=$4
 
+check_build.sh $build || exit 1
+chdir=$chdir/$build
+
 if test ! -e $samplepairlist; then
     echo "Error: $samplepairlist does not exist."
     exit 1
 fi
 
-pdir=$chdir/$pdir
-logdir=$chdir/log/drompa+
+pdir=$chdir/bigWig/$pdir
+logdir=$chdir/log/genPvalwig/
 odir=$chdir/$odir
 mkdir -p $logdir $odir
 
@@ -67,9 +70,9 @@ fi
 echo "output directory: $odir"
 if test "$post_predefined" = ""; then
     if test $mp -eq 1; then
-        post=-bowtie2-$build-raw-mpbl-GR
+        post=.mpbl
     else
-        post=-bowtie2-$build-raw-GR
+        post=""
     fi
 else
     post=$post_predefined
@@ -84,10 +87,10 @@ while read LINE; do
     label=${LINE[2]}
 
     if test "$input" != ""; then
-	drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,${label}_up > $logdir/GENWIG.$chip$post.up
-	drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$input$post.$binsize.bw,$pdir/$chip$post.$binsize.bw,${label}_down  > $logdir/GENWIG.$chip$post.down
+        drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,${label}_up > $logdir/GENWIG.$chip$post.up
+        drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$input$post.$binsize.bw,$pdir/$chip$post.$binsize.bw,${label}_down  > $logdir/GENWIG.$chip$post.down
     else
-	echo "Error: input sample is not specified for the sample $chip."
-	exit 1
+        echo "Error: input sample is not specified for the sample $chip."
+        exit 1
     fi
 done < $samplepairlist

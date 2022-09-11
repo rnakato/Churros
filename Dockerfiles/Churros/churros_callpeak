@@ -28,7 +28,9 @@ do
 	b) bamdir=${OPTARG};;
 	q) qval=${OPTARG};;
 	d) mdir=${OPTARG};;
-	p) ncore=${OPTARG};;
+	p) ncore=${OPTARG}
+           isnumber.sh $ncore "-p" || exit 1
+	   ;;
 	F) force="-F";;
         *)
 	    usage
@@ -50,6 +52,9 @@ if test ! -e $samplepairlist; then
     echo "Error: $samplepairlist does not exist."
     exit 1
 fi
+
+check_build.sh $build || exit 1
+chdir=$chdir/$build
 
 ex(){ echo $1; eval $1; }
 
@@ -103,28 +108,28 @@ do_macs(){
     label=${LINE[2]}
     mode=${LINE[3]}
     flen=${LINE[4]}
-    IPbam=$bamdir/$chip-bowtie2-$build.sort.bam
-    Inputbam=$bamdir/$input-bowtie2-$build.sort.bam
+    IPbam=$bamdir/$chip.sort.bam
+    Inputbam=$bamdir/$input.sort.bam
 
     if test "$mode" = ""; then mode="sharp"; fi
 
     if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
-	peak=$mdir/${label}_peaks.narrowPeak
-	if test "$flen" != ""; then
-	    mode="sharp-nomodel"
-	    flen="-f $flen"
-	fi
+        peak=$mdir/${label}_peaks.narrowPeak
+        if test "$flen" != ""; then
+            mode="sharp-nomodel"
+            flen="-f $flen"
+        fi
     else
-	peak=$mdir/${label}_peaks.broadPeak
-	if test "$flen" != ""; then
-	    mode="broad-nomodel"
-	    flen="-f $flen"
-	fi
+        peak=$mdir/${label}_peaks.broadPeak
+        if test "$flen" != ""; then
+            mode="broad-nomodel"
+            flen="-f $flen"
+        fi
     fi
     if test "$input" = ""; then
-	macs.sh $force -q $qval -d $mdir $flen $IPbam none $label $build $mode
+        macs.sh $force -q $qval -d $mdir $flen $IPbam none $label $build $mode
     else
-	macs.sh $force -q $qval -d $mdir $flen $IPbam $Inputbam $label $build $mode
+        macs.sh $force -q $qval -d $mdir $flen $IPbam $Inputbam $label $build $mode
     fi
 }
 export -f do_macs
@@ -132,22 +137,3 @@ export -f do_macs
 echo ${array[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval $force"
 
 echo "churros_callpeak done."
-
-
-
-#echo -en "churros peak comparison..."
-
-## bedtools jaccard
-#odir=$chdir/comparison
-#mkdir -p $odir
-#jaccard.pl $peakarray -n 10000000 > $odir/jaccard.all.tsv
-#Rscript /opt/Churros/matrix_heatmap.R -i=$odir/jaccard.all.tsv -o=$odir/jaccard.all -clst -fsize=1 -method=ward.D2 -k=2
-
-#jaccard.pl $peakarray -n 2000 > $odir/jaccard.2000.tsv
-#Rscript /opt/Churros/matrix_heatmap.R -i=$odir/jaccard.2000.tsv -o=$odir/jaccard.2000 -clst -fsize=1 -method=ward.D2 -k=2
-
-## peak overlap simpson
-#simpson_peak.sh -p $ncore -d $chdir/simpson_peak_results/ $peaklist_simpson
-#simpson_peak.sh -p $ncore -n 2000 -d $chdir/simpson_peak_results/ $peaklist_simpson
-
-#echo "done."

@@ -4,9 +4,10 @@ pwd=`pwd`
 function usage()
 {
     echo "$cmdname [-p ncore] -a <program> <odir>" 1>&2
-    echo "  program: bowtie, bowtie-cs, bowtie2, bwa, chromap" 1>&2
-    echo "  Example:" 1>&2
-    echo "         $cmdname bowtie2 Ensembl-GRCh38" 1>&2
+    echo "   <program>: bowtie, bowtie-cs, bowtie2, bwa, chromap" 1>&2
+    echo '   <Ddir>: Reference data directory' 1>&2
+    echo "   Example:" 1>&2
+    echo "         $cmdname bowtie2 Referencedata_hg38" 1>&2
 }
 
 ncore=4
@@ -14,8 +15,10 @@ full=0
 while getopts ap: option
 do
     case ${option} in
-        a) full=1 ;;
-        p) ncore=${OPTARG} ;;
+        a) full=1;;
+        p) ncore=${OPTARG}
+           isnumber.sh $ncore "-p" || exit 1
+           ;;
         *)
             usage
             exit 1
@@ -27,13 +30,6 @@ shift $((OPTIND - 1))
 if [ $# -ne 2 ]; then
   usage
   exit 1
-fi
-
-if expr "$ncore" : "[0-9]*$" >&/dev/null; then
-    echo "ncore: $ncore"
-else
-    echo "Error: illegal number specified to -p: $ncore"
-    exit
 fi
 
 ex(){

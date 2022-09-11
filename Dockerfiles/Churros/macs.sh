@@ -24,15 +24,17 @@ param_bdg=""
 while getopts f:q:d:BF option
 do
     case ${option} in
-	f) flen=${OPTARG};;
-	q) qval=${OPTARG};;
-	d) mdir=${OPTARG};;
-	B) param_bdg="-B";;
-	F) force=1;;
-	*)
-	    usage
-	    exit 1
-	    ;;
+        f) flen=${OPTARG}
+           isnumber.sh $flen "-f" || exit 1
+           ;;
+        q) qval=${OPTARG};;
+        d) mdir=${OPTARG};;
+        B) param_bdg="-B";;
+        F) force=1;;
+        *)
+            usage
+            exit 1
+            ;;
     esac
 done
 shift $((OPTIND - 1))
@@ -98,15 +100,15 @@ if test -e "$peak" -a $force -eq 0 ; then
 else
     logfile=$mdir/$prefix.$mode.log
     if test $mode = "sharp"; then
-	ex "$macs $param_sharp -n $mdir/$prefix >& $logfile"
+        ex "$macs $param_sharp -n $mdir/$prefix >& $logfile"
     elif test $mode = "sharp-nomodel"; then
-    	ex "$macs $param_sharp -n $mdir/$prefix --nomodel --extsize `expr ${flen} / 2` >& $logfile"
+        ex "$macs $param_sharp -n $mdir/$prefix --nomodel --extsize `expr ${flen} / 2` >& $logfile"
     elif test $mode = "broad"; then
-    	ex "$macs $param_broad -n $mdir/$prefix --broad >& $logfile"
+        ex "$macs $param_broad -n $mdir/$prefix --broad >& $logfile"
     elif test $mode = "broad-nomodel"; then
-    	ex "$macs $param_broad -n $mdir/$prefix --broad --nomodel --extsize `expr ${flen} / 2` >& $logfile"
+        ex "$macs $param_broad -n $mdir/$prefix --broad --nomodel --extsize `expr ${flen} / 2` >& $logfile"
     else
-	echo "Error: specify [sharp|broad|sharp-nomodel|broad-nomodel] for mode."
-	exit 1
+        echo "Error: specify [sharp|broad|sharp-nomodel|broad-nomodel] for mode."
+        exit 1
     fi
 fi

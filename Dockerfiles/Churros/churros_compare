@@ -8,7 +8,7 @@ function usage()
     echo '   Options:' 1>&2
     echo '      -o: output directory (defalt: "comparison")' 1>&2
     echo '      -d: peak direcoty (defalt: "macs")' 1>&2
-    echo '      -m: consider genome mappability in parse2wig+' 1>&2
+    echo '      -n: do not consider genome mappability' 1>&2
     echo '      -D: directory for execution (defalt: "Churros_result")' 1>&2
     echo '      -p : number of CPUs (default: 8)' 1>&2
     echo '      -y <str>: param string of parse2wig+ files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
@@ -16,24 +16,26 @@ function usage()
 
 odir=comparison
 chdir="Churros_result"
-mp=0
+mp=1
 post_predefined=""
 mdir=macs
 ncore=8
 
-while getopts o:d:mD:p:y: option
+while getopts o:d:nD:p:y: option
 do
     case ${option} in
-	o) odir=${OPTARG};;
-	o) mdir=${OPTARG};;
-        m) mp=1;;
-	D) chdir=${OPTARG};;
-        p) ncore=${OPTARG};;
+        o) odir=${OPTARG};;
+        d) mdir=${OPTARG};;
+        n) mp=0;;
+        D) chdir=${OPTARG};;
+        p) ncore=${OPTARG}
+           isnumber.sh $ncore "-p" || exit 1
+           ;;
         y) post_predefined=${OPTARG};;
         *)
-	    usage
-	    exit 1
-	    ;;
+            usage
+            exit 1
+            ;;
     esac
 done
 shift $((OPTIND - 1))
@@ -57,6 +59,9 @@ if test ! -e $samplepairlist; then
     exit 1
 fi
 
+check_build.sh $build || exit 1
+chdir=$chdir/$build
+
 ex(){ echo $1; eval $1; }
 
 odir=$chdir/`basename $odir`
@@ -65,9 +70,9 @@ mdir=$chdir/`basename $mdir`
 
 if test "$post_predefined" = ""; then
     if test $mp -eq 1; then
-        post=-bowtie2-$build-raw-mpbl-GR
+        post=".mpbl"
     else
-        post=-bowtie2-$build-raw-GR
+        post=""
     fi
 else
     post=$post_predefined
@@ -76,45 +81,59 @@ fi
 while read LINE; do
     LINE=($LINE)
     prefix=${LINE[0]}
-    array="$array `ls $chdir/parse2wigdir+/$prefix$post.100.bw`"
+    array="$array `ls $chdir/bigWig/TotalReadNormalized/$prefix$post.100.bw`"
 
-    sample=`ls $chdir/parse2wigdir+/$prefix$post.100000.bw 2> /dev/null`
+    sample=`ls $chdir/bigWig/TotalReadNormalized/$prefix$post.100000.bw 2> /dev/null`
     if test "$sample" != ""; then array100k="$array100k $sample"; fi
 done < $samplelist
 echo $array100k
 
 echo -en "churros bigWig comparison..."
-ofile=$odir/margedbin.npz
-multiBigwigSummary bins -b $array -o $ofile
-convertlabel_deeptools_npz.py $ofile $odir/margedbin_renamed.npz $post.100.bw
-mv $odir/margedbin_renamed.npz $ofile
+deepdir=$odir/bigwigCorrelation
+mkdir -p $deepdir
 
-param="--corMethod spearman --skipZeros -in $ofile"
-plotCorrelation $param --plotTitle "Spearman Correlation (100-bp bin)" --whatToPlot scatterplot \
-                -o $odir/scatterplot_SpearmanCorr_bigwigScores.100bp.png \
-                --outFileCorMatrix $odir/SpearmanCorr_bigwigScores.100bp.tab
-plotCorrelation $param --plotTitle "Spearman Correlation (100-bp bin)" --whatToPlot heatmap --colorMap RdYlBu_r --plotNumbers \
-                -o $odir/heatmap_SpearmanCorr_readCounts.100bp.png \
-                --outFileCorMatrix $odir/SpearmanCorr_readCounts.100bp.tab
-
-if test "$array100k" != ""; then
-    ofile=$odir/margedbin.100k.npz
-    multiBigwigSummary bins -b $array100k -o $ofile
-    convertlabel_deeptools_npz.py $ofile $odir/margedbin_renamed.npz $post.100000.bw
-    mv $odir/margedbin_renamed.npz $ofile
+#if test -e "$odir/scatterplot_SpearmanCorr_bigwigScores.100bp.png" && test -e "$odir/heatmap_SpearmanCorr_readCounts.100bp.png"; then
+#    echo "Heatmaps already exist. Skipping"
+#else
+    ofile=$deepdir/mergedbin.npz
+    multiBigwigSummary bins -b $array -o $ofile
+    convertlabel_deeptools_npz.py $ofile $deepdir/margedbin_renamed.npz $post.100.bw
+    mv $deepdir/margedbin_renamed.npz $ofile
 
     param="--corMethod spearman --skipZeros -in $ofile"
+    head=$deepdir/scatterplot_SpearmanCorr.100bp
+    plotCorrelation $param --plotTitle "Spearman Correlation (100-bp bin)" --whatToPlot scatterplot \
+                    -o $head.png --outFileCorMatrix $head.tab
+    head=$deepdir/heatmap_SpearmanCorr.100bp
+    plotCorrelation $param --plotTitle "Spearman Correlation (100-bp bin)" --whatToPlot heatmap --colorMap RdYlBu_r --plotNumbers \
+                    -o $head.png --outFileCorMatrix $head.tab
+    rm $ofile
+#fi
+
+if test "$array100k" != ""; then
+ #   if test -e "$odir/scatterplot_SpearmanCorr.100kbp.png" && test -e "$odir/heatmap_SpearmanCorr_readCounts.100kbp.png"; then
+ #       echo "Heatmaps already exist. Skipping"
+ #   else
+    ofile=$deepdir/mergedbin.100k.npz
+    multiBigwigSummary bins -b $array100k -o $ofile
+    convertlabel_deeptools_npz.py $ofile $deepdir/margedbin_renamed.npz $post.100000.bw
+    mv $deepdir/margedbin_renamed.npz $ofile
+
+    param="--corMethod spearman --skipZeros -in $ofile"
+    head=$deepdir/scatterplot_SpearmanCorr.100kbp
     plotCorrelation $param --plotTitle "Spearman Correlation (100-kbp bin)" --whatToPlot scatterplot \
-                    -o $odir/scatterplot_SpearmanCorr_bigwigScores.100kbp.png \
-                    --outFileCorMatrix $odir/SpearmanCorr_bigwigScores.100kbp.tab
+                    -o $head.png --outFileCorMatrix $head.tab
+    head=$deepdir/heatmap_SpearmanCorr.100kbp
     plotCorrelation $param --plotTitle "Spearman Correlation (100-kbp bin)" --whatToPlot heatmap --colorMap RdYlBu_r --plotNumbers \
-                    -o $odir/heatmap_SpearmanCorr_readCounts.100kbp.png \
-                    --outFileCorMatrix $odir/SpearmanCorr_readCounts.100kbp.tab
+                    -o $head.png --outFileCorMatrix $head.tab
+    rm $ofile
+    #   fi
 fi
 
-
 # peak comparison
-echo -en "churros peak comparison..."
+echo -en "churros base-pair lebel overlap of peaks..."
+jacdir=$odir/Peak_BPlevel_overlap
+mkdir -p $jacdir
 peakarray=""
 peaklist_simpson=""
 while read LINE; do
@@ -138,14 +157,17 @@ while read LINE; do
 done < $samplepairlist
 
 ## bedtools jaccard
-jaccard.pl $peakarray -n 10000000 > $odir/jaccard.all.tsv
-Rscript /opt/Churros/matrix_heatmap.R -i=$odir/jaccard.all.tsv -o=$odir/jaccard.all -clst -fsize=1 -method=ward.D2 -k=2
+head=$jacdir/jaccard.all
+jaccard.pl $peakarray -n 10000000 > $head.tsv
+Rscript /opt/Churros/matrix_heatmap.R -i=$head.tsv -o=$head -clst -fsize=1 -method=ward.D2 -k=2
 
-jaccard.pl $peakarray -n 2000 > $odir/jaccard.2000.tsv
-Rscript /opt/Churros/matrix_heatmap.R -i=$odir/jaccard.2000.tsv -o=$odir/jaccard.2000 -clst -fsize=1 -method=ward.D2 -k=2
+head=$jacdir/jaccard.top2000
+jaccard.pl $peakarray -n 2000 > $head.tsv
+Rscript /opt/Churros/matrix_heatmap.R -i=$head.tsv -o=$head -clst -fsize=1 -method=ward.D2 -k=2
 
 ## peak overlap simpson
-simpson_peak.sh -p $ncore -d $chdir/simpson_peak_results/ $peaklist_simpson
-simpson_peak.sh -p $ncore -n 2000 -d $chdir/simpson_peak_results/ $peaklist_simpson
+simpdir=$odir/Peak_Number_overlap
+simpson_peak.sh -p $ncore -d $simpdir $peaklist_simpson
+simpson_peak.sh -p $ncore -n 2000 -d $simpdir $peaklist_simpson
 
 echo "done."

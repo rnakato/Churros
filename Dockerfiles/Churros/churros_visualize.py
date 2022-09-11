@@ -62,7 +62,7 @@ def do_churros_visualize(args):
     samplepairlist = args.samplepairlist
     build = args.build
     Ddir = args.Ddir
-    chdir = args.outputdir
+    chdir = args.outputdir + "/" + build + "/"
 
     check_file(samplepairlist)
 
@@ -71,46 +71,45 @@ def do_churros_visualize(args):
 
     os.makedirs(chdir, exist_ok=True)
 
-    pdir = chdir + "/" + args.d + "/"
+    pdir = chdir + "/bigWig/" + args.d + "/"
 
-    if args.wigformat == 0:
-        fileext = "wig.gz"
-    elif args.wigformat == 1:
-        fileext = "wig"
-    elif args.wigformat == 2:
-        fileext = "bedGraph"
-    elif args.wigformat == 3:
-        fileext = "bw"
-    else:
-        print("Error: specify [0-3] for '-f' option.")
-        exit()
+#    if args.wigformat == 0:
+ #       fileext = "wig.gz"
+ #   elif args.wigformat == 1:
+ #       fileext = "wig"
+ #   elif args.wigformat == 2:
+ #       fileext = "bedGraph"
+ #   elif args.wigformat == 3:
+    fileext = "bw"
+  #  else:
+   #     print("Error: specify [0-3] for '-f' option.")
+   #     exit()
 
     if args.postfix != "":
         post = args.postfix
     else:
-        if args.bowtie1:
-            bstr = "-bowtie-"
+        if args.nompbl:
+            post = ""
         else:
-            bstr = "-bowtie2-"
-        if args.mpbl:
-            post = bstr + build + "-raw-mpbl-GR"
-        else:
-            post = bstr + build + "-raw-GR"
+            post = ".mpbl"
 
     # DROMPA+ param
     pdfdir = chdir + "/pdf"
     os.makedirs(pdfdir, exist_ok=True)
+    logdir = chdir + "/log/pdf/"
+    os.makedirs(logdir, exist_ok=True)
 
     param = setparam(args)
 
     if args.G:
-        visualize_GV(args, samplepairlist, pdir, pdfdir, fileext, post, Ddir, build)
+        visualize_GV(args, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir, build)
     elif args.enrich:
-        visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, fileext, post, Ddir)
+        visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir)
     else:
-        visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, fileext, post, Ddir, chdir)
+        visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir, chdir)
 
-def visualize_GV(args, samplepairlist, pdir, pdfdir, fileext, post, Ddir, build):
+
+def visualize_GV(args, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir, build):
     param = " " + args.drompaparam + " "
     ideogram = "/opt/DROMPAplus/data/ideogram/" + build + ".tsv"
     GC = Ddir + "/GCcontents/"
@@ -135,10 +134,6 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, fileext, post, Ddir, build)
         else:
             print (GD + " does not exist. skipping.")
 
-    chdir = args.outputdir
-    logdir = chdir + "/log/"
-    os.makedirs(logdir, exist_ok=True)
-
     df = pd.read_csv(samplepairlist, sep=",", header=None)
     sGV = ""
     for index, row in df.iterrows():
@@ -147,8 +142,8 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, fileext, post, Ddir, build)
         label = row[2]
 
         if input != "":
-            sGV += " -i " + pdir + chip  + post + ".100000." + fileext + ","
-                          + pdir + input + post + ".100000." + fileext + ","
+            sGV += " -i " + pdir + chip  + post + ".100000." + fileext + "," \
+                          + pdir + input + post + ".100000." + fileext + "," \
                           + label
         else:
             print ("sample " + chip + " does not have the input sample. skipped..")
@@ -161,17 +156,13 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, fileext, post, Ddir, build)
     echo_and_print_and_exec_shell(command, logfile)
 
 
-def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, fileext, post, Ddir):
+def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir):
     if args.pvalue:
         param += " --showpenrich 1"
     if args.logratio:
         param += " --showratio 2"
     if args.preset != "scer":
         param += " --showchr "
-
-    chdir = args.outputdir
-    logdir = chdir + "/log/"
-    os.makedirs(logdir, exist_ok=True)
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
     s = ""
@@ -180,8 +171,8 @@ def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, fileext, post,
         input = row[1]
         label = row[2]
         if input != "":
-            s += " -i " + pdir + chip  + post + "." + str(args.binsize) + "." + fileext + ","
-                        + pdir + input + post + "." + str(args.binsize) + "." + fileext + ","
+            s += " -i " + pdir + chip  + post + "." + str(args.binsize) + "." + fileext + "," \
+                        + pdir + input + post + "." + str(args.binsize) + "." + fileext + "," \
                         + label
         else:
             print ("sample " + chip + " does not have the input sample. skipped..")
@@ -200,17 +191,13 @@ def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, fileext, post,
         os.remove(outputprefix + ".callpeak.pdf")
 
 
-def visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, fileext, post, Ddir, chdir):
+def visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir, chdir):
     if args.pvalue:
         param += " --showctag 0 --showpenrich 1"
 
     param += " --callpeak"
     if args.preset != "scer":
         param += " --showchr "
-
-    chdir = args.outputdir
-    logdir = chdir + "/log/"
-    os.makedirs(logdir, exist_ok=True)
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
     s = ""
@@ -228,11 +215,11 @@ def visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, fileext, post, 
                 peak = ""
 
         if input != "":
-            s += " -i " + pdir + chip  + post + "." + str(args.binsize) + "." + fileext + ","
-                        + pdir + input + post + "." + str(args.binsize) + "." + fileext + ","
+            s += " -i " + pdir + chip  + post + "." + str(args.binsize) + "." + fileext + "," \
+                        + pdir + input + post + "." + str(args.binsize) + "." + fileext + "," \
                         + label + "," + peak
         else:
-            s += " -i " + pdir + chip + post + "." + str(args.binsize) + "." + fileext + ",,"
+            s += " -i " + pdir + chip + post + "." + str(args.binsize) + "." + fileext + ",," \
                         + label + "," + peak
 
     head = os.path.basename(args.prefix)
@@ -244,6 +231,7 @@ def visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, fileext, post, 
 
     if args.preset != "scer":
         os.remove(outputprefix + ".pdf")
+    print_and_exec_shell("rm " + outputprefix + "*.peak.bed " + outputprefix + "*.peak.tsv")
 
 if(__name__ == '__main__'):
     parser = argparse.ArgumentParser()
@@ -251,11 +239,11 @@ if(__name__ == '__main__'):
     parser.add_argument("prefix", help="output prefix (directory will be omitted)", type=str)
     parser.add_argument("build", help="genome build (e.g., hg38)", type=str)
     parser.add_argument("Ddir", help="directory of reference data", type=str)
-    parser.add_argument("-f", "--wigformat", help="input file format 0: compressed wig (.wig.gz)\n 1: uncompressed wig (.wig)\n 2: bedGraph (.bedGraph) \n 3 (default): bigWig (.bw)", type=int, default=3)
+#    parser.add_argument("-f", "--wigformat", help="input file format 0: compressed wig (.wig.gz)\n 1: uncompressed wig (.wig)\n 2: bedGraph (.bedGraph) \n 3 (default): bigWig (.bw)", type=int, default=3)
     parser.add_argument("-b", "--binsize", help="binsize of parse2wig+ (default: 100)", type=int, default=100)
     parser.add_argument("-l", "--linesize", help="line size for each page (kbp, defalt: 1000)", type=int, default=-1)
-    parser.add_argument("--mpbl", help="consider genome mappability in drompa+", action="store_true")
-    parser.add_argument("-d", help="directory of parse2wig+ (default: parse2wigdir+)", type=str, default="parse2wigdir+")
+    parser.add_argument("--nompbl", help="do not consider genome mappability", action="store_true")
+    parser.add_argument("-d", help="directory of bigWig files (default: TotalReadNormalized/)", type=str, default="TotalReadNormalized/")
     parser.add_argument("--postfix", help="param string of parse2wig+ files to be used (default: '-bowtie2-<build>-raw-GR')", type=str, default="")
     parser.add_argument("--pvalue", help="show p-value distribution instead of read distribution", action="store_true")
     parser.add_argument("--bowtie1", help="specified bowtie1", action="store_true")

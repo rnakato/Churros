@@ -27,10 +27,14 @@ chdir="./"
 while getopts k:o:pt:D: option
 do
     case ${option} in
-	k) k=${OPTARG};;
+	k) k=${OPTARG}
+           isnumber.sh $k "-k" || exit 1
+	   ;;
 	o) odir=${OPTARG};;
 	p) pair="--pair";;
-	t) ncore=${OPTARG};;
+        t) ncore=${OPTARG}
+           isnumber.sh $ncore "-p" || exit 1
+           ;;
         D) chdir=${OPTARG};;
         *)
 	    usage
@@ -48,6 +52,8 @@ input=$1
 prefix=$2
 build=$3
 gt=$4
+
+check_build.sh $build || exit 1
 
 odir=$chdir/$odir
 
@@ -75,4 +81,4 @@ else
     echo "$input does not exist."
 fi
 
-echo "ssp.sh done."
+#echo "ssp.sh done."

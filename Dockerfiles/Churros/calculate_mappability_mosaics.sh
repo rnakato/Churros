@@ -1,5 +1,5 @@
 #!/bin/bash
-cmdname=`basename $0`
+0;136;0ccmdname=`basename $0`
 function usage()
 {
     echo "$cmdname [Options] <Ddir>" 1>&2
@@ -20,10 +20,14 @@ arr_binsize="10000 25000 50000 500000 1000000"
 while getopts f:r:b:p: option
 do
     case ${option} in
-        f) fraglen=${OPTARG};;
+        f) fraglen=${OPTARG}
+           isnumber.sh $fraglen "-f" || exit 1
+           ;;
         r) arr_readlen=${OPTARG};;
         b) arr_binsize=${OPTARG};;
-	p) ncore=${OPTARG};;
+        p) ncore=${OPTARG}
+           isnumber.sh $ncore "-p" || exit 1
+           ;;
         *)
             usage
             exit 1

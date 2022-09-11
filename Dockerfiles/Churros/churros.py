@@ -28,7 +28,7 @@ def check_dir(dir):
         exit()
 
 def get_mapfile_postfix(mapparam):
-    post = "-bowtie2" + mapparam.replace(' ', '')
+    post = mapparam.replace(' ', '')
     return post
 
 def do_qualitycheck_fastq(fastq, fastqcdir, fastpdir):
@@ -45,11 +45,11 @@ def do_qualitycheck_fastq(fastq, fastqcdir, fastpdir):
         print (fastp_output + " already created. skipping.")
     else:
         print_and_exec_shell('fastp -w 4 -q 15 -n 5 -i ' + fastq
-                             + ' -o ' + fastpdir + prefix + '.fastq.gz'
                              + ' -h ' + fastpdir + prefix + '.fastp.html'
                              + ' -j ' + fastpdir + prefix + '.fastp.json')
+#                             + ' -o ' + fastpdir + prefix + '.fastq.gz'
 
-def do_fastqc(chdir, samplelist):
+def do_fastqc(chdir, build, samplelist):
     fastqcdir = chdir + "/fastqc/"
     fastpdir =  chdir + "/fastp/"
     os.makedirs(fastqcdir, exist_ok=True)
@@ -73,18 +73,18 @@ def do_fastqc(chdir, samplelist):
 
 
 def do_mapping(args, samplelist, post, build, chdir):
-    if args.mpbl:
-        param_churros_mapping = "-D " + chdir + " -p " + str(args.threads) + " -m"
+    if args.nompbl:
+        param_churros_mapping = "-D " + chdir + " -p " + str(args.threads) + " -n"
     else:
         param_churros_mapping = "-D " + chdir + " -p " + str(args.threads)
 
     print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' exec ' + str(samplelist) + ' ' + build + ' ' + args.Ddir)
 
     # header
-    os.system('churros_mapping ' + param_churros_mapping + ' header > ' + chdir + '/churros.QCstats.tsv')
+    os.system('churros_mapping ' + param_churros_mapping + ' header > ' + chdir + '/' + build + '/churros.QCstats.tsv')
 
     # stats
-    os.system('churros_mapping ' + param_churros_mapping + ' stats ' + str(samplelist) + ' ' + build + ' ' + args.Ddir + ' >> ' + chdir + '/churros.QCstats.tsv')
+    os.system('churros_mapping ' + param_churros_mapping + ' stats ' + str(samplelist) + ' ' + build + ' ' + args.Ddir + ' >> ' + chdir + '/' + build + '/churros.QCstats.tsv')
 
 def make_samplepairlist_withflen(samplepairlist, post, build, chdir):
     samplepairlist_withflen = chdir + "/churros.samplepairlist.withflen.txt"
@@ -98,7 +98,7 @@ def make_samplepairlist_withflen(samplepairlist, post, build, chdir):
         label = row[2]
         mode  = row[3]
 
-        sspstats = pd.read_csv(chdir + '/sspout/' + chip + post + '-' + build + '.stats.txt', sep="\t", header=0)
+        sspstats = pd.read_csv(chdir + '/sspout/' + chip + post + '.stats.txt', sep="\t", header=0)
         flen = int(sspstats["fragment length"])
 
         with open(samplepairlist_withflen, 'a') as f:
@@ -131,7 +131,8 @@ def exec_churros(args):
     samplepairlist = args.samplepairlist
     build = args.build
     Ddir = args.Ddir
-    chdir = args.outputdir
+    chdir = args.outputdir #+ "/" + build + "/"
+    chdir_build = chdir + "/" + build + "/"
 
     check_file(samplelist)
     check_file(samplepairlist)
@@ -152,13 +153,13 @@ def exec_churros(args):
 
     ### FASTQC
     if args.nofastqc == False:
-        do_fastqc(chdir, samplelist)
+        do_fastqc(chdir_build, build, samplelist)
 
     ## churros_mapping
     do_mapping(args, samplelist, post, build, chdir)
 
     ## make samplepairlist_withflen
-    samplepairlist_withflen = make_samplepairlist_withflen(samplepairlist, post, build, chdir)
+    samplepairlist_withflen = make_samplepairlist_withflen(samplepairlist, post, build, chdir_build)
 
     ## churros_callpeak
     param_macs=' -b bam -p ' + str(args.threads_callpeak) + ' -q ' + str(args.qval) + ' -d ' + args.macsdir + ' -D ' + chdir
@@ -168,22 +169,22 @@ def exec_churros(args):
         print_and_exec_shell('churros_callpeak' + param_macs + ' ' + samplepairlist + ' ' + build)
 
     ### MultiQC
-    print_and_exec_shell('multiqc -m fastqc -m fastp -m bowtie2 -m macs2 -f -o ' + chdir + ' ' + chdir)
+    print_and_exec_shell('multiqc -m fastqc -m fastp -m bowtie2 -m macs2 -f -o ' + chdir_build + ' ' + chdir_build)
 
     ### generate P-value bedGraph
     if args.outputpvalue:
-        if args.mpbl:
-            param_churros_genwig = " -m -D" + chdir + " "
+        if args.nompbl:
+            param_churros_genwig = " -n -D" + chdir + " "
         else:
             param_churros_genwig = " -D " + chdir + " "
 
         print ("generate Pvalue bedGraph file...")
-        print_and_exec_shell('churros_genPvalwig ' + param_churros_genwig + str(samplepairlist) + ' drompa+.pval ' + build + ' ' + gt)
+        print_and_exec_shell('churros_genPvalwig ' + param_churros_genwig + str(samplepairlist) + ' bedGraph_Pval ' + build + ' ' + gt)
 
     ### make corremation heatmap
     if args.comparative:
-        if args.mpbl:
-            param_churros_compare = "-m -D" + chdir + " -p " + str(args.threads_callpeak) + " "
+        if args.nompbl:
+            param_churros_compare = "-n -D" + chdir + " -p " + str(args.threads_callpeak) + " "
         else:
             param_churros_compare = " -D " + chdir + " -p " + str(args.threads_callpeak) + " "
 
@@ -192,8 +193,8 @@ def exec_churros(args):
     ### make pdf files
     print ("generate pdf files by drompa+...")
 
-    if args.mpbl:
-        param_churros_visualize = "-D " + chdir + " --mpbl"
+    if args.nompbl:
+        param_churros_visualize = "-D " + chdir + " --nompbl"
     else:
         param_churros_visualize = "-D " + chdir
     if args.preset == "T2T":
@@ -217,7 +218,7 @@ if(__name__ == '__main__'):
     parser.add_argument("--cram", help="output as CRAM format (default: BAM)", action="store_true")
     parser.add_argument("-f", "--force", help="overwrite if the output directory already exists", action="store_true")
     parser.add_argument("-b", "--binsize", help="binsize of parse2wig+ (default: 100)", type=int, default=100)
-    parser.add_argument("--mpbl", help="consider genome mappability in drompa+", action="store_true")
+    parser.add_argument("--nompbl", help="do not consider genome mappability in drompa+", action="store_true")
     parser.add_argument("--nofastqc", help="omit FASTQC", action="store_true")
     parser.add_argument("-q", "--qval", help="threshould of MACS2 (default: 0.05)", type=float, default=0.05)
     parser.add_argument("--macsdir", help="output direcoty of macs2 (default: 'macs2')", type=str, default="macs")
