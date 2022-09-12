@@ -244,7 +244,8 @@ churros_compare: compare peaks among ChIP samples
 
 ``churros_compare`` output the heatmap of correlation of peaks among ChIP samples.
 The results will be output in ``comparsion/`` directory. 
-``churros_compare`` estimates peak overlap for 'all peaks' and 'top-ranked 2000 peaks'.
+
+It the number of peaks largely varies among samples, the comparison may become unfair. Therefore ``churros_compare`` also estimates peak overlap for 'top-ranked 2000 peaks'.
 
 .. code-block:: bash
 
@@ -256,9 +257,9 @@ The results will be output in ``comparsion/`` directory.
     - ``Peak_Number_overlap/`` ... results of peak-number level comparion (Simpson index). ``PairwiseComparison/`` contains the results of all pairs (overlapped peak list and Venn diagram) and the ``Peaks`` contains top-ranked peaks of samples.
 
 
-.. note::
+There are three types of comparison. ``bigwigCorrelation``  evaluates the similarity of whole genome including non-peak regions. Therefore the results may reflect the genome-wide features (e.g., GC bias and copy number variations) rather than peak overlap.
+``Peak_BPlevel_overlap/`` and ``Peak_Number_overlap/`` implement peak comparsion.
 
-   Unlike the peak comparison implemented in ``churros_callpeak``, ``churros_compare`` evaluates the similarity of whole genome including non-peak regions. Therefore the results may reflect the genome-wide features (e.g., GC bias and copy number variations) rather than peak overlap.
 
 
 churros_genPvalwig: generate P-value distribution as bedGraph
