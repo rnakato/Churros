@@ -252,7 +252,7 @@ It the number of peaks largely varies among samples, the comparison may become u
     churros_compare samplelist.txt samplepairlist.txt hg38
 
 - Output
-    - ``bigwigCorrelation/`` ... Spearman correlation of read distributon in 100-bp and 100-kbp bins by `deepTools plotCorrelation <https://deeptools.readthedocs.io/en/develop/content/tools/plotCorrelation.html>`_ and jaccard index of peak overlap by `bedtools jaccard <https://bedtools.readthedocs.io/en/latest/content/tools/jaccard.html>`_ (for all peaks and top-ranked 2000 peaks)
+    - ``bigwigCorrelation/`` ... Spearman correlation of read distributon in 100-bp and 100-kbp bins by `deepTools plotCorrelation <https://deeptools.readthedocs.io/en/develop/content/tools/plotCorrelation.html>`_ (for all peaks and top-ranked 2000 peaks)
     - ``Peak_BPlevel_overlap/`` ... results of base-pair level overlap of peaks (Jaccard index) by `BEDtools jaccard <https://bedtools.readthedocs.io/en/latest/content/tools/jaccard.html>`_
     - ``Peak_Number_overlap/`` ... results of peak-number level comparion (Simpson index). ``PairwiseComparison/`` contains the results of all pairs (overlapped peak list and Venn diagram) and the ``Peaks`` contains top-ranked peaks of samples.
 
