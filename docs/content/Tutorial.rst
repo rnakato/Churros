@@ -112,13 +112,13 @@ By supplying ``--comparative`` option, ``churros`` implements all-by-all sample 
 
 .. code-block:: bash
 
-    churros -p 12 --comparative samplelist.txt samplepairlist.txt $build $Ddir
+    churros -p 12 --comparative samplelist.txt samplepairlist.txt hg38 Referencedata_hg38
 
 ``--outputpvalue`` option outputs the bedGraph file for -log10(p-value) of ChIP/Input enrichment.
 
 .. code-block:: bash
 
-    churros -p 12 --outputpvalue samplelist.txt samplepairlist.txt $build $Ddir
+    churros -p 12 --outputpvalue samplelist.txt samplepairlist.txt hg38 Referencedata_hg38
 
 Churros consider genome mappability in default. 
 The mappability affects the quality check results and the read-distribution normalization in DROMPA+ but does not affect peak calling by MACS2. 
@@ -126,7 +126,7 @@ If you want not to consider it, supply ``--nompbl`` option.
 
 .. code-block:: bash
 
-    churros -p 12 --nompbl samplelist.txt samplepairlist.txt $build $Ddir
+    churros -p 12 --nompbl samplelist.txt samplepairlist.txt hg38 Referencedata_hg38
 
 
 The detail and output are described below.
@@ -205,7 +205,8 @@ Highlight peak regions
 
 .. code-block:: bash
 
-    churros_visualize Churros_result/hg38/macs/samplepairlist.txt drompa+.macspeak hg38 Referencedata_hg38
+    samplepairlist=Churros_result/hg38/macs/samplepairlist.txt
+    churros_visualize $samplepairlist drompa+.macspeak hg38 Referencedata_hg38
 
 Visualize p-value distribution
 +++++++++++++++++++++++++++++++++++++++
@@ -214,7 +215,8 @@ Supply ``--pvalue`` option to visualize -log10(p) distribution of ChIP/input enr
 
 .. code-block:: bash
 
-    churros_visualize --pvalue -b 5000 -l 8000 samplepairlist.txt drompa+.pval.bin5M hg38 Referencedata_hg38
+    churros_visualize --pvalue -b 5000 -l 8000 \
+        samplepairlist.txt drompa+.pval.bin5M hg38 Referencedata_hg38
 
 
 (Optional) modify parameter sets for visualization manually
@@ -252,12 +254,10 @@ It the number of peaks largely varies among samples, the comparison may become u
     churros_compare samplelist.txt samplepairlist.txt hg38
 
 
-The results contain three types of comparisons.
-
-- Output
-    - ``bigwigCorrelation/`` ... Spearman correlation of read distributon in 100-bp and 100-kbp bins by `deepTools plotCorrelation <https://deeptools.readthedocs.io/en/develop/content/tools/plotCorrelation.html>`_. This score evaluates the similarity of whole genome including non-peak regions. Therefore the results may reflect the genome-wide features (e.g., GC bias and copy number variations) rather than peak overlap.
+- The results contain three types of comparisons.
+    - ``bigwigCorrelation/`` ... Spearman correlation of read distribution in 100-bp and 100-kbp bins by `deepTools plotCorrelation <https://deeptools.readthedocs.io/en/develop/content/tools/plotCorrelation.html>`_. This score evaluates the similarity of the whole genome including non-peak regions. Therefore the results may reflect the genome-wide features (e.g., GC bias and copy number variations) rather than peak overlap.
     - ``Peak_BPlevel_overlap/`` ... results of base-pair level overlap of peaks (Jaccard index) by `BEDtools jaccard <https://bedtools.readthedocs.io/en/latest/content/tools/jaccard.html>`_. This score is good for broad peaks such as some histone modifications (H3K27me3 and H3K36me3).
-    - ``Peak_Number_overlap/`` ... results of peak-number level comparion (Simpson index). ``PairwiseComparison/`` contains the results of all pairs (overlapped peak list and Venn diagram) and the ``Peaks`` contains top-ranked peaks of samples. This score is good for comparison of sharp peaks such as transcription factors.
+    - ``Peak_Number_overlap/`` ... results of peak-number level comparison (Simpson index). ``PairwiseComparison/`` contains the results of all pairs (overlapped peak list and Venn diagram) and the ``Peaks`` contains top-ranked peaks of samples. This score is good for the comparison of sharp peaks such as transcription factors.
 
 
 churros_genPvalwig: generate P-value distribution as bedGraph
