@@ -260,10 +260,6 @@ The results contain three types of comparisons.
     - ``Peak_Number_overlap/`` ... results of peak-number level comparion (Simpson index). ``PairwiseComparison/`` contains the results of all pairs (overlapped peak list and Venn diagram) and the ``Peaks`` contains top-ranked peaks of samples. This score is good for comparison of sharp peaks such as transcription factors.
 
 
-``Peak_BPlevel_overlap/`` and ``Peak_Number_overlap/`` implement peak comparsion.
-
-
-
 churros_genPvalwig: generate P-value distribution as bedGraph
 --------------------------------------------------------------------
 
