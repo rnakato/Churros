@@ -155,6 +155,7 @@ The mapped reads are then quality-checked and converted to BigWig files.
     - parse2wigdir+/ ... bigWig files (100-bp, 5-kbp and 100-lbp bins in default) by parse2wig+
     - log/ ... log files
 
+
 churros_callpeak: call peaks by MACS2
 --------------------------------------------------
 
@@ -169,6 +170,7 @@ If input samples are omitted, peaks are called using ChIP samples only.
 
 - Output
     - macs/ ... peak files called by MACS2. The log files are stored in *log. ``samplepairlist.txt`` in ``macs/`` directory includes the filename of peak files that is used in ``churros_visualize``.
+
 
 churros_visualize: visualize read distributions by DROMPA+
 --------------------------------------------------------------------
@@ -241,14 +243,18 @@ churros_compare: compare peaks among ChIP samples
 --------------------------------------------------------------------
 
 ``churros_compare`` output the heatmap of correlation of peaks among ChIP samples.
+The results will be output in ``comparsion/`` directory. 
+``churros_compare`` estimates peak overlap for 'all peaks' and 'top-ranked 2000 peaks'.
 
 .. code-block:: bash
 
     churros_compare samplelist.txt samplepairlist.txt hg38
 
 - Output
-    - comparison/ ... Spearman correlation of read distributon in 100-bp and 100-kbp bins by `deepTools plotCorrelation <https://deeptools.readthedocs.io/en/develop/content/tools/plotCorrelation.html>`_ and jaccard index of peak overlap by `bedtools jaccard <https://bedtools.readthedocs.io/en/latest/content/tools/jaccard.html>`_ (for all peaks and top-ranked 2000 peaks)
-    - simpson_peak_results/ ... results of one-by-one comparion (overlapped peak list and Venn diagram) and the heatmap of Simposon index of peak overlap for all peaks and top-ranked 2000 peaks
+    - bigwigCorrelation/ ... Spearman correlation of read distributon in 100-bp and 100-kbp bins by `deepTools plotCorrelation <https://deeptools.readthedocs.io/en/develop/content/tools/plotCorrelation.html>`_ and jaccard index of peak overlap by `bedtools jaccard <https://bedtools.readthedocs.io/en/latest/content/tools/jaccard.html>`_ (for all peaks and top-ranked 2000 peaks)
+    - Peak_BPlevel_overlap/ ... results of base-pair level overlap of peaks (Jaccard index) by BEDtools jaccard
+    - Peak_Number_overlap/ ... results of peak-number level comparion (Simpson index). ``PairwiseComparison/`` contains the results of all pairs (overlapped peak list and Venn diagram) and the ``Peaks`` contains top-ranked peaks of samples.
+
 
 .. note::
 
