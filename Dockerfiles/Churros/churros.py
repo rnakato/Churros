@@ -74,9 +74,9 @@ def do_fastqc(chdir, build, samplelist):
 
 def do_mapping(args, samplelist, post, build, chdir):
     if args.nompbl:
-        param_churros_mapping = "-D " + chdir + " -p " + str(args.threads) + " -n"
+        param_churros_mapping = "-D " + chdir + "-k " + str(args.k) + " -p " + str(args.threads) + " -n"
     else:
-        param_churros_mapping = "-D " + chdir + " -p " + str(args.threads)
+        param_churros_mapping = "-D " + chdir + "-k " + str(args.k) + " -p " + str(args.threads)
 
     print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' exec ' + str(samplelist) + ' ' + build + ' ' + args.Ddir)
 
@@ -131,7 +131,7 @@ def exec_churros(args):
     samplepairlist = args.samplepairlist
     build = args.build
     Ddir = args.Ddir
-    chdir = args.outputdir #+ "/" + build + "/"
+    chdir = args.outputdir
     chdir_build = chdir + "/" + build + "/"
 
     check_file(samplelist)
@@ -162,7 +162,7 @@ def exec_churros(args):
     samplepairlist_withflen = make_samplepairlist_withflen(samplepairlist, post, build, chdir_build)
 
     ## churros_callpeak
-    param_macs=' -b bam -p ' + str(args.threads_callpeak) + ' -q ' + str(args.qval) + ' -d ' + args.macsdir + ' -D ' + chdir
+    param_macs=' -b bam -p ' + str(args.threads) + ' -q ' + str(args.qval) + ' -d ' + args.macsdir + ' -D ' + chdir
     if os.path.isfile(samplepairlist_withflen):
         print_and_exec_shell('churros_callpeak' + param_macs + ' ' + samplepairlist_withflen + ' ' + build)
     else:
@@ -184,9 +184,9 @@ def exec_churros(args):
     ### make corremation heatmap
     if args.comparative:
         if args.nompbl:
-            param_churros_compare = "-n -D" + chdir + " -p " + str(args.threads_callpeak) + " "
+            param_churros_compare = "-n -D" + chdir + " -p " + str(args.threads_comparative) + " "
         else:
-            param_churros_compare = " -D " + chdir + " -p " + str(args.threads_callpeak) + " "
+            param_churros_compare = " -D " + chdir + " -p " + str(args.threads_comparative) + " "
 
         print_and_exec_shell('churros_compare ' + param_churros_compare + ' ' + str(samplelist) + ' ' + str(samplepairlist) + ' ' + build)
 
@@ -218,6 +218,7 @@ if(__name__ == '__main__'):
     parser.add_argument("--cram", help="output as CRAM format (default: BAM)", action="store_true")
     parser.add_argument("-f", "--force", help="overwrite if the output directory already exists", action="store_true")
     parser.add_argument("-b", "--binsize", help="binsize of parse2wig+ (default: 100)", type=int, default=100)
+    parser.add_argument("-k", help="read length for mappability file ([28|36|50], default:50)", type=int, default=50)
     parser.add_argument("--nompbl", help="do not consider genome mappability in drompa+", action="store_true")
     parser.add_argument("--nofastqc", help="omit FASTQC", action="store_true")
     parser.add_argument("-q", "--qval", help="threshould of MACS2 (default: 0.05)", type=float, default=0.05)
@@ -225,11 +226,11 @@ if(__name__ == '__main__'):
 #    parser.add_argument("-f", "--format", help="output format of parse2wig+ 0: compressed wig (.wig.gz)\n 1: uncompressed wig (.wig)\n 2: bedGraph (.bedGraph) \n 3 (default): bigWig (.bw)", type=int, default=3)
     parser.add_argument("--mapparam", help="parameter of bowtie|bowtie2 (shouled be quated)", type=str, default="")
     parser.add_argument("-p", "--threads", help="number of CPUs (default: 12)", type=int, default=12)
-    parser.add_argument("--threads_callpeak", help="number of CPUs (default: 8)", type=int, default=4)
+    parser.add_argument("--threads_comparative", help="number of CPUs for --comparative option (default: 8)", type=int, default=8)
     parser.add_argument("--outputpvalue", help="output ChIP/Input -log(p) distribution as a begraph format", action="store_true")
     parser.add_argument("--comparative", help="compare bigWigs and peaks among samples by churros_compare", action="store_true")
     parser.add_argument("-D", "--outputdir", help="output directory (default: 'Churros_result')", type=str, default="Churros_result")
-    parser.add_argument("--preset", help="Preset parameters for mapping reads ([scer])", type=str, default="")
+    parser.add_argument("--preset", help="Preset parameters for mapping reads ([scer|T2T])", type=str, default="")
     parser.add_argument("-v", "--version", help="print version information and quit", action='version', version=__version__)
 
     args = parser.parse_args()

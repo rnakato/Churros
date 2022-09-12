@@ -38,59 +38,59 @@ The ``<odir>`` is used in the **Churros** commands below.
     build-index.sh [-p ncore] -a <program> <odir>
         program: bowtie, bowtie-cs, bowtie2, bwa, chromap
         Example:
-            build-index.sh bowtie2 Ensembl-GRCh38
+            build-index.sh bowtie2 Referencedata_hg38
 
 churros
 --------------------------------------------
 
 ``churros`` command internally implements ``churros_mapping``, ``churros_callpeak``, ``churros_visualize``, ``churros_compare`` and ``churros_genPvalwig``.
 
-``churros`` also check the quality of FASTQ files using fastqc and fastp in addition to the quality check of map files by ``churros_mapping``. The result is summarized in the stats file in text format (``Churros_result/churros.QCstats.tsv``) and HTML format by MULTIQC (``multiqc_report.html``).
+``churros`` also check the quality of FASTQ files using fastqc and fastp in addition to the quality check of map files by ``churros_mapping``. The result is summarized in the stats file in text format (``churros.QCstats.tsv``) and HTML format by MULTIQC (``multiqc_report.html``) in the output directory.
 
 .. code-block:: bash
 
-    churros [-h] [--cram] [-b BINSIZE] [--mpbl] [--nofastqc] [-q QVAL]
-               [--macsdir MACSDIR] [-f FORMAT] [--mapparam MAPPARAM]
-               [-p THREADS] [--outputpvalue] [-D OUTPUTDIR] [--preset PRESET]
+   usage: churros [-h] [--cram] [-f] [-b BINSIZE] [--nompbl] [--nofastqc] [-q QVAL] [--macsdir MACSDIR] [--mapparam MAPPARAM] [-p THREADS]
+               [--threads_comparative THREADS_COMPARATIVE] [--outputpvalue] [--comparative] [-D OUTPUTDIR] [--preset PRESET] [-v]
                samplelist samplepairlist build Ddir
 
-    positional arguments:
-      samplelist            sample list
-      samplepairlist        ChIP/Input pair list
-      build                 genome build (e.g., hg38)
-      Ddir                  directory of reference data
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      --cram                output as CRAM format (default: BAM)
-      -b BINSIZE, --binsize BINSIZE
-                            binsize of parse2wig+ (default: 100)
-      --mpbl                consider genome mappability in drompa+
-      --nofastqc            omit FASTQC
-      -q QVAL, --qval QVAL  threshould of MACS2 (default: 0.05)
-      --macsdir MACSDIR     output direcoty of macs2 (default: 'macs2')
-      -f FORMAT, --format FORMAT
-                            output format of parse2wig+ 0: compressed wig
-                            (.wig.gz) 1: uncompressed wig (.wig) 2: bedGraph
-                            (.bedGraph) 3 (default): bigWig (.bw)
-      --mapparam MAPPARAM   parameter of bowtie|bowtie2 (shouled be quated)
-      -p THREADS, --threads THREADS
-                            number of CPUs (default: 12)
-      --outputpvalue        output ChIP/Input -log(p) distribution as a begraph
-                            format
-      -D OUTPUTDIR, --outputdir OUTPUTDIR
-                            output directory (default: 'Churros_result')
-      --preset PRESET       Preset parameters for mapping reads ([scer])
+   positional arguments:
+     samplelist            sample list
+     samplepairlist        ChIP/Input pair list
+     build                 genome build (e.g., hg38)
+     Ddir                  directory of reference data
+
+   optional arguments:
+     -h, --help            show this help message and exit
+     --cram                output as CRAM format (default: BAM)
+     -f, --force           overwrite if the output directory already exists
+     -b BINSIZE, --binsize BINSIZE
+                           binsize of parse2wig+ (default: 100)
+     -k K                  read length for mappability file ([28|36|50], default:50)
+     --nompbl              do not consider genome mappability in drompa+
+     --nofastqc            omit FASTQC
+     -q QVAL, --qval QVAL  threshould of MACS2 (default: 0.05)
+     --macsdir MACSDIR     output direcoty of macs2 (default: 'macs2')
+     --mapparam MAPPARAM   parameter of bowtie|bowtie2 (shouled be quated)
+     -p THREADS, --threads THREADS
+                           number of CPUs (default: 12)
+     --threads_comparative THREADS_COMPARATIVE
+                           number of CPUs for --comparative option (default: 8)
+     --outputpvalue        output ChIP/Input -log(p) distribution as a begraph format
+     --comparative         compare bigWigs and peaks among samples by churros_compare
+     -D OUTPUTDIR, --outputdir OUTPUTDIR
+                           output directory (default: 'Churros_result')
+     --preset PRESET       Preset parameters for mapping reads ([scer|T2T])
+     -v, --version         print version information and quit
 
 - Key points:
-   - We recommend considering genome mappability by supplying ``--mpbl`` option as long as mappability files are available. 
+   - We recommend considering genome mappability as long as mappability files are available. 
 
-       - ``download_genomedata.sh`` generates mappability files for the read lengths 28, 36, and 50. Specify the read length closest to your data.
-       - If the data is unavailable, consider generating the mappability files (see :doc:`Appendix`).
-   - ``--outputpvalue`` option generates the bedGraph of -log10(p) by ``churros_genPvalwig``. By specifying ChIP files in two conditions (e.g., before and after stimulation) in ``samplepairlist``, you can generate and analyze the p-value distribution itself.
+      - ``download_genomedata.sh`` generates mappability files for the read lengths 28, 36, and 50. Specify the read length closest to your data by ``-k`` option.
+      - If the mappability file is unavailable, consider generating it by yourself (see :doc:`Appendix`).
    - The appropriate parameter setting depends on the species to be investigated. ``churros`` has ``--preset`` option to tune the parameter set for each species. 
 
-       - In version 0.2.0, there is ``--preset scer`` option only (for `S. cerevisiae`). When applying ``chuross`` to `S. serevisiae`, try ``--preset scer`` option.
+      - In version ``0.4.0``, ``scer`` (for `S. cerevisiae`) and ``T2T`` (for `T2T-CHM13`) are available. When applying ``chuross`` to `S. cerevisiae`, try ``--preset scer`` option.
+
 
 churros_mapping
 --------------------------------------------
@@ -270,6 +270,7 @@ As ``churros_visualize`` can visualize -log10(p) of ChIP/Input enrichment distri
          churros_genPvalwig samplelist.txt chip-seq hg38 Referencedata_hg38
 
 
+``--outputpvalue`` option generates the bedGraph of -log10(p) by ``churros_genPvalwig``. By specifying ChIP files in two conditions (e.g., before and after stimulation) in ``samplepairlist``, you can generate and analyze the p-value distribution itself.
 bowtie.sh
 ------------------------------------------------
 

@@ -17,7 +17,7 @@ function usage()
     echo '      -c: output as CRAM format (defalt: BAM)' 1>&2
     echo '      -b: binsize of parse2wig+ (defalt: 100)' 1>&2
     echo '      -z: peak file for FRiP calculation (BED format, default: default MACS2 without control)' 1>&2
-    echo '      -k [36|50]: read length of mappability file (default:50)' 1>&2
+    echo '      -k [28|36|50]: read length for mappability file (default:50)' 1>&2
     echo '      -n: do not consider genome mappability' 1>&2
 #    echo '      -n: omit ssp' 1>&2
     echo '      -C: for SOLiD data (csfastq, defalt: fastq)' 1>&2

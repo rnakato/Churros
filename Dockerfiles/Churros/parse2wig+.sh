@@ -13,7 +13,7 @@ function usage()
     echo '      -z: peak file for FRiP calculation (BED format)' 1>&2
     echo '      -l: predefined fragment length (default: estimated by trand-shift profile)' 1>&2
     echo '      -m: consider genome mappability' 1>&2
-    echo '      -k: read length (36 or 50) for mappability calculation (default: 50)' 1>&2
+    echo '      -k: read length for mappability calculation ([28|36|50], default: 50)' 1>&2
     echo '      -p: for paired-end file' 1>&2
     echo '      -t: number of CPUs (default: 4)' 1>&2
     echo '      -o: output directory (default: parse2wigdir+)' 1>&2
