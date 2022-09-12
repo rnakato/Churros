@@ -11,7 +11,7 @@ function usage()
     echo '      -n: do not consider genome mappability' 1>&2
     echo '      -D: directory for execution (defalt: "Churros_result")' 1>&2
     echo '      -p : number of CPUs (default: 8)' 1>&2
-    echo '      -y <str>: param string of parse2wig+ files to be used (default: "-bowtie2-<build>-raw-GR")' 1>&2
+    echo '      -y <str>: param string of parse2wig+ files to be used (default: ".mpbl")' 1>&2
 }
 
 odir=comparison

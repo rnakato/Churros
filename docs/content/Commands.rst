@@ -124,8 +124,8 @@ The mapped reads are then quality-checked and converted to BigWig files.
           -b: binsize of parse2wig+ (defalt: 100)
           -z: peak file for FRiP calculation (BED format, default: default MACS2 without control)
           -m: consider genome mappability in parse2wig+
-          -k [36|50]: read length of mappability file (default:50)
-          -n: omit ssp
+          -k [28|36|50]: read length for mappability file (default:50)
+          -n: do not consider genome mappability
           -C: for SOLiD data (csfastq, defalt: fastq)
           -f: output format of parse2wig+ (default: 3)
                    0: compressed wig (.wig.gz)
@@ -133,12 +133,15 @@ The mapped reads are then quality-checked and converted to BigWig files.
                    2: bedGraph (.bedGraph)
                    3: bigWig (.bw)
           -P "param": parameter of bowtie|bowtie2 (shouled be quated)
-          -p : number of CPUs (default: 12)
-          -D : directory for execution (defalt: "Churros_result")
+          -p: number of CPUs (default: 12)
+          -D: directory for execution (defalt: "Churros_result")
        Example:
-         For single-end: churros_mapping exec chip.fastq.gz chip hg38 Referencedata_hg38
+          For single-end: churros_mapping exec chip.fastq.gz chip hg38 Referencedata_hg38
           For paired-end: churros_mapping exec "-1 chip_1.fastq.gz -2 chip_2.fastq.gz" chip hg38 Referencedata_hg38
 
+- Key points:
+   - There are two directories in ``bigWig`` directory, ``RawCount`` and ``TotalReadNormalized``. The former is a raw count of nonredundant mapped reads, while the latter stores the read number after total read normalization to 20 M. 
+   - **Churros** uses ``TotalReadNormalized`` in the downstream analysis, while MACS2 (peak calling) uses the former.
 
 churros_callpeak
 -------------------------------------
@@ -167,91 +170,96 @@ churros_visualize
 ``churros_visualize`` executes DROMPA+ to make pdf files that visualize read/enrichment/p-value distributions.
 The results are output in ``pdf`` directory by default.
 
-.. note::
-
-   If you supply ``-m`` option in ``churros_mapping`` (consider genome mappability), supply ``--mpbl`` optoon in ``churros_visualize`` to use the generated mappability-normalized bigWig files.
-
-
 .. code-block:: bash
 
-   churros_visualize [-h] [-f WIGFORMAT] [-b BINSIZE] [-l LINESIZE]
-                         [--mpbl] [-d D] [--postfix POSTFIX] [--pvalue]
-                         [-P DROMPAPARAM] [-G] [--enrich] [--logratio]
-                         [--preset PRESET] [-D OUTPUTDIR]
+   usage: churros_visualize [-h] [-b BINSIZE] [-l LINESIZE] [--nompbl] [-d D] [--postfix POSTFIX] [--pvalue] [--bowtie1] [-P DROMPAPARAM] [-G] [--enrich]
+                         [--logratio] [--preset PRESET] [-D OUTPUTDIR]
                          samplepairlist prefix build Ddir
-   
+
    positional arguments:
      samplepairlist        ChIP/Input pair list
      prefix                output prefix (directory will be omitted)
      build                 genome build (e.g., hg38)
      Ddir                  directory of reference data
-   
+
    optional arguments:
      -h, --help            show this help message and exit
-     -f WIGFORMAT, --wigformat WIGFORMAT
-                           input file format 0: compressed wig (.wig.gz) 1:
-                           uncompressed wig (.wig) 2: bedGraph (.bedGraph) 3
-                           (default): bigWig (.bw)
      -b BINSIZE, --binsize BINSIZE
                            binsize of parse2wig+ (default: 100)
      -l LINESIZE, --linesize LINESIZE
                            line size for each page (kbp, defalt: 1000)
-     --mpbl                consider genome mappability in drompa+
-     -d D                  directory of parse2wig+ (default: parse2wigdir+)
-     --postfix POSTFIX     param string of parse2wig+ files to be used (default:
-                           '-bowtie2-<build>-raw-GR')
+     --nompbl              do not consider genome mappability
+     -d D                  directory of bigWig files (default: 'TotalReadNormalized/')
+     --postfix POSTFIX     param string of parse2wig+ files to be used (default: '.mpbl')
      --pvalue              show p-value distribution instead of read distribution
+     --bowtie1             specified bowtie1
      -P DROMPAPARAM, --drompaparam DROMPAPARAM
                            additional parameters for DROMPA+ (shouled be quated)
      -G                    genome-wide view (100kbp)
      --enrich              PC_ENRICH: show ChIP/Input ratio (preferred for yeast)
      --logratio            (for PC_ENRICH) show log-scaled ChIP/Input ratio
-     --preset PRESET       Preset parameters for mapping reads ([scer])
+     --preset PRESET       Preset parameters for mapping reads ([scer|T2T])
      -D OUTPUTDIR, --outputdir OUTPUTDIR
                            output directory (default: 'Churros_result')
 
+
+.. note::
+
+   If you supply ``-n`` option in ``churros_mapping`` (do not consider genome mappability), supply ``--nompbl`` optoon in ``churros_visualize`` to use the generated mappability-normalized bigWig files.
 
 - Key points:
    - The default setting (100-bp bin and 1-Mbp page width) is adjusted to typical transcription factor analysis for human/mouse.
    - For the broad mark analysis (e.g., H3K27me3 and H3K9me3, which are distributed more than 100 kbp), macro-scale visualization is useful. For example, ``-b 5000 -l 8000`` option generates 5-kbp bin, 8-Mbp page width. The scale of the y-axis can be changed by ``-P`` option, for example, ``-P "--scale_tag 100"``.
    - By ``-G`` option, ``churros_visualize`` visualizes ChIP/Input enrichment in genome-wide view (whole chromosome on one page).
    - It is also possible to visualize -log10(p) of ChIP/Input enrichment instead of read distribution, by supplying ``--pvalue`` option.
-   - ``churros_visualize`` can highlight the peak regions called by MACS2 by supplying the ``macs/samplepairlist.txt`` generated by ``churros_callpeak`` for ``samplepairlist``.
+   - ``churros_visualize`` can highlight the peak regions called by MACS2 by supplying the ``macs/samplepairlist.txt`` generated by ``churros_callpeak`` for ``samplepairlist`` (see :doc:`Tutorial`).
 
 
 churros_compare
 -------------------------------------
 
-``churros_compare`` executes ``deepTools plotCorrelation`` to calculate Spearman correlation coefficient using bigWig files (100-bp and 100-kbp bins) generated by ``churros_mapping`` and make heatmaps and scatter plots.
+``churros_compare`` estimates the correlation among samples described in ``<samplepairlist>`` and draw heatmaps and scatter plots using three types of comparative analysis:
+
+- Spearman correlation of read distribution by applying bigWig files (100-bp and 100-kbp bins) to `deepTools plotCorrelation <https://deeptools.readthedocs.io/en/develop/content/tools/plotCorrelation.html>`_. 
+
+   - This score evaluates the similarity of the whole genome including non-peak regions. Therefore the results may reflect the genome-wide features (e.g., GC bias and copy number variations) rather than peak overlap.
+   - The results are stored in ``bigwigCorrelation/``.
+- Jaccard index of base-pair level overlap of peaks by `BEDtools jaccard <https://bedtools.readthedocs.io/en/latest/content/tools/jaccard.html>`_.
+
+   - This score is good for broad peaks such as some histone modifications (H3K27me3 and H3K36me3).
+   - The results are stored in ``Peak_BPlevel_overlap/``.
+- Simpson index of peak-number level comparison.
+
+   - This score is good for the comparison of sharp peaks such as transcription factors.
+   - The results are stored in ``Peak_Number_overlap/``. ``PairwiseComparison/`` contains the results of all pairs (overlapped peak list and Venn diagram) and the ``Peaks`` contains top-ranked peaks of samples.
 
 .. code-block:: bash
 
-   churros_compare [Options] <samplelist> <build>
+   churros_compare [Options] <samplelist> <samplepairlist> <build>
       <samplelist>: text file of samples
       <build>: genome build (e.g., hg38)
       Options:
-         -d : output directory (defalt: "compare")
-         -m: consider genome mappability in parse2wig+
-         -D : directory for execution (defalt: "Churros_result")
-         -y <str>: param string of parse2wig+ files to be used (default: "-bowtie2-<build>-raw-GR")
+         -o: output directory (defalt: "comparison")
+         -d: peak direcoty (defalt: "macs")
+         -n: do not consider genome mappability
+         -D: directory for execution (defalt: "Churros_result")
+         -p : number of CPUs (default: 8)
+         -y <str>: param string of parse2wig+ files to be used (default: ".mpbl")
 
 .. note::
 
-   While the Jaccard index stored in ``comparison`` results evaluates the basepair-level overlap using ``bedtools jaccard`` command, the Simpson index stored in ``simpson_peak_results`` evaluates the peak-number-level overlap. If all samples are sharp peaks (e.g., transcription factors), the Simpson index may be reasonable. If the samples contain broad peaks (e.g., histone modification such as H3K27me3), the Jaccard index may provide more reasonable results because multiple sharp peaks can be overlapped with one broad peak.
+   If all samples are sharp peaks (e.g., transcription factors), the Simpson index may be reasonable. If the samples contain broad peaks (e.g., histone modification such as H3K27me3), the Jaccard index may provide more reasonable results because multiple sharp peaks can be overlapped with one broad peak.
 
 .. note::
 
-   Unlike the peak comparison implemented in ``churros_callpeak``, ``churros_compare`` evaluates the similarity of whole genome including non-peak regions. Therefore the results may reflect the genome-wide features (e.g., GC bias and copy number variations) rather than peak overlap.
-
+   If the number of samples is large (50~) and/or the number of peaks of each sample is large (100k~), the comparison will require a long time. In such a case, consider supplying a large number for ``-p``, though that will require a large memory size.
 
 churros_genPvalwig
 ----------------------------------------
 
 As ``churros_visualize`` can visualize -log10(p) of ChIP/Input enrichment distribution, ``churros_genPvalwig`` can be used the p-value distribution in bedGraph.
 
-.. note::
-
-   If you supply ``-m`` option in ``churros_mapping`` (consider genome mappability), supply ``-m`` option also here to use the generated mappability-normalized bigWig files.
+The good usage of ``churros_genPvalwig`` is specifying ChIP files in two conditions (e.g., before and after stimulation) in ``samplepairlist`` and analyzing the p-value distribution to investigate significantly increased/descreased regions.
 
 .. code-block:: bash
 
@@ -262,15 +270,18 @@ As ``churros_visualize`` can visualize -log10(p) of ChIP/Input enrichment distri
       <gt>: genome_table file
       Options:
          -b <int>: binsize (defalt: 100)
-         -d <str>: directory of parse2wig+ (default: parse2wigdir+)
-         -m: consider genome mappability in parse2wig+
-         -y <str>: postfix of .bw files to be used (default: "-raw-GR")
-        -D : directory for execution (defalt: "Churros_result")
+         -d <str>: directory of bigWig files (default: 'TotalReadNormalized/'')
+         -n: do not consider genome mappability
+         -y <str>: postfix of .bw files to be used (default: '.mpbl')
+         -D <str>: directory for execution (defalt: "Churros_result")
       Example:
-         churros_genPvalwig samplelist.txt chip-seq hg38 Referencedata_hg38
+         churros_genPvalwig samplelist.txt chip-seq hg38 genometable.hg38.txt
 
+.. note::
 
-``--outputpvalue`` option generates the bedGraph of -log10(p) by ``churros_genPvalwig``. By specifying ChIP files in two conditions (e.g., before and after stimulation) in ``samplepairlist``, you can generate and analyze the p-value distribution itself.
+   If you supply ``-n`` option in ``churros_mapping`` (do not consider genome mappability), supply ``--nompbl`` optoon in ``churros_visualize`` to use the generated mappability-normalized bigWig files.
+
+  
 bowtie.sh
 ------------------------------------------------
 
@@ -321,17 +332,17 @@ macs.sh
 
 .. code-block:: bash
 
-    macs.sh [Options] <IP bam> <Input bam> <prefix> <build> <mode>
-       <IP bam>: BAM for for ChIP (treat) sample
-       <Input bam>: BAM for for Input (control) sample: specify "none" if unavailable
-       <prefix>: prefix of output file
-       <build>: genome build (e.g., hg38)
-       <mode>: peak mode ([sharp|broad|sharp-nomodel|broad-nomodel])
-       Options:
-          -f <int>: predefined fragment length (defalt: estimated in MACS2)
-          -d <str>: output directory (defalt: "macs")
-          -B: save extended fragment pileup, and local lambda tracks (two files) at every bp into a bedGraph file
-          -F: overwrite files if exist (defalt: skip)
+   macs.sh [Options] <IP bam> <Input bam> <prefix> <build> <mode>
+      <IP bam>: BAM for for ChIP (treat) sample
+      <Input bam>: BAM for for Input (control) sample: specify "none" if unavailable
+      <prefix>: prefix of output file
+      <build>: genome build (e.g., hg38)
+      <mode>: peak mode ([sharp|broad|sharp-nomodel|broad-nomodel])
+      Options:
+         -f <int>: predefined fragment length (defalt: estimated in MACS2)
+         -d <str>: output directory (defalt: "macs")
+         -B: save extended fragment pileup, and local lambda tracks (two files) at every bp into a bedGraph file
+         -F: overwrite files if exist (defalt: skip)
 
 
 parse2wig+.sh
@@ -353,16 +364,16 @@ When ``-m`` option is supplied, ``parse2wig+.sh`` also normalizes the read based
          -z: peak file for FRiP calculation (BED format)
          -l: predefined fragment length (default: estimated by trand-shift profile)
          -m: consider genome mappability
-         -k: read length (36 or 50) for mappability calculation (default: 50)
+         -k: read length for mappability calculation ([28|36|50], default: 50)
          -p: for paired-end file
          -t: number of CPUs (default: 4)
          -o: output directory (default: parse2wigdir+)
          -s: stats directory (default: log/parse2wig+)
          -f: output format of parse2wig+ (default: 3)
-                  0: compressed wig (.wig.gz)
-                  1: uncompressed wig (.wig)
-                  2: bedGraph (.bedGraph)
-                  3: bigWig (.bw)
+               0: compressed wig (.wig.gz)
+               1: uncompressed wig (.wig)
+               2: bedGraph (.bedGraph)
+               3: bigWig (.bw)
          -D outputdir: output dir (defalt: ./)
          -F: overwrite files if exist (defalt: skip)
       Example:
@@ -381,12 +392,13 @@ The one-by-one comparison results (overlapped peak list and Venn diagram) are al
 
 .. code-block:: bash
 
-    simpson_peak.sh [Options] <peakfile> <peakfile> ...
-       <peakfile>: peak file (bed format)
-       Options:
-          -n <int>: extract top-<int> peaks for comparison (default: all peaks)
-          -d <str>: output directory (default: "simpson_peak_results/")
-          -p <int>: number of CPUs (default: 4)
+   simpson_peak.sh [Options] <peakfile> <peakfile> ...
+      <peakfile>: peak file (bed format)
+      Options:
+         -n <int>: extract top-<int> peaks for comparison (default: all peaks)
+         -d <str>: output directory (default: "simpson_peak_results/")
+         -v: Draw Venn diagrams for all pairs
+         -p <int>: number of CPUs (default: 8)
 
 chromHMM.sh:
 ------------------------------------------------

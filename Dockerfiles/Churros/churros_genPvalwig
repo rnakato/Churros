@@ -12,7 +12,7 @@ function usage()
     echo '      -d <str>: directory of bigWig files (default: TotalReadNormalized/)' 1>&2
     echo '      -n: do not consider genome mappability' 1>&2
     echo '      -y <str>: postfix of .bw files to be used (default: "-raw-GR")' 1>&2
-    echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
+    echo '      -D <str>: directory for execution (defalt: "Churros_result")' 1>&2
     echo "   Example:" 1>&2
     echo "      $cmdname samplelist.txt chip-seq hg38 genometable.hg38.txt" 1>&2
 }
