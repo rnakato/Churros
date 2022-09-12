@@ -251,13 +251,15 @@ It the number of peaks largely varies among samples, the comparison may become u
 
     churros_compare samplelist.txt samplepairlist.txt hg38
 
+
+The results contain three types of comparisons.
+
 - Output
-    - ``bigwigCorrelation/`` ... Spearman correlation of read distributon in 100-bp and 100-kbp bins by `deepTools plotCorrelation <https://deeptools.readthedocs.io/en/develop/content/tools/plotCorrelation.html>`_ (for all peaks and top-ranked 2000 peaks)
-    - ``Peak_BPlevel_overlap/`` ... results of base-pair level overlap of peaks (Jaccard index) by `BEDtools jaccard <https://bedtools.readthedocs.io/en/latest/content/tools/jaccard.html>`_
-    - ``Peak_Number_overlap/`` ... results of peak-number level comparion (Simpson index). ``PairwiseComparison/`` contains the results of all pairs (overlapped peak list and Venn diagram) and the ``Peaks`` contains top-ranked peaks of samples.
+    - ``bigwigCorrelation/`` ... Spearman correlation of read distributon in 100-bp and 100-kbp bins by `deepTools plotCorrelation <https://deeptools.readthedocs.io/en/develop/content/tools/plotCorrelation.html>`_. This score evaluates the similarity of whole genome including non-peak regions. Therefore the results may reflect the genome-wide features (e.g., GC bias and copy number variations) rather than peak overlap.
+    - ``Peak_BPlevel_overlap/`` ... results of base-pair level overlap of peaks (Jaccard index) by `BEDtools jaccard <https://bedtools.readthedocs.io/en/latest/content/tools/jaccard.html>`_. This score is good for broad peaks such as some histone modifications (H3K27me3 and H3K36me3).
+    - ``Peak_Number_overlap/`` ... results of peak-number level comparion (Simpson index). ``PairwiseComparison/`` contains the results of all pairs (overlapped peak list and Venn diagram) and the ``Peaks`` contains top-ranked peaks of samples. This score is good for comparison of sharp peaks such as transcription factors.
 
 
-There are three types of comparison. ``bigwigCorrelation``  evaluates the similarity of whole genome including non-peak regions. Therefore the results may reflect the genome-wide features (e.g., GC bias and copy number variations) rather than peak overlap.
 ``Peak_BPlevel_overlap/`` and ``Peak_Number_overlap/`` implement peak comparsion.
 
 
