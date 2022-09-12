@@ -115,13 +115,14 @@ visualizes read distribution as pdf format.
 
 .. code-block:: bash
 
-    churros_visualize samplepairlist.txt drompa+ sacCer3 Referencedata_sacCer3 --preset scer --enrich
+    churros_visualize samplepairlist.txt drompa+ \
+        sacCer3 Referencedata_sacCer3 --preset scer --enrich
 
 ``--preset scer`` option changes the width and smoothing width for the small genome.
 In addition, ``--logratio`` option makes the enrichment in log-scale.
 
 .. code-block:: bash
 
-    churros_visualize samplepairlist.txt drompa+.logscale sacCer3 \
-        Referencedata_sacCer3 --preset scer --enrich --logratio
+    churros_visualize samplepairlist.txt drompa+.logscale \
+        sacCer3 Referencedata_sacCer3 --preset scer --enrich --logratio
 
