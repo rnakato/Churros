@@ -22,12 +22,16 @@ While ``download_genomedata.sh`` uses the `Ensembl <https://asia.ensembl.org/ind
    "C. elegans", "WBcel235", "ce11"
    "S. serevisiae", "R64-1-1", "sacCer3"
 
-For example, to use human genome build GRCh38/hg38, specify GRCh38 for ``download_genomedata.sh`` and hg38 for ``churros``.
+For example, to use human genome build GRCh38/hg38, specify GRCh38 or hg38 for ``download_genomedata.sh`` and hg38 for ``churros``.
 
 .. code-block:: bash
 
-    download_genomedata.sh GRCh38 Ensembl-GRCh38/ 2>&1 | tee log/Ensembl-GRCh38
-    churros -p 24 --mpbl samplelist.txt samplepairlist.txt hg38 Ensembl-GRCh38/
+   download_genomedata.sh hg38 UCSC-hg38/ 2>&1 | tee log/UCSC-hg38
+   churros -p 24 --mpbl samplelist.txt samplepairlist.txt hg38 UCSC-hg38
+   # or
+   download_genomedata.sh GRCh38 Ensembl-GRCh38/ 2>&1 | tee log/Ensembl-GRCh38
+   churros -p 24 --mpbl samplelist.txt samplepairlist.txt hg38 Ensembl-GRCh38/
+
 
 Make mappability files
 --------------------------------------------------
@@ -50,9 +54,9 @@ For example, if you want to make the mappability files for genome build hg38 wit
 
 .. code-block:: bash
 
-    calculate_mappability_mosaics.sh -r "75 100" Ensembl-GRCh38
+    calculate_mappability_mosaics.sh -r "75 100" UCSC-hg38
 
-Then the data is created in ``Ensembl-GRCm38/mappability_Mosaics_75mer`` and ``Ensembl-GRCm38/mappability_Mosaics_100mer``.
+Then the data is created in ``UCSC-hg38/mappability_Mosaics_75mer`` and ``UCSC-hg38/mappability_Mosaics_100mer``.
 
 .. note::
 
