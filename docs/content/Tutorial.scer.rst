@@ -122,5 +122,6 @@ In addition, ``--logratio`` option makes the enrichment in log-scale.
 
 .. code-block:: bash
 
-    churros_visualize samplepairlist.txt drompa+.logscale sacCer3 Ensembl-R64-1-1/ --preset scer --enrich --logratio
+    churros_visualize samplepairlist.txt drompa+.logscale sacCer3 \
+        Referencedata_sacCer3 --preset scer --enrich --logratio
 
