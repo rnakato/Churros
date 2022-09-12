@@ -169,7 +169,7 @@ If input samples are omitted, peaks are called using ChIP samples only.
 ``churros_callpeak`` also outputs the correlation scores (Simpson index) and heatmaps.
 
 - Output
-    - macs/ ... peak files called by MACS2. The log files are stored in *log. ``samplepairlist.txt`` in ``macs/`` directory includes the filename of peak files that is used in ``churros_visualize``.
+    - macs/ ... peak files called by MACS2. The log files are stored in \*log. ``samplepairlist.txt`` in ``macs/`` directory includes the filename of peak files that is used in ``churros_visualize``.
 
 
 churros_visualize: visualize read distributions by DROMPA+
