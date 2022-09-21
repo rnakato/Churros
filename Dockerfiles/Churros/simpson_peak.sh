@@ -64,13 +64,13 @@ ex(){ echo $1; eval $1; }
 export -f ex
 
 if test $npeak -gt 0; then
-    outputfile=$odir/simpson_peak.top${npeak}peaks.tsv
+    outputfile=$odir/PeakcomparisonHeatmap.Simpson.top${npeak}peaks.tsv
     for peak1 in $peaklist; do
         label1=`basename $peak1 _peaks.narrowPeak | sed -e 's/.bed//g'`
         ex "grep -v \# $peak1 | head -n$npeak > $peakdir/$label1.top$npeak"
     done
 else
-    outputfile=$odir/simpson_peak.allpeaks.tsv
+    outputfile=$odir/PeakcomparisonHeatmap.Simpson.allpeaks.tsv
 fi
 rm -rf $outputfile
 
