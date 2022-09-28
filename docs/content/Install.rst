@@ -16,6 +16,7 @@ The latest version of **Churros** (``v0.2.0``) internally uses the tools includi
 - SAMtools v1.15.1
 - DROMPA+ v1.15.3
 - SSP v1.2.5
+- ROSE v0.1
 - ChromHMM v1.23
 - ChromImpute v1.0.3
 
