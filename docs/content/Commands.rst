@@ -400,13 +400,32 @@ The one-by-one comparison results (overlapped peak list and Venn diagram) are al
          -v: Draw Venn diagrams for all pairs
          -p <int>: number of CPUs (default: 8)
 
-chromHMM.sh:
+
+rose: Super-enhancer analysis
+------------------------------------
+
+``rose`` executes `ROSE <http://younglab.wi.mit.edu/super_enhancer_code.html>`_ to identify super-enhancer sites from a BED file.
+
+Input bam file is optional.
+
+.. code-block:: bash
+
+   rose [Options] <IPbam> <Inputbam> <bed> <build>
+      <IPbam>: BAM file for ChIP sample
+      <Inputbam>: BAM file for Input sample (specify "none" when input is absent)
+      <bed>: enhancer regions (BED format)
+      <build>: genome build (hg18|hg19|hg38|mm8|mm9|mm10)
+      Options:
+         -d : maximum distance between two regions that will be stitched together (default: 12500)
+         -e : exclude regions contained within +/- this distance from TSS in order to account for promoter biases (default: 0, recommended if used: 2500)
+
+chromHMM.sh
 ------------------------------------------------
 
 You can use chromHMM using ``chromHMM.sh <command>``, e.g., ``chromHMM.sh LearnModel``.
 See the `ChromHMM website <http://compbio.mit.edu/ChromHMM/>`_ for the detail.
 
-chromImpute.sh:
+chromImpute.sh
 ------------------------------------------------
 
 You can use chromImpute using ``chromImpute.sh <command>``, e.g., ``chromImpute.sh Convert``.
