@@ -1,0 +1,57 @@
+#!/bin/bash
+cmdname=`basename $0`
+function usage()
+{
+    echo "$cmdname [Options] <IPbam> <Inputbam> <bed> <build>" 1>&2
+    echo '   <IPbam>: BAM file for ChIP sample' 1>&2
+    echo '   <Inputbam>: BAM file for Input sample (specify "none" when input is absent)' 1>&2
+    echo '   <bed>: enhancer regions (BED format)' 1>&2
+    echo '   <build>: genome build (hg18|hg19|hg38|mm8|mm9|mm10)' 1>&2
+    echo '   Options:' 1>&2
+    echo '      -d : maximum distance between two regions that will be stitched together (default: 12500)' 1>&2
+    echo '      -e : exclude regions contained within +/- this distance from TSS in order to account for promoter biases (default: 0, recommended if used: 2500)' 1>&2
+    echo '      -o : output directory (default: rose)' 1>&2
+}
+
+distance_stitch=12500
+size_tss_exclude=0
+odir=rose
+
+while getopts d:e:o: option
+do
+    case ${option} in
+	d) distance_stitch=${OPTARG} ;;
+	e) size_tss_exclude=${OPTARG} ;;
+	o) odir=${OPTARG} ;;
+        *)
+	    usage
+	    exit 1
+	    ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+if [ $# -ne 4 ]; then
+  usage
+  exit 1
+fi
+
+bamIP=$1
+bamInp=$2
+bed=$3
+build=$4
+
+if test ! -e $bed; then
+    echo "Error: $bed does not exist."
+    exit 1
+fi
+
+ex(){ echo $1; eval $1; }
+
+bed_to_gff_converter.py $bed $bed.gff
+if test $bamInp = "none"; then
+    /usr/bin/python /opt/ROSE/ROSE_main.py -g $build -i $bed.gff -r $bamIP -o $odir -s $distance_stitch -t $size_tss_exclude
+else
+    /usr/bin/python /opt/ROSE/ROSE_main.py -g $build -i $bed.gff -r $bamIP -c $bamInp -o $odir -s $distance_stitch -t $size_tss_exclude
+fi
+#grep -v \# $odir/spikein_SuperEnhancers.table.txt | grep -v REGION_ID | cut -f2,3,4 > $odir/spikein_SuperEnhancers.table.bed
