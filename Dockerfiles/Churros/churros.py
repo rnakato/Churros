@@ -74,9 +74,9 @@ def do_fastqc(chdir, build, samplelist):
 
 def do_mapping(args, samplelist, post, build, chdir):
     if args.nompbl:
-        param_churros_mapping = "-D " + chdir + "-k " + str(args.k) + " -p " + str(args.threads) + " -n"
+        param_churros_mapping = "-D " + chdir + " -k " + str(args.k) + " -p " + str(args.threads) + " -n"
     else:
-        param_churros_mapping = "-D " + chdir + "-k " + str(args.k) + " -p " + str(args.threads)
+        param_churros_mapping = "-D " + chdir + " -k " + str(args.k) + " -p " + str(args.threads)
 
     print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' exec ' + str(samplelist) + ' ' + build + ' ' + args.Ddir)
 
