@@ -68,7 +68,7 @@ for (each.arg in args) {
 library(RColorBrewer)
 library(gplots)
 
-counts <- read.table(infile, row.names=1, header=T, sep="\t")
+counts <- read.table(infile, header=T, sep="\t")
 counts <- as.matrix(counts)
 
 if(t == "T"){ counts <- t(counts)}
