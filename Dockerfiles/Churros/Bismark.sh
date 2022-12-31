@@ -8,11 +8,11 @@ function usage()
     echo '   Options:' 1>&2
     echo '      -d <str>: output directory (defalt: "Bismarkdir")' 1>&2
     echo '      -m <mode>: Bismark mode ([directional|non_directional|pbat|rrbs], default: directional)' 1>&2
-    echo '      -p : number of CPUs (default: 12)' 1>&2
+    echo '      -p : number of CPUs (default: 4)' 1>&2
 }
 
 odir=Bismarkdir
-ncore=12
+ncore=4
 mode=directional
 
 while getopts d:m:p: option
