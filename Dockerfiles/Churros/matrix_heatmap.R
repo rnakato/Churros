@@ -69,9 +69,10 @@ library(RColorBrewer)
 library(gplots)
 
 counts <- read.table(infile, header=T, sep="\t")
-counts <- as.matrix(counts)
+#counts <- as.matrix(counts)
+counts <- as.matrix(data.frame(counts[,-1], row.names = counts[,1]))
 
-if(t == "T"){ counts <- t(counts)}
+if(t == "T"){ counts <- t(counts) }
 
 head(counts)
 

@@ -3,7 +3,7 @@ Installation
 
 Docker image is available at `DockerHub <https://hub.docker.com/r/rnakato/churros>`_.
 
-The latest version of **Churros** (``v0.2.0``) internally uses the tools including:
+The latest version of **Churros** (``v0.5.0``) internally uses the tools including:
 
 - FastQC v0.11.9
 - fastp v0.23.2
@@ -14,6 +14,7 @@ The latest version of **Churros** (``v0.2.0``) internally uses the tools includi
 - chromap v0.2.1
 - MACS2 v2.2.6
 - SAMtools v1.15.1
+- Bismark v0.22.3
 - DROMPA+ v1.17.0
 - SSP v1.2.5
 - ROSE v0.1

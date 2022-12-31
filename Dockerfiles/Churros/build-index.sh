@@ -98,4 +98,12 @@ elif test $program = "bwa" ; then
     command_version="$binary"
     ex $program $name "$command" "$command_version"
     ln -rsf $fa $indexdir/$name
+elif test $program = "bismark" ; then
+    binary="bismark_genome_preparation"
+    indexdir=$odir/bismark-indexes_$name
+    mkdir -p $indexdir
+    ln -rsf $fa $indexdir/genome.fa
+    command="$binary --parallel $ncore --verbose $indexdir"
+    command_version="$binary --version"
+    ex $program $name "$command" "$command_version"
 fi
