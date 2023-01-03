@@ -1,5 +1,5 @@
-Tutorial (human)
-=====================
+Tutorial (ChIP-seq, human)
+============================
 
 This page describes the tutorial how to get the results from FASTQ files.
 While this tutorial uses human data, the sample scripts for human, mouse and `S. cerevisiae` are also available at `Chrros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial>`_.
@@ -24,7 +24,7 @@ Here we use five histone modification data of HepG2 cells from `ENCODE Project <
     done
 
 | Then download and generate the reference dataset including genome, gene annotation and index files. **Chuross** contains scripts for that: ``download_genomedata.sh`` and ``build-index.sh``.
-| Here we specify ``GRCh38`` for genome build. See :doc:`Appendix` for the detail of genome build.
+| Here we specify ``hg38`` for genome build. See :doc:`Appendix` for the detail of genome build.
 
 .. code-block:: bash
 
@@ -102,7 +102,7 @@ Running Churros
 
     churros -p 12 samplelist.txt samplepairlist.txt hg38 Referencedata_hg38
 
-The results are output in ``Churros_result/``. If you want to specify the name of output directory, use ``-D`` option.
+The results are output in ``Churros_result/``. If you want to specify the name of the output directory, use ``-D`` option.
 
 .. code-block:: bash
 

@@ -36,7 +36,7 @@ The ``<odir>`` is used in the **Churros** commands below.
 .. code-block:: bash
 
     build-index.sh [-p ncore] -a <program> <odir>
-        program: bowtie, bowtie-cs, bowtie2, bwa, chromap
+        program: bowtie, bowtie-cs, bowtie2, bwa, chromap, bismark
         Example:
             build-index.sh bowtie2 Referencedata_hg38
 
@@ -270,7 +270,7 @@ The good usage of ``churros_genPvalwig`` is specifying ChIP files in two conditi
       <gt>: genome_table file
       Options:
          -b <int>: binsize (defalt: 100)
-         -d <str>: directory of bigWig files (default: 'TotalReadNormalized/'')
+         -d <str>: directory of bigWig files (default: 'TotalReadNormalized/')
          -n: do not consider genome mappability
          -y <str>: postfix of .bw files to be used (default: '.mpbl')
          -D <str>: directory for execution (defalt: "Churros_result")
@@ -431,3 +431,28 @@ chromImpute.sh
 You can use chromImpute using ``chromImpute.sh <command>``, e.g., ``chromImpute.sh Convert``.
 See the `chromImpute website <https://ernstlab.biolchem.ucla.edu/ChromImpute/>`_ for the detail.
 
+
+Bismark.sh: Bisulfite sequencing analysis
+--------------------------------------------------
+
+**Bismark.sh** executes `Bismark <https://www.bioinformatics.babraham.ac.uk/projects/bismark/>`_ to handle Bisulfite sequencing data.
+
+**Bismark.sh** command executes all steps of Bismark as follows:
+
+    - ``bismark (mapping)``
+    - ``deduplicate_bismark``
+    - ``bismark_methylation_extractor``
+    - ``bismark2report``
+    - ``bismark2summary``
+
+.. code-block:: bash
+
+   Bismark.sh [Options] <index> <fastq>
+      <index>: Bismark index directory
+      <fastq>: Input fastq file
+      Options:
+         -d <str>: output directory (defalt: "Bismarkdir")
+         -m <mode>: Bismark mode ([directional|non_directional|pbat|rrbs], default: directional)
+         -p : number of CPUs (default: 4)
+
+The results are output in ``Bismarkdir/``. If you want to specify the name of output directory, use ``-d`` option.

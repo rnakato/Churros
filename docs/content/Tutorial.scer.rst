@@ -1,5 +1,5 @@
-Tutorial (S. serevisiae)
-==================================
+Tutorial (ChIP-seq, *S. serevisiae*)
+=======================================
 
 This tutorial is for the analysis of `S. cerevisiae`. For human analysis, see :doc:`Tutorial`.
 The sample scripts are also available at `Chrros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial/yeast>`_.
