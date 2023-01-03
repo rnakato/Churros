@@ -4,7 +4,7 @@ pwd=`pwd`
 function usage()
 {
     echo "$cmdname [-p ncore] -a <program> <odir>" 1>&2
-    echo "   <program>: bowtie, bowtie-cs, bowtie2, bwa, chromap" 1>&2
+    echo "   <program>: bowtie, bowtie-cs, bowtie2, bwa, chromap, bismark" 1>&2
     echo '   <Ddir>: Reference data directory' 1>&2
     echo "   Example:" 1>&2
     echo "         $cmdname bowtie2 Referencedata_hg38" 1>&2
