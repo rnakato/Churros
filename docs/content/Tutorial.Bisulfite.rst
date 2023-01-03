@@ -19,7 +19,7 @@ These are paired-end fastq files.
 .. code-block:: bash
 
     mkdir -p fastq
-    for id in SRR19268566 SRR19268567
+    for id in SRR19268567
     do
         fastq-dump --split-files --gzip $id -O fastq
     done
