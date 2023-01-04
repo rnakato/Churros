@@ -69,6 +69,7 @@ else
     outputbam=`ls $odir/*_bismark_bt2*.deduplicated.bam`
 fi
 ex "bismark_methylation_extractor --gzip --bedGraph $outputbam -o $odir"
+ex "bam2nuc --dir $odir --genome_folder $index $outputbam"
 
 cd $odir
 ex "bismark2report"
