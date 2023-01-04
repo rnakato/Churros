@@ -66,6 +66,7 @@ if test $mode = "rrbs"; then
     echo "Because this is RRBS mode, the deduplication step is skipped."
 else
     ex "deduplicate_bismark --bam $outputbam --output_dir $odir"
+    outputbam=`ls $odir/*_bismark_bt2*.deduplicated.bam`
 fi
 ex "bismark_methylation_extractor --gzip --bedGraph $outputbam -o $odir"
 
