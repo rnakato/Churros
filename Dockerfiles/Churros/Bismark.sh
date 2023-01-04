@@ -72,5 +72,5 @@ ex "bismark_methylation_extractor --gzip --bedGraph $outputbam -o $odir"
 cd $odir
 ex "bismark2report"
 ex "bismark2summary"
-ex "multiqc ."
+ex "multiqc --pdf --force ."
 cd ..
