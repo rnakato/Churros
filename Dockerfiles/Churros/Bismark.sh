@@ -61,7 +61,7 @@ mkdir -p $odir
 ex "bismark --genome $index -o $odir --temp_dir $odir/tmp -p $ncore $bismarkparam $fastq"
 rm -rf $odir/tmp
 
-outputbam=`ls $odir/*_bismark_bt2*.bam`
+outputbam=`ls $odir/*_bismark_bt2*.bam | grep -v deduplicated`
 if test $mode = "rrbs"; then
     echo "Because this is RRBS mode, the deduplication step is skipped."
 else
