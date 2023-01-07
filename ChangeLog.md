@@ -3,6 +3,7 @@
 ## 0.5.0 (2023-01-07)
 - Add [Bismark](https://github.com/FelixKrueger/Bismark) and Bismark.sh for Bisulfite sequencing analysis
 - Add [TrimGalore](https://github.com/FelixKrueger/TrimGalore) for adapter and quality trimming to FastQ files
+- Add [Cutadapt](https://cutadapt.readthedocs.io/en/stable/index.html) for adapter trimming to FastQ files
 
 ## 0.4.1 (2022-11-24)
 - add ChangeLog
