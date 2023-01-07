@@ -41,6 +41,8 @@ fastq=$2
 
 ex(){ echo $1; eval $1; }
 
+fqdir=$odir/trimmed_fastq
+mkdir -p $fqdir
 if test $mode = "directional"; then
     bismarkparam=""
 elif test $mode = "non_directional"; then
@@ -48,16 +50,17 @@ elif test $mode = "non_directional"; then
 elif test $mode = "pbat"; then
     bismarkparam="--pbat"
 elif test $mode = "rrbs"; then
-    bismarkparam="--rrbs --ignore_r2 2"
+    ex "trim_galore --cores $ncore --rrbs $fastq -o $odir/trimmed_fastq"
+    fastq=`ls $fqdir/*.gz`
+    bismarkextractparam="--ignore_r2 2"
 elif test $mode = "bs_seq"; then
-    bismarkparam="--ignore_r2 2"
+    bismarkextractparam="--ignore_r2 2"
 else
     echo "error: specify [directional|non_directional|pbat|rrbs] for -m:"
     echo "specified: $mode"
     exit
 fi
 
-mkdir -p $odir
 ex "bismark --genome $index -o $odir --temp_dir $odir/tmp -p $ncore $bismarkparam $fastq"
 rm -rf $odir/tmp
 
@@ -68,7 +71,7 @@ else
     ex "deduplicate_bismark --bam $outputbam --output_dir $odir"
     outputbam=`ls $odir/*_bismark_bt2*.deduplicated.bam`
 fi
-ex "bismark_methylation_extractor --gzip --bedGraph $outputbam -o $odir"
+ex "bismark_methylation_extractor $bismarkextractparam --gzip --bedGraph $outputbam -o $odir"
 ex "bam2nuc --dir $odir --genome_folder $index $outputbam"
 
 cd $odir
