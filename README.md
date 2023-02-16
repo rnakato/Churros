@@ -43,7 +43,6 @@ Then the results are output in `Churros_result` directory.
 
 See https://churros.readthedocs.io for the detailed Manual.
 
-
 ## 4. Build Docker image from Dockerfile
 
 First clone and move to the repository
@@ -54,6 +53,12 @@ First clone and move to the repository
 Then type:
 
     docker build -f Dokerfile.<version> -t <account>/churros
+
+## 5. Singularity images
+
+Prebuild singularity images (version 3.8.5) are available on our [Google Drive](https://drive.google.com/drive/folders/1wZey_jhhz8corcgqXG5-fvC8ixbxpVQr?usp=sharing).
+
+
 
 ## 6. Contact
 
