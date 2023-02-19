@@ -116,13 +116,11 @@ do_macs(){
     if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
         peak=$mdir/${label}_peaks.narrowPeak
         if test "$flen" != ""; then
-            mode="sharp-nomodel"
             flen="-f $flen"
         fi
-    else
+    elif test $mode = "broad" -o $mode = "broad-nomodel"; then
         peak=$mdir/${label}_peaks.broadPeak
         if test "$flen" != ""; then
-            mode="broad-nomodel"
             flen="-f $flen"
         fi
     fi

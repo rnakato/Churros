@@ -1,5 +1,5 @@
 ### Churros: Docker image for ChIP-seq analysis
-FROM rnakato/database:2022.12
+FROM rnakato/database:2023.02
 MAINTAINER Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>
 
 WORKDIR /opt

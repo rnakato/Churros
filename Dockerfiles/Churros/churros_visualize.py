@@ -46,6 +46,9 @@ def setparam(args):
         gene = "/opt/DROMPAplus/data/S_cerevisiae/SGD_features.tab"
         arsfile = "/opt/DROMPAplus/data/S_cerevisiae/ARS-oriDB_scer.txt"
         param = "--scale_ratio 4 --ls " + str(linesize) + " --sm 10 --lpp 3 -g " + gene + " --gftype 2 --ars " + arsfile
+#    elif args.preset == "T2T":
+#        gene = Ddir + "/chm13v2.refFlat"
+#        param = " --ls " + str(linesize) + " -g " + gene
     else:
         gene = Ddir + "/gtf_chrUCSC/chr.gene.refFlat"
         param = " --ls " + str(linesize) + " -g " + gene
