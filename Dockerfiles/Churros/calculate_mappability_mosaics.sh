@@ -1,5 +1,5 @@
 #!/bin/bash
-0;136;0ccmdname=`basename $0`
+cmdname=`basename $0`
 function usage()
 {
     echo "$cmdname [Options] <Ddir>" 1>&2
@@ -42,7 +42,6 @@ if [ $# -ne 1 ]; then
 fi
 
 Ddir=$1
-Mdir=/opt/scripts/MOSAiCS_mappability/
 
 ex(){ echo $1; eval $1; }
 export -f ex
@@ -61,7 +60,8 @@ export -f read_genometable
 func_hashing_eachchr(){
     dir=$1
     chr=$2
-    Mdir=/opt/scripts/MOSAiCS_mappability/
+    #Mdir=/opt/scripts/MOSAiCS_mappability/
+    Mdir=/opt/Churros/MOSAiCS_mappability/
 
     if test -e $dir/$chr.fa; then
 	if test ! -e $dir/$chr.fa.HashOffsetTable || test ! -s $dir/$chr.fa.HashOffsetTable; then
@@ -101,7 +101,8 @@ oligoFind(){
 	hashdir=$3
 	readlen=$4
 	gt=$5
-	Mdir=/opt/scripts/MOSAiCS_mappability/
+#	Mdir=/opt/scripts/MOSAiCS_mappability/
+	Mdir=/opt/Churros/MOSAiCS_mappability/
 
 	read_genometable $gt
 
@@ -134,7 +135,8 @@ mergeOligo(){
 	odir=$3
 	hashdir=$4
 	outfile=$odir/${chr}b.out
-	Mdir=/opt/scripts/MOSAiCS_mappability/
+#	Mdir=/opt/scripts/MOSAiCS_mappability/
+	Mdir=/opt/Churros/MOSAiCS_mappability/
 
 	if test ! -e $outfile || test ! -s $outfile; then
 	    ex "$Mdir/mergeOligoCounts $hashdir/chr*$chr.${readlen}mer.out > $outfile"

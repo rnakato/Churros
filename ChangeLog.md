@@ -3,6 +3,7 @@
 ## 0.8.0 (2023-02-19)
 - Update gene annotation for T2T genome
 - Update DROMPAplus to v1.17.1
+- Bigfix of calculate_mappability_mosaics.sh
 
 ## 0.7.1 (2023-02-10)
 - Fix bug in macs2.sh
