@@ -24,7 +24,7 @@ The latest version of **Churros** internally uses the tools including:
    - ChromHMM v1.23
    - ChromImpute v1.0.3
    - epilogos v0.1.1
-   - `STITCHIT <https://github.com/SchulzLab/STITCHIT>`_ : link regulatory elements to genes
+   - `STITCHIT <https://github.com/SchulzLab/STITCHIT>`_: link regulatory elements to genes
 
 - Bisulfite sequencing (DNA methylation)
    - `Bismark <https://github.com/FelixKrueger/Bismark>`_  v0.22.3
