@@ -3,42 +3,6 @@ Installation
 
 Docker image is available at `DockerHub <https://hub.docker.com/r/rnakato/churros>`_.
 
-The latest version of **Churros** (``v0.5.0``) internally uses the tools including:
-
-- Mapping
-    - Bowtie v1.1.2
-    - Bowtie2 v2.4.5
-    - BWA v0.7.17
-    - chromap v0.2.1
-
-- ChIP-seq analysis
-    - MACS2 v2.2.6
-    - DROMPA+ v1.17.0
-    - SSP v1.2.5
-    - ROSE v0.1
-    - ChromHMM v1.23
-    - ChromImpute v1.0.3
-
-- File processing
-    - SAMtools v1.15.1
-
-- Bisulfite sequencing (DNA methylation)
-    - Bismark v0.22.3
-
-- Quality assessment
-    - FastQC v0.11.9
-    - fastp v0.23.2
-    - MultiQC v1.12
-
-- Adapter trimming
-    - Cutadapt v4.2
-    - TrimGalore v0.6.7
-
-- Utility tools
-    - SRA Toolkit v3.0.0
-    - Intervene v0.6.5
-
-
 Docker
 ++++++++++++++
 

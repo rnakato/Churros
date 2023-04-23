@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.0 (2023-04-23)
+- Change the base image from rnakato/database to rnakato/mapping (to simplify installation)
+- Add [GenMap](https://github.com/cpockrandt/genmap): fast computation of genome mappability
+
 ## 0.8.0 (2023-02-19)
 - Update gene annotation for T2T genome
 - Update DROMPAplus to v1.17.1
