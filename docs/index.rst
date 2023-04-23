@@ -5,7 +5,10 @@ Churros
 **Churros** is a Epigenome analysis pipeline with Docker.
 While **Chross** mainly focuses on the ChIP-seq analysis, it can also handle CUT&TAG, ATAC-seq and DNA methylation data.
 
-The latest version of **Churros** (``v0.9.0``) internally uses the tools including:
+Installed tools in Churros
+-----------------------------------------
+
+The latest version of **Churros** internally uses the tools including:
 
 - Mapping
    - Bowtie v1.1.2
@@ -21,10 +24,10 @@ The latest version of **Churros** (``v0.9.0``) internally uses the tools includi
    - ChromHMM v1.23
    - ChromImpute v1.0.3
    - epilogos v0.1.1
-   - [STITCHIT](https://github.com/SchulzLab/STITCHIT): link regulatory elements to genes
+   - `STITCHIT <https://github.com/SchulzLab/STITCHIT>`_ : link regulatory elements to genes
 
 - Bisulfite sequencing (DNA methylation)
-   - [Bismark](https://github.com/FelixKrueger/Bismark) v0.22.3
+   - `Bismark <https://github.com/FelixKrueger/Bismark>`_  v0.22.3
 
 - Quality assessment
    - FastQC v0.11.9
@@ -34,15 +37,15 @@ The latest version of **Churros** (``v0.9.0``) internally uses the tools includi
 - File processing
    - SAMtools v1.17
    - BEDtools v2.30.0
-   - [deepTools](https://deeptools.readthedocs.io/) v3.5.1
+   - `deepTools <https://deeptools.readthedocs.io/>`_  v3.5.1
 
 - Adapter trimming
-   - [Cutadapt](https://cutadapt.readthedocs.io/en/stable/index.html) v4.2
-   - [TrimGalore](https://github.com/FelixKrueger/TrimGalore) v0.6.7
+   - `Cutadapt <https://cutadapt.readthedocs.io/en/stable/index.html>`_ v4.2
+   - `TrimGalore <https://github.com/FelixKrueger/TrimGalore>`_ v0.6.7
 
 - Mappability culculation
    - Mosaics
-   - [GenMap](https://github.com/cpockrandt/genmap) v1.2.0
+   - `GenMap <https://github.com/cpockrandt/genmap>`_ v1.2.0
 
 - Utility tools
    - SRAtoolkit v3.0.2
