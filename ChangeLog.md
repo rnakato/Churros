@@ -1,8 +1,9 @@
 # Changelog
 
-## 0.9.0 (2023-04-23)
-- Change the base image from rnakato/database to rnakato/mapping (to simplify installation)
+## 0.9.0 (2023-04-25)
+- Changed the base image from rnakato/database to rnakato/mapping (to simplify installation)
 - Add [GenMap](https://github.com/cpockrandt/genmap): fast computation of genome mappability
+- Add `gen_samplelist.sh` and `gen_samplepairlist.sh`, utilities to create samplelist.txt and samplepairlist.txt.
 
 ## 0.8.0 (2023-02-19)
 - Update gene annotation for T2T genome
