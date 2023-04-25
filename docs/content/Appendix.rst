@@ -33,6 +33,7 @@ For example, to use human genome build GRCh38/hg38, specify GRCh38 or hg38 for `
    churros -p 24 --mpbl samplelist.txt samplepairlist.txt hg38 Ensembl-GRCh38/
 
 
+.. _label_samplelist_pairedend:
 Make samplelist for paired-end fastq
 ------------------------------------------------
 
