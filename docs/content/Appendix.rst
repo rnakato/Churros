@@ -33,6 +33,32 @@ For example, to use human genome build GRCh38/hg38, specify GRCh38 or hg38 for `
    churros -p 24 --mpbl samplelist.txt samplepairlist.txt hg38 Ensembl-GRCh38/
 
 
+Make samplelist for paired-end fastq
+------------------------------------------------
+
+This is an example of a samplelist.txt for single-end fastqs.
+
+.. code-block:: bash
+
+    HepG2_H2A.Z     fastq/SRR227639.fastq.gz
+    HepG2_H3K4me3   fastq/SRR227563.fastq.gz
+    HepG2_H3K27ac   fastq/SRR227575.fastq.gz
+    HepG2_H3K27me3  fastq/SRR227598.fastq.gz
+    HepG2_H3K36me3  fastq/SRR227447.fastq.gz
+    HepG2_Control   fastq/SRR227552.fastq.gz
+
+When using paired-end fastqs, use the second and the third columns to specify the R1 and R2 fastqs like this: 
+
+.. code-block:: bash
+
+    HepG2_H2A.Z     fastq/SRR227639_1.fastq.gz  fastq/SRR227639_2.fastq.gz
+    HepG2_H3K4me3   fastq/SRR227563_1.fastq.gz  fastq/SRR227563_2.fastq.gz
+    HepG2_H3K27ac   fastq/SRR227575_1.fastq.gz  fastq/SRR227575_2.fastq.gz
+    HepG2_H3K27me3  fastq/SRR227598_1.fastq.gz  fastq/SRR227598_2.fastq.gz
+    HepG2_H3K36me3  fastq/SRR227447_1.fastq.gz  fastq/SRR227447_2.fastq.gz
+    HepG2_Control   fastq/SRR227552_1.fastq.gz  fastq/SRR227552_2.fastq.gz
+
+
 Make mappability files
 --------------------------------------------------
 
