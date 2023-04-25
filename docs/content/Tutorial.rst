@@ -58,6 +58,9 @@ Multiple fastq files can be specified by separateing with ``,``.
     HepG2_Control   fastq/SRR227552.fastq.gz,fastq/SRR227553.fastq.gz
 
 
+.. note:: 
+    See :doc:`Appendix` for paired-end fastqs.
+
 samplepairlist.txt
 ++++++++++++++++++++++++++
 
