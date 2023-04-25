@@ -1,6 +1,9 @@
 Commands in Churros
 ============================
 
+Reference Data Preparation
+++++++++++++++++++++++++++++++++++++++++++
+
 download_genomedata.sh
 ------------------------------------
 
@@ -39,6 +42,9 @@ The ``<odir>`` is used in the **Churros** commands below.
         program: bowtie, bowtie-cs, bowtie2, bwa, chromap, bismark
         Example:
             build-index.sh bowtie2 Referencedata_hg38
+
+Commands internally used in churros
+++++++++++++++++++++++++++++++++++++++++++
 
 churros
 --------------------------------------------
@@ -281,6 +287,9 @@ The good usage of ``churros_genPvalwig`` is specifying ChIP files in two conditi
 
    If you supply ``-n`` option in ``churros_mapping`` (do not consider genome mappability), supply ``--nompbl`` optoon in ``churros_visualize`` to use the generated mappability-normalized bigWig files.
 
+
+Commands internally used in churros_mapping
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   
 bowtie.sh
 ------------------------------------------------
@@ -325,25 +334,6 @@ bowtie2.sh
           For single-end: bowtie2.sh -p "--very-sensitive" chip.fastq.gz chip Referencedata_hg38
           For paired-end: bowtie2.sh "\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz" chip Referencedata_hg38
 
-macs.sh
-------------------------------------------------
-
-``macs.sh`` is a script to use MACS2.
-
-.. code-block:: bash
-
-   macs.sh [Options] <IP bam> <Input bam> <prefix> <build> <mode>
-      <IP bam>: BAM for for ChIP (treat) sample
-      <Input bam>: BAM for for Input (control) sample: specify "none" if unavailable
-      <prefix>: prefix of output file
-      <build>: genome build (e.g., hg38)
-      <mode>: peak mode ([sharp|broad|sharp-nomodel|broad-nomodel])
-      Options:
-         -f <int>: predefined fragment length (defalt: estimated in MACS2)
-         -d <str>: output directory (defalt: "macs")
-         -B: save extended fragment pileup, and local lambda tracks (two files) at every bp into a bedGraph file
-         -F: overwrite files if exist (defalt: skip)
-
 
 parse2wig+.sh
 ------------------------------------------------
@@ -380,6 +370,32 @@ When ``-m`` option is supplied, ``parse2wig+.sh`` also normalizes the read based
          For single-end: parse2wig+.sh chip.sort.bam chip hg38 Referencedata_hg38
          For paired-end: parse2wig+.sh -p chip.sort.bam chip hg38 Referencedata_hg38
 
+Commands internally used in churros_callpeak
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+macs.sh
+------------------------------------------------
+
+``macs.sh`` is a script to use MACS2.
+
+.. code-block:: bash
+
+   macs.sh [Options] <IP bam> <Input bam> <prefix> <build> <mode>
+      <IP bam>: BAM for for ChIP (treat) sample
+      <Input bam>: BAM for for Input (control) sample: specify "none" if unavailable
+      <prefix>: prefix of output file
+      <build>: genome build (e.g., hg38)
+      <mode>: peak mode ([sharp|broad|sharp-nomodel|broad-nomodel])
+      Options:
+         -f <int>: predefined fragment length (defalt: estimated in MACS2)
+         -d <str>: output directory (defalt: "macs")
+         -B: save extended fragment pileup, and local lambda tracks (two files) at every bp into a bedGraph file
+         -F: overwrite files if exist (defalt: skip)
+
+
+Commands internally used in churros_compare
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 simpson_peak.sh
 -------------------------------------
 
@@ -400,6 +416,9 @@ The one-by-one comparison results (overlapped peak list and Venn diagram) are al
          -v: Draw Venn diagrams for all pairs
          -p <int>: number of CPUs (default: 8)
 
+
+Tools for Advanced Usage
++++++++++++++++++++++++++++++++++++++++++++++++++
 
 rose: Super-enhancer analysis
 ------------------------------------
@@ -456,3 +475,73 @@ Bismark.sh: Bisulfite sequencing analysis
          -p : number of CPUs (default: 4)
 
 The results are output in ``Bismarkdir/``. If you want to specify the name of output directory, use ``-d`` option.
+
+
+Utility tools
++++++++++++++++++++++++++++++++++++++++++++++++++
+
+gen_samplelist.sh: create samplelist.txt
+--------------------------------------------------
+
+By specifying the direcoty of fastq files, ``gen_samplelist.sh`` generates ``samplelist.txt`` for ``churros``.
+
+.. code-block:: bash
+
+   $ ls fastq/                                                                                                         
+   SRR227447.fastq.gz  SRR227552.fastq.gz  SRR227563.fastq.gz  SRR227575.fastq.gz  SRR227598.fastq.gz  SRR227639.fastq.gz
+   SRR227448.fastq.gz  SRR227553.fastq.gz  SRR227564.fastq.gz  SRR227576.fastq.gz  SRR227599.fastq.gz  SRR227640.fastq.gz
+   $ gen_samplelist.sh fastq/ > samplelist.txt
+   $ cat samplelist.txt
+   SRR227447.fastq.gz      fastq//SRR227447.fastq.gz
+   SRR227448.fastq.gz      fastq//SRR227448.fastq.gz
+   SRR227552.fastq.gz      fastq//SRR227552.fastq.gz
+   SRR227553.fastq.gz      fastq//SRR227553.fastq.gz
+   SRR227563.fastq.gz      fastq//SRR227563.fastq.gz
+   SRR227564.fastq.gz      fastq//SRR227564.fastq.gz
+   SRR227575.fastq.gz      fastq//SRR227575.fastq.gz
+   SRR227576.fastq.gz      fastq//SRR227576.fastq.gz
+   SRR227598.fastq.gz      fastq//SRR227598.fastq.gz
+   SRR227599.fastq.gz      fastq//SRR227599.fastq.gz
+   SRR227639.fastq.gz      fastq//SRR227639.fastq.gz
+   SRR227640.fastq.gz      fastq//SRR227640.fastq.gz
+
+Supply ``-p`` option when using paired-end fastqs.
+
+.. code-block:: bash
+
+   $ gen_samplelist.sh -p fastq/ > samplelist.txt
+
+By default, ``gen_samplelist.sh`` assumes that the postfix of paired fastq files is "_1" and "_2". If it is "_R1" and "_R2", specify ``-r`` option.
+
+.. code-block:: bash
+
+   $ gen_samplelist.sh -p -r fastq/ > samplelist.txt
+
+
+gen_samplepairlist.sh: create samplepairlist.txt
+--------------------------------------------------
+
+``gen_samplepairlist.sh`` takes ``samplelist.txt`` as input and "roughly" outputs ``samplepairlist.txt``.
+
+.. code-block:: bash
+
+   $ cat samplelist.txt
+   HepG2_H2A.Z     fastq/SRR227639.fastq.gz,fastq/SRR227640.fastq.gz
+   HepG2_H3K4me3   fastq/SRR227563.fastq.gz,fastq/SRR227564.fastq.gz
+   HepG2_H3K27ac   fastq/SRR227575.fastq.gz,fastq/SRR227576.fastq.gz
+   HepG2_H3K27me3  fastq/SRR227598.fastq.gz,fastq/SRR227599.fastq.gz
+   HepG2_H3K36me3  fastq/SRR227447.fastq.gz,fastq/SRR227448.fastq.gz
+   HepG2_Control   fastq/SRR227552.fastq.gz,fastq/SRR227553.fastq.gz
+
+   $ gen_samplepairlist.sh samplelist.txt
+   HepG2_H2A.Z,<input>,HepG2_H2A.Z,sharp
+   HepG2_H3K4me3,<input>,HepG2_H3K4me3,sharp
+   HepG2_H3K27ac,<input>,HepG2_H3K27ac,sharp
+   HepG2_H3K27me3,<input>,HepG2_H3K27me3,sharp
+   HepG2_H3K36me3,<input>,HepG2_H3K36me3,sharp
+   HepG2_Control,<input>,HepG2_Control,sharp
+
+Change ``<input>`` to the exact label of Input samples.
+
+- Specify ``-n`` option when omitting input samples (outputs "none").
+- Specify ``-b`` option when the peak mode is "broad".
