@@ -59,6 +59,8 @@ Multiple fastq files can be specified by separateing with ``,``.
     RPO21_thiolutin fastq/SRR13065974.fastq.gz
     InputRPO21_thiolutin    fastq/SRR13065975.fastq.gz
 
+.. note:: 
+    See :ref:`label_samplelist_pairedend` for paired-end fastqs.
 
 samplepairlist.txt
 ++++++++++++++++++++++++++
