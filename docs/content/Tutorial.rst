@@ -59,7 +59,8 @@ Multiple fastq files can be specified by separateing with ``,``.
 
 
 .. note:: 
-    See :ref:`_label_samplelist_pairedend` for paired-end fastqs.
+    See :ref:`label_samplelist_pairedend` for paired-end fastqs.
+:ref:`label_samplelist_pairedend`
 
 samplepairlist.txt
 ++++++++++++++++++++++++++
