@@ -58,11 +58,6 @@ Then type:
 
     docker build -f Dokerfile.<version> -t <account>/churros
 
-## 5. Singularity images
-
-Prebuild singularity images (version 3.8.5) are available on our [OneDrive](https://univtokyo-my.sharepoint.com/:f:/g/personal/5389587184_utac_u-tokyo_ac_jp/Ets7oReOmS9Lh07GIIJzGgsB37DU758tBumO6qmAjCv3Ag?e=y7rzx0).
-
-
 
 ## 6. Contact
 

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.1 (2023-05-11)
+- Remove /root/.cpanm/work directory
+
 ## 0.9.0 (2023-04-25)
 - Changed the base image from rnakato/database to rnakato/mapping (to simplify installation)
 - Add [GenMap](https://github.com/cpockrandt/genmap): fast computation of genome mappability
