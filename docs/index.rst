@@ -21,7 +21,7 @@ The latest version of **Churros** internally uses the tools including:
    - DROMPA+ v1.17.0
    - SSP v1.2.5
    - ROSE v0.1
-   - ChromHMM v1.23
+   - ChromHMM v1.24
    - ChromImpute v1.0.3
    - epilogos v0.1.1
    - `STITCHIT <https://github.com/SchulzLab/STITCHIT>`_: link regulatory elements to genes

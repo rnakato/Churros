@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.2 (2023-06-23)
+- Update ChromHMM from v1.23 to v1.24
+
 ## 0.9.1 (2023-05-11)
 - Remove /root/.cpanm/work directory
 
