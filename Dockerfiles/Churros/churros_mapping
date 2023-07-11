@@ -19,7 +19,6 @@ function usage()
     echo '      -z: peak file for FRiP calculation (BED format, default: default MACS2 without control)' 1>&2
     echo '      -k [28|36|50]: read length for mappability file (default:50)' 1>&2
     echo '      -n: do not consider genome mappability' 1>&2
-#    echo '      -n: omit ssp' 1>&2
     echo '      -C: for SOLiD data (csfastq, defalt: fastq)' 1>&2
     echo '      -f: output format of parse2wig+ (default: 3)' 1>&2
     echo '               0: compressed wig (.wig.gz)' 1>&2
@@ -36,7 +35,6 @@ function usage()
 
 bowtieparam=""
 mp=1
-#nopp=0
 format=BAM
 bamdir=bam
 of=3
@@ -47,7 +45,7 @@ ncore=12
 csfasta=0
 chdir="Churros_result"
 
-while getopts cCb:z:a:k:nf:P:p:D: option
+while getopts cCb:z:a:k:f:P:p:D: option
 do
     case ${option} in
         c) format=CRAM
@@ -69,7 +67,6 @@ do
         k) k=${OPTARG}
            isnumber.sh $k "-k" || exit 1
            ;;
- #       n) nopp=1;;
         f) of=${OPTARG}
            isnumber.sh $of "-f" || exit 1
            ;;
@@ -120,11 +117,12 @@ else
 fi
 
 gt=$Ddir/genometable.txt
+mptable=$Ddir/mappability_Mosaics_${k}mer/map_fragL150_genome.txt
+
 if test ! -e $gt; then
     echo "Error: $gt does not exist. Please make it by 'download_genomedata.sh'."
     exit 1
 fi
-
 
 func_map(){
     prefix=$1
@@ -191,12 +189,10 @@ func_postprocess(){
         mapfile=$chdir/$bamdir/$head.sort.bam
     fi
 
-#    if test $nopp != 1; then
     echo -e "churros_mapping: quality check by SSP..."
-    ssp.sh -t $ncore $pair -D $chdir $mapfile $head $build $gt;
+    ssp.sh -t $ncore $pair -D $chdir $mapfile $head $build $gt $mptable
     flen=`cut -f5 $chdir/sspout/$head.stats.txt | tail -n1`
     parseparam="$parseparam -l $flen"
- #   fi
 
     if test $format = "CRAM"; then
        parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir

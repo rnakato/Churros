@@ -60,7 +60,6 @@ export -f read_genometable
 func_hashing_eachchr(){
     dir=$1
     chr=$2
-    #Mdir=/opt/scripts/MOSAiCS_mappability/
     Mdir=/opt/Churros/MOSAiCS_mappability/
 
     if test -e $dir/$chr.fa; then
@@ -101,7 +100,6 @@ oligoFind(){
 	hashdir=$3
 	readlen=$4
 	gt=$5
-#	Mdir=/opt/scripts/MOSAiCS_mappability/
 	Mdir=/opt/Churros/MOSAiCS_mappability/
 
 	read_genometable $gt
@@ -170,7 +168,7 @@ func_MOSAICS(){
        Ddir=$6
        gt=$7
        arr_binsize=$8
-       scriptsdir=/opt/scripts/MOSAiCS_scripts
+       scriptsdir=/opt/Churros/MOSAiCS_scripts
 
        read_genometable $gt
        chr=${CHR[$i]}
@@ -178,7 +176,7 @@ func_MOSAICS(){
 
        outfile=$Mosdir/map_${chr}_binary.txt
        echo $chr $outfile
-       ex "/usr/bin/python $scriptsdir/cal_binary_map_score.py $Ddir/mappability_hashdir_${readlen}mer/${chr}b.out 1 $len > $outfile"
+       ex "/usr/bin/python2 $scriptsdir/cal_binary_map_score.py $Ddir/mappability_hashdir_${readlen}mer/${chr}b.out 1 $len > $outfile"
        ex "perl $scriptsdir/cal_binary_GC_N_score.pl $chrdir/${chr}.fa $Mosdir/${chr} 1"
 
        for binsize in $arr_binsize; do

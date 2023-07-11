@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.3 (2023-07-06)
+- Add Genometable file for S.pombe
+- Modify `ssp.sh` to take a mptable as an argument
+- Modify `churros_mapping` to use the mptable in `Ddir/mappability_Mosaics_kmer`
+- Bug fix in `calculate_mappability_mosaics.sh`
+
 ## 0.9.2 (2023-06-23)
 - Update ChromHMM from v1.23 to v1.24
 

@@ -2,11 +2,12 @@
 cmdname=`basename $0`
 function usage()
 {
-    echo "$cmdname [-k kmer] [-o dir] [-p] <mapfile> <prefix> <build> <genometable>" 1>&2
+    echo "$cmdname [-k kmer] [-o dir] [-p] <mapfile> <prefix> <build> <genometable> <mptable>" 1>&2
     echo '   <mapfile>: mapfile (SAM|BAM|CRAM|TAGALIGN format)' 1>&2
     echo '   <prefix>: output prefix' 1>&2
     echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   <genometable>: genome table file' 1>&2
+    echo '   <mptable>: genome table file of mappable regions' 1>&2
     echo '   Options:' 1>&2
     echo '      -k: read length (36 or 50) for mappability calculation (default: 50)' 1>&2
     echo '      -p: for paired-end file' 1>&2
@@ -44,7 +45,7 @@ do
 done
 shift $((OPTIND - 1))
 
-if [ $# -ne 4 ]; then
+if [ $# -ne 5 ]; then
   usage
   exit 1
 fi
@@ -52,6 +53,7 @@ input=$1
 prefix=$2
 build=$3
 gt=$4
+mptable=$5
 
 check_build.sh $build || exit 1
 
@@ -69,13 +71,18 @@ else
     param=""
 fi
 
-mptable=/opt/SSP/data/mptable/mptable.UCSC.$build.${k}mer.flen150.txt
+#mptable=/opt/SSP/data/mptable/mptable.UCSC.$build.${k}mer.flen150.txt
 
 echo "Quality check of $input by ssp."
 
 if test -e $input && test -s $input ; then
     if test ! -e $odir/$prefix.stats.txt ; then
-	ex "ssp $param $pair -i $input -o $prefix --odir $odir --gt $gt --mptable $mptable -p $ncore >& $logdir/$prefix.txt"
+        if test ! -e $mptable; then
+	    echo "Warning: $mptable does not exist. --mptable option is omitted.."
+            ex "ssp $param $pair -i $input -o $prefix --odir $odir --gt $gt -p $ncore >& $logdir/$prefix.txt"
+	else
+            ex "ssp $param $pair -i $input -o $prefix --odir $odir --gt $gt --mptable $mptable -p $ncore >& $logdir/$prefix.txt"
+	fi
     fi
 else
     echo "$input does not exist."
