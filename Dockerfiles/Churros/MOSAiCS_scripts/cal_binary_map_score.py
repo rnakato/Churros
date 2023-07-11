@@ -36,4 +36,5 @@ for j in xrange(1,max_coord):
 		#outstring = nicechr + "\t" + str(window*window_size) + "\t" + str(count)
 		outstring =  str(count)
 		print outstring,
+#		print(outstring, end=" ")
 		count = 0

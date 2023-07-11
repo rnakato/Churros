@@ -1,5 +1,5 @@
 ### Churros: Docker image for ChIP-seq analysis
-FROM rnakato/mapping:2023.05
+FROM rnakato/mapping:2023.07
 LABEL maintainer "Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>"
 
 WORKDIR /opt
@@ -22,6 +22,7 @@ RUN apt-get update \
     curl \
     pandoc \
     pigz \
+    python2 \
     texlive-fonts-recommended \
     texlive-xetex \
     && apt-get clean \
@@ -50,7 +51,7 @@ RUN tar zxvf TrimGalore-0.6.7.tar.gz \
 
 # Python (MultiQC, deepTools, intervene, TOBIAS, genmap)
 RUN conda install -y -c bioconda genmap \
-    && pip install --no-cache-dir epilogos multiqc deeptools intervene cutadapt tobias
+    && pip install --no-cache-dir epilogos multiqc deeptools intervene cutadapt tobias argh
 
 # HOMER
 RUN mkdir HOMER && cd HOMER \

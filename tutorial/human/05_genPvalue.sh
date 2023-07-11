@@ -5,4 +5,4 @@ build=hg38
 Ddir=Referencedata_$build
 gt=$Ddir/genometable.txt
 
-$sing churros_genPvalwig samplepairlist.txt bedGraph_pval $build $gt
+$sing churros_genPvalwig samplepairlist.txt bedGraph_Pval $build $gt
