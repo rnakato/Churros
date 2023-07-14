@@ -107,7 +107,7 @@ samplelist=$2
 build=$3
 Ddir=$4
 
-check_build.sh $build || exit 1
+#check_build.sh $build || exit 1
 chdir=$chdir/$build
 
 if test $csfasta -eq 1; then
@@ -131,9 +131,9 @@ func_map(){
     head=$prefix$post
 
     if test "$fq2" = ""; then
-	fastq=$fq1
+	    fastq=$fq1
     else
-	fastq="\-1 $fq1 \-2 $fq2"
+	    fastq="\-1 $fq1 \-2 $fq2"
     fi
 
     if test $csfasta -eq 1; then
@@ -220,14 +220,22 @@ if test $command = "postprocess" -o $command = "exec"; then
         prefix=${LINE[0]}
         fq1=${LINE[1]}
         fq2=${LINE[2]}
-        func_postprocess $prefix $fq1 $fq2
+        func_postprocess $prefix "$fq1" "$fq2"
     done < $samplelist
 fi
 
 
 func_stats(){
     prefix=$1
+    fq1=$2
+    fq2=$3
     head=$prefix$post
+
+    if test "$fq2" = ""; then
+        pair=""
+    else
+        pair="-p"
+    fi
 
     logdir=$chdir/log
     statsdir=$chdir/stats
@@ -259,6 +267,8 @@ if test $command = "stats"; then
     while read LINE; do
         LINE=($LINE)
         prefix=${LINE[0]}
-        func_stats $prefix
+        fq1=${LINE[1]}
+        fq2=${LINE[2]}
+        func_stats $prefix "$fq1" "$fq2"
     done < $samplelist
 fi
