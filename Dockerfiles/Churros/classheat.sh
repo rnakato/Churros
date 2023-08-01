@@ -1,0 +1,101 @@
+#!/bin/bash
+
+# Set default values for optional arguments
+kcluster=3
+sortname="defaultUseFirstColumn"
+outdir="output"
+binsize=1000 # must? when using continuous
+gt="" # must when using continuous
+samplelabel=""
+
+# Parse command line arguments
+while getopts "k:s:o:g:b:l:n:" opt; do
+  case $opt in
+    k)
+      kcluster=$OPTARG
+      ;;
+    s)
+      sortname=$OPTARG
+      ;;
+    o)
+      outdir=$OPTARG
+      ;;
+    g)
+      gt=$OPTARG
+      ;;
+    b)
+      binsize=$OPTARG
+      ;;
+    l)
+      samplelabeltsv=$OPTARG
+      ;;
+    n)
+      normalize=$OPTARG
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+# Assign values to required positional arguments
+mode=$1
+region=$2
+directory=$3
+
+# Check if required arguments are provided
+if [[ -z $mode || -z $region || -z $directory ]]; then
+  echo "Usage: $0 mode region directory [-k kcluster] [-s sortname] [-l samplelabel] [-n normalize type]"
+  exit 1
+fi
+
+#do something after confirming the code
+echo $binsize
+mkdir -p $outdir
+
+# Check if mode is binary or continuous
+if [[ $mode == "binary" ]]; then
+  # Do something if mode is binary
+  echo "Mode is binary. Performing binary action."
+  
+  #make raw matrix
+  for i in `ls $directory`
+  do
+	  cut -f 1-3 $region | intersectBed -a stdin -b $directory/$i -c |\
+		  awk -v OFS="\t" '{if ($4==0) print 0; else print 1}' |\
+		  sed "1i$i" > $outdir/binary.$i.tmp
+  done
+
+  cut -f 1-3 $region | sed '1ichromosome\tstart\tend' > $outdir/input.bed3.tmp
+  paste $outdir/input.bed3.tmp $outdir/binary*tmp > $outdir/Output1_raw_matrix.tsv
+  rm $outdir/*tmp
+
+  python3 classheat.py binary $outdir/Output1_raw_matrix.tsv --sortname $sortname --kcluster $kcluster --outdir $outdir --samplelabeltsv $samplelabeltsv
+
+elif [[ $mode == "continuous" ]]; then
+  # Do something if mode is continuous
+  echo "Mode is continuous. Performing continuous action."
+  if [ -z "$gt" ]; then
+    echo "Error: -g parameter is required for continuous mode"
+    exit 1
+  fi
+
+  drompacode=$(for i in `ls $directory | grep -v tsv$`; do prefix=$i; echo -i $directory/$i,,$prefix,,$binsize; done | tr '\n' '\t')
+  drompa+ MULTICI --gt $gt --bed $region -o $outdir/tmp $drompacode
+  mv $outdir/tmp.MULTICI.averaged.ChIPread.tsv $outdir/Output1_raw_matrix.tsv
+
+  python3 classheat.py continuous $outdir/Output1_raw_matrix.tsv --sortname $sortname --kcluster $kcluster --outdir $outdir  --samplelabeltsv $samplelabeltsv --normalize $normalize
+
+
+else
+  # If mode is neither binary nor continuous
+  echo "Invalid mode parameter. Valid options are: binary, continuous."
+  exit 1
+fi
+
+
+
+

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.0 (2023--8-XX)
+- Add `classheat` function
+- Add [HOMER](http://homer.ucsd.edu/homer/): Motif analysis
+
 ## 0.9.3 (2023-07-06)
 - Add Genometable file for S.pombe
 - Modify `ssp.sh` to take a mptable as an argument

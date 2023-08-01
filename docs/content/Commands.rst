@@ -476,6 +476,13 @@ Bismark.sh: Bisulfite sequencing analysis
 
 The results are output in ``Bismarkdir/``. If you want to specify the name of output directory, use ``-d`` option.
 
+classheat.sh
+-------------------------------------------------------
+
+.. code-block:: bash
+
+   classheat.sh mode region directory [-k kcluster] [-s sortname] [-l samplelabel] [-n normalize type]
+
 
 Utility tools
 +++++++++++++++++++++++++++++++++++++++++++++++++
