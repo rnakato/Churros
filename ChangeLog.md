@@ -1,7 +1,7 @@
 # Changelog
 
-## 0.10.0 (2023--8-XX)
-- Add `classheat` function
+## 0.10.0 (2023-08-04)
+- Add `churros_classheat` function
 - Add [HOMER](http://homer.ucsd.edu/homer/): Motif analysis
 
 ## 0.9.3 (2023-07-06)
