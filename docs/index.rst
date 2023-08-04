@@ -24,12 +24,20 @@ The latest version of **Churros** internally uses the tools including:
    - ChromHMM v1.24
    - ChromImpute v1.0.3
    - epilogos v0.1.1
-   - ChIPseeker v1.36.0
-   - HOMER
-   - `STITCHIT <https://github.com/SchulzLab/STITCHIT>`_: link regulatory elements to genes
+
+- ATAC-seq analysis
+   - TOBIAS
+   - HINT-ATAC
 
 - Bisulfite sequencing (DNA methylation)
    - `Bismark <https://github.com/FelixKrueger/Bismark>`_  v0.22.3
+
+- Functional analysis
+   - `ChIPseeker <https://bioconductor.org/packages/release/bioc/html/ChIPseeker.html>`_ v1.36.0
+   - `HOMER <http://homer.ucsd.edu/homer/>`_ v4.11
+   - `STITCHIT <https://github.com/SchulzLab/STITCHIT>`_: link regulatory elements to genes
+   - `clusterProfiler <https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html>`_
+   - `rGREAT <https://bioconductor.org/packages/release/bioc/html/rGREAT.html>`_
 
 - Quality assessment
    - FastQC v0.11.9
@@ -38,6 +46,7 @@ The latest version of **Churros** internally uses the tools including:
 
 - File processing
    - SAMtools v1.17
+   - `sambamba <https://github.com/biod/sambamba>`_ v1.0.0
    - BEDtools v2.30.0
    - `deepTools <https://deeptools.readthedocs.io/>`_  v3.5.1
 
@@ -46,7 +55,7 @@ The latest version of **Churros** internally uses the tools including:
    - `TrimGalore <https://github.com/FelixKrueger/TrimGalore>`_ v0.6.7
 
 - Mappability culculation
-   - Mosaics
+   - `MOSAiCS <https://pages.stat.wisc.edu/~keles/Software/mosaics/>`_
    - `GenMap <https://github.com/cpockrandt/genmap>`_ v1.2.0
 
 - Utility tools

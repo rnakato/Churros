@@ -29,7 +29,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/list
 
 # R packages
-RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeker', 'Rsamtools', 'similaRpeak', 'metagene', 'Imetagene'))" \
+RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeker', 'Rsamtools', 'rGREAT', 'similaRpeak', 'metagene', 'Imetagene', 'clusterProfiler', \
+                                'TxDb.Hsapiens.UCSC.hg38.knownGene', 'TxDb.Hsapiens.UCSC.hg19.knownGene', 'TxDb.Hsapiens.UCSC.mm39.knownGene', 'TxDb.Hsapiens.UCSC.mm10.knownGene'))" \
     && R -e "install.packages(c('snow', 'snowfall', 'bitops', 'caTools', 'VennDiagram'))"
 
 # ChromHMM v1.23, ChromImpute v1.0.3
@@ -49,9 +50,9 @@ COPY TrimGalore-0.6.7.tar.gz TrimGalore-0.6.7.tar.gz
 RUN tar zxvf TrimGalore-0.6.7.tar.gz \
     && rm TrimGalore-0.6.7.tar.gz
 
-# Python (MultiQC, deepTools, intervene, TOBIAS, genmap)
-RUN conda install -y -c bioconda genmap \
-    && pip install --no-cache-dir epilogos multiqc deeptools intervene cutadapt tobias argh
+# Python (MultiQC, deepTools, intervene, TOBIAS, genmap, sambamba)
+RUN conda install -y -c bioconda genmap sambamba \
+    && pip install --no-cache-dir epilogos multiqc deeptools intervene cutadapt tobias argh threadpoolctl==3.1.0
 
 # HOMER v4.11 
 RUN mkdir HOMER && cd HOMER \
@@ -63,7 +64,14 @@ RUN mkdir HOMER && cd HOMER \
     && perl configureHomer.pl -install mouse-o \
     && perl configureHomer.pl -install mouse-p \
     && perl configureHomer.pl -install zebrafish-o \
-    && perl configureHomer.pl -install yeast-o
+    && perl configureHomer.pl -install yeast-o \
+    && perl configureHomer.pl -install hg19 \
+    && perl configureHomer.pl -install hg38 \
+    && perl configureHomer.pl -install mm10 \
+    && perl configureHomer.pl -install sacCer3 \
+    && perl configureHomer.pl -install dm6 \
+    && perl configureHomer.pl -install galGal6 \
+    && perl configureHomer.pl -install danRer11 
 
 # STITCHIT
 RUN git clone https://github.com/SchulzLab/STITCHIT.git \

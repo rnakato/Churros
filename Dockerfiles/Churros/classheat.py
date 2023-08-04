@@ -1,3 +1,7 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
 import argparse
 import pandas as pd
 import seaborn as sns
@@ -8,6 +12,10 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import MiniBatchKMeans
 import matplotlib.cm
 import matplotlib.colors as mcolors
+
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['GOTO_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
 
 parser = argparse.ArgumentParser(description='Process and plot matrix')
 parser.add_argument('mode', type=str, help='continuous or binary')
@@ -82,39 +90,40 @@ if samplelabeltsv:
 
 if mode == 'continuous':
     if not samplelabeltsv:
-        sortheat = sns.clustermap(sortDF,cmap="RdBu_r",center=0,vmax=4,vmin=-4,
-               row_cluster=False,yticklabels=False,figsize=(10,10),xticklabels=True)
+        sortheat = sns.clustermap(sortDF, cmap="RdBu_r", center=0, vmax=4, vmin=-4,
+               row_cluster=False, yticklabels=False, figsize=(10,10), xticklabels=True)
     else:
-        sortheat = sns.clustermap(sortDF,cmap="RdBu_r",center=0,vmax=4,vmin=-4,col_colors=col_colors,
-               row_cluster=False,yticklabels=False,figsize=(10,10),xticklabels=True)
-        plt.legend(handles=patches, bbox_to_anchor=(0.15, 0.7),loc='best',bbox_transform=plt.gcf().transFigure)
+        sortheat = sns.clustermap(sortDF, cmap="RdBu_r", center=0, vmax=4, vmin=-4, col_colors=col_colors,
+               row_cluster=False, yticklabels=False, figsize=(10,10), xticklabels=True)
+        plt.legend(handles=patches, bbox_to_anchor=(0.15, 0.7), loc='best', bbox_transform=plt.gcf().transFigure)
 
 elif mode == 'binary':
     if not samplelabeltsv:
-        sortheat = sns.clustermap(sortDF,cmap="Purples",vmax=2,
-               row_cluster=False,yticklabels=False,figsize=(10,10),xticklabels=True)
+        sortheat = sns.clustermap(sortDF, cmap="Purples",vmax=2,
+               row_cluster=False, yticklabels=False, figsize=(10,10), xticklabels=True)
     else:
-        sortheat = sns.clustermap(sortDF,cmap="Purples",vmax=2,col_colors=col_colors,
-               row_cluster=False,yticklabels=False,figsize=(10,10),xticklabels=True)
-        plt.legend(handles=patches, bbox_to_anchor=(0.15, 0.7),loc='best',bbox_transform=plt.gcf().transFigure)
+        sortheat = sns.clustermap(sortDF, cmap="Purples", vmax=2, col_colors=col_colors,
+               row_cluster=False, yticklabels=False, figsize=(10,10), xticklabels=True)
+        plt.legend(handles=patches, bbox_to_anchor=(0.15, 0.7), loc='best', bbox_transform=plt.gcf().transFigure)
 
 else:
     print("Please choose continuous or binary")
     exit(1)
 
-sortheat.savefig(outdir+"/Output3_sorted_heatmap.png",dpi=300)
+sortheat.savefig(outdir+"/Output3_sorted_heatmap.png", dpi=300)
 
 def DimReduction(data, ncluster,seed=0,num_pca=10):
     pca = PCA(n_components=num_pca)
     pca.fit(data)
     matrix = pca.transform(data)
-    model = MiniBatchKMeans(random_state=seed, n_clusters=ncluster, max_iter=10000)
+    model = MiniBatchKMeans(random_state=seed, n_clusters=ncluster, max_iter=10000, batch_size=100)
     kmeans = model.fit_predict(matrix)
     return kmeans
 
 # add k-mean informatio to the last column
 kmeanDF = processedmt.copy(deep=True)
 ncluster = kcluster
+
 kmeanDF["kmeans"] = DimReduction(kmeanDF, ncluster)
 kmeanDF = kmeanDF.sort_values(by=['kmeans'])
 
@@ -145,23 +154,23 @@ if samplelabeltsv:
 if mode == 'continuous':
     if not samplelabeltsv:
         sns_plot = sns.clustermap(kmeanDF_nolabel, row_colors=row_colors, row_cluster=False,
-                         cmap="RdBu_r", yticklabels=False,center=0,vmax=4,vmin=-4,
-                         figsize=(10,10),xticklabels=True)
+                         cmap="RdBu_r", yticklabels=False, center=0, vmax=4, vmin=-4,
+                         figsize=(10,10), xticklabels=True)
     else:
         sns_plot = sns.clustermap(kmeanDF_nolabel, row_colors=row_colors, row_cluster=False,
-                         cmap="RdBu_r", yticklabels=False,center=0,vmax=4,vmin=-4,
-                         figsize=(10,10),xticklabels=True,col_colors=col_colors)
-        plt.legend(handles=patches, bbox_to_anchor=(0.15, 0.7),loc='best',bbox_transform=plt.gcf().transFigure)
+                         cmap="RdBu_r", yticklabels=False, center=0, vmax=4, vmin=-4,
+                         figsize=(10,10), xticklabels=True, col_colors=col_colors)
+        plt.legend(handles=patches, bbox_to_anchor=(0.15, 0.7), loc='best', bbox_transform=plt.gcf().transFigure)
 
 elif mode == 'binary':
     if not samplelabeltsv:
         sns_plot = sns.clustermap(kmeanDF_nolabel, row_colors=row_colors, row_cluster=False,
-                         cmap="Purples", yticklabels=False,figsize=(10,10),xticklabels=True,vmax=2)
+                         cmap="Purples", yticklabels=False, figsize=(10,10), xticklabels=True, vmax=2)
     else:
         sns_plot = sns.clustermap(kmeanDF_nolabel, row_colors=row_colors, row_cluster=False,
-                         cmap="Purples", yticklabels=False,figsize=(10,10),xticklabels=True,vmax=2,col_colors=col_colors)
-        plt.legend(handles=patches, bbox_to_anchor=(0.15, 0.7),loc='best',bbox_transform=plt.gcf().transFigure)
+                         cmap="Purples", yticklabels=False, figsize=(10,10), xticklabels=True, vmax=2, col_colors=col_colors)
+        plt.legend(handles=patches, bbox_to_anchor=(0.15, 0.7), loc='best', bbox_transform=plt.gcf().transFigure)
 
-sns_plot.savefig(outdir+"/Output5_kmeans_heatmap.png",dpi=300)
+sns_plot.savefig(outdir+"/Output5_kmeans_heatmap.png", dpi=300)
 
 

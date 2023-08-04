@@ -48,9 +48,13 @@ directory=$3
 
 # Check if required arguments are provided
 if [[ -z $mode || -z $region || -z $directory ]]; then
-  echo "Usage: $0 mode region directory [-k kcluster] [-s sortname] [-l samplelabel] [-n normalize type]"
+  echo "Usage: churros_classheat mode region directory [-k kcluster] [-s sortname] [-l samplelabel] [-n normalize type]"
   exit 1
 fi
+
+export OPENBLAS_NUM_THREADS=1
+export GOTO_NUM_THREADS=1
+export OMP_NUM_THREADS=1
 
 #do something after confirming the code
 echo $binsize
@@ -60,7 +64,7 @@ mkdir -p $outdir
 if [[ $mode == "binary" ]]; then
   # Do something if mode is binary
   echo "Mode is binary. Performing binary action."
-  
+
   #make raw matrix
   for i in `ls $directory`
   do
@@ -73,7 +77,7 @@ if [[ $mode == "binary" ]]; then
   paste $outdir/input.bed3.tmp $outdir/binary*tmp > $outdir/Output1_raw_matrix.tsv
   rm $outdir/*tmp
 
-  python3 classheat.py binary $outdir/Output1_raw_matrix.tsv --sortname $sortname --kcluster $kcluster --outdir $outdir --samplelabeltsv $samplelabeltsv
+  classheat.py binary $outdir/Output1_raw_matrix.tsv --sortname $sortname --kcluster $kcluster --outdir $outdir --samplelabeltsv $samplelabeltsv
 
 elif [[ $mode == "continuous" ]]; then
   # Do something if mode is continuous
@@ -87,15 +91,10 @@ elif [[ $mode == "continuous" ]]; then
   drompa+ MULTICI --gt $gt --bed $region -o $outdir/tmp $drompacode
   mv $outdir/tmp.MULTICI.averaged.ChIPread.tsv $outdir/Output1_raw_matrix.tsv
 
-  python3 classheat.py continuous $outdir/Output1_raw_matrix.tsv --sortname $sortname --kcluster $kcluster --outdir $outdir  --samplelabeltsv $samplelabeltsv --normalize $normalize
-
+  classheat.py continuous $outdir/Output1_raw_matrix.tsv --sortname $sortname --kcluster $kcluster --outdir $outdir  --samplelabeltsv $samplelabeltsv --normalize $normalize
 
 else
   # If mode is neither binary nor continuous
   echo "Invalid mode parameter. Valid options are: binary, continuous."
   exit 1
 fi
-
-
-
-
