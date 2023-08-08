@@ -7,7 +7,7 @@ import argparse
 import pathlib
 import pandas as pd
 
-__version__ = '0.4.0'
+__version__ = '0.10.0'
 
 def print_and_exec_shell(command):
     print (command)
@@ -47,7 +47,6 @@ def do_qualitycheck_fastq(fastq, fastqcdir, fastpdir):
         print_and_exec_shell('fastp -w 4 -q 15 -n 5 -i ' + fastq
                              + ' -h ' + fastpdir + prefix + '.fastp.html'
                              + ' -j ' + fastpdir + prefix + '.fastp.json')
-#                             + ' -o ' + fastpdir + prefix + '.fastq.gz'
 
 def do_fastqc(chdir, build, samplelist):
     fastqcdir = chdir + "/fastqc/"
