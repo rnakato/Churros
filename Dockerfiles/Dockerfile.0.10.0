@@ -29,7 +29,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/list
 
 # R packages
-RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeker', 'Rsamtools', 'rGREAT', 'similaRpeak', 'metagene', 'Imetagene', 'clusterProfiler', \
+RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeker', 'Rsamtools', 'rGREAT', 'similaRpeak', 'metagene', 'Imetagene', 'clusterProfiler', 'motifbreakR', \
                                 'TxDb.Hsapiens.UCSC.hg38.knownGene', 'TxDb.Hsapiens.UCSC.hg19.knownGene', 'TxDb.Hsapiens.UCSC.mm39.knownGene', 'TxDb.Hsapiens.UCSC.mm10.knownGene'))" \
     && R -e "install.packages(c('snow', 'snowfall', 'bitops', 'caTools', 'VennDiagram'))"
 
@@ -49,10 +49,6 @@ COPY fastp /opt/bin/fastp
 COPY TrimGalore-0.6.7.tar.gz TrimGalore-0.6.7.tar.gz
 RUN tar zxvf TrimGalore-0.6.7.tar.gz \
     && rm TrimGalore-0.6.7.tar.gz
-
-# Python (MultiQC, deepTools, intervene, TOBIAS, genmap, sambamba)
-RUN conda install -y -c bioconda genmap sambamba \
-    && pip install --no-cache-dir epilogos multiqc deeptools intervene cutadapt tobias argh threadpoolctl==3.1.0
 
 # HOMER v4.11
 RUN mkdir HOMER && cd HOMER \
@@ -85,6 +81,10 @@ RUN git clone --recursive https://github.com/rnakato/DROMPAplus \
     && cd DROMPAplus \
     && git submodule foreach git pull origin master \
     && make
+
+# Python (MultiQC, deepTools, intervene, TOBIAS, genmap, sambamba) pip install --no-cache-dir  blosc2 \
+RUN conda install -y -c bioconda genmap sambamba \
+    && pip install --no-cache-dir epilogos multiqc intervene argh deeptools tobias cutadapt threadpoolctl==3.1.0
 
 # scripts
 ENV CDIR Churros

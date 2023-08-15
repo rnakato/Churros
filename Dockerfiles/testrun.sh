@@ -1,10 +1,16 @@
-for tool in fastq-dump bedtools samtools drompa+ ssp trim_galore genmap  bismark bowtie bowtie2 chromap deeptools cutadapt epilogos
+for tool in sambamba fastq-dump bedtools samtools macs2 drompa+ ssp trim_galore genmap  bismark bowtie bowtie2 chromap deeptools cutadapt epilogos
 do
     echo $tool
-    docker run --rm -it rnakato/churros:0.9.0 $tool --version
+    docker run --rm -it rnakato/churros $tool --version
 done
+
 for tool in STITCH bwa
 do
     echo $tool
-    docker run --rm -it rnakato/churros:0.9.0 $tool
+    docker run --rm -it rnakato/churros $tool
+done
+
+for tool in edgeR DESeq2 ChIPseeker rGREAT clusterProfiler motifbreakR
+do
+    docker run -it --rm rnakato/churros R -e "library("$tool"); sessionInfo(package = "$tool")"
 done

@@ -2,28 +2,28 @@
 Churros
 ================================================================
 
-**Churros** is a Epigenome analysis pipeline with Docker.
+**Churros** is a Docker-based epigenomics analysis pipeline.
 While **Chross** mainly focuses on the ChIP-seq analysis, it can also handle CUT&TAG, ATAC-seq and DNA methylation data.
 
-Installed tools in Churros
+Tools installed in Churros
 -----------------------------------------
 
-The latest version of **Churros** internally uses the tools including:
+The latest version of **Churros** uses the following tools internally.
 
 - Mapping
-   - Bowtie v1.1.2
+   - Bowtie v1.3.1
    - Bowtie2 v2.4.5
    - BWA v0.7.17
    - chromap v0.2.4
 
 - ChIP-seq analysis
-   - MACS2 v2.2.6
-   - DROMPA+ v1.17.0
-   - SSP v1.2.5
+   - MACS2 v2.2.9.1
+   - DROMPA+ v1.18.0
+   - SSP v1.3.0
    - ROSE v0.1
    - ChromHMM v1.24
    - ChromImpute v1.0.3
-   - epilogos v0.1.1
+   - epilogos v0.1.2
 
 - ATAC-seq analysis
    - TOBIAS
@@ -32,12 +32,17 @@ The latest version of **Churros** internally uses the tools including:
 - Bisulfite sequencing (DNA methylation)
    - `Bismark <https://github.com/FelixKrueger/Bismark>`_  v0.22.3
 
+- Differential analysis
+   - `edgeR <https://bioconductor.org/packages/release/bioc/html/edgeR.html>`_ v3.42.4
+   - `DESeq2 <https://bioconductor.org/packages/release/bioc/html/DESeq2.html>`_ v1.40.2
+
 - Functional analysis
    - `ChIPseeker <https://bioconductor.org/packages/release/bioc/html/ChIPseeker.html>`_ v1.36.0
    - `HOMER <http://homer.ucsd.edu/homer/>`_ v4.11
    - `STITCHIT <https://github.com/SchulzLab/STITCHIT>`_: link regulatory elements to genes
-   - `clusterProfiler <https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html>`_
-   - `rGREAT <https://bioconductor.org/packages/release/bioc/html/rGREAT.html>`_
+   - `clusterProfiler <https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html>`_ v4.8.2
+   - `rGREAT <https://bioconductor.org/packages/release/bioc/html/rGREAT.html>`_ v2.2.0
+   - `motifbreakR <https://bioconductor.org/packages/release/bioc/html/motifbreakR.html>`_ v2.14.2
 
 - Quality assessment
    - FastQC v0.11.9
@@ -45,21 +50,21 @@ The latest version of **Churros** internally uses the tools including:
    - MultiQC v1.12
 
 - File processing
-   - SAMtools v1.17
-   - `sambamba <https://github.com/biod/sambamba>`_ v1.0.0
-   - BEDtools v2.30.0
-   - `deepTools <https://deeptools.readthedocs.io/>`_  v3.5.1
+   - `SAMtools <http://www.htslib.org/>`_ v1.17
+   - `sambamba <https://github.com/biod/sambamba>`_ v0.6.6
+   - `bedtools <https://bedtools.readthedocs.io/en/latest/>`_ v2.30.0
+   - `deepTools <https://deeptools.readthedocs.io/>`_  v3.5.2
 
 - Adapter trimming
-   - `Cutadapt <https://cutadapt.readthedocs.io/en/stable/index.html>`_ v4.2
+   - `Cutadapt <https://cutadapt.readthedocs.io/en/stable/index.html>`_ v4.4
    - `TrimGalore <https://github.com/FelixKrueger/TrimGalore>`_ v0.6.7
 
-- Mappability culculation
+- Mappability calculation
    - `MOSAiCS <https://pages.stat.wisc.edu/~keles/Software/mosaics/>`_
    - `GenMap <https://github.com/cpockrandt/genmap>`_ v1.2.0
 
 - Utility tools
-   - SRAtoolkit v3.0.2
+   - `SRAtoolkit <https://github.com/ncbi/sra-tools>`_ v3.0.2
 
 
 Contents:
