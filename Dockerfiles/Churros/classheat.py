@@ -25,6 +25,7 @@ parser.add_argument('--kcluster', type=int, default=3, help='number of clusters 
 parser.add_argument('--outdir', type=str, default='output', help='output directory (default: output)')
 parser.add_argument('--samplelabeltsv', type=str, default='', help='Labels for the samples (e.g., celltypes, datasets, antibody types..). Two columns separated by tab, 1st column is file name, 2nd column is the label')
 parser.add_argument('--normalize', type=str, default="zscore", help='normalization method after log [zscore, scale0to1]')
+parser.add_argument('--clustermethod', type=str, default="minikmeans", help='clustering algorithm [minikmeans, kmeans, spectral, meanshift, dbscan, affinity ]')
 
 args = parser.parse_args()
 rawmt = args.rawmt
@@ -34,6 +35,7 @@ kcluster = args.kcluster
 outdir = args.outdir
 samplelabeltsv = args.samplelabeltsv
 normalize = args.normalize
+clustermethod = args.clustermethod
 
 #print(args.rawmt,args.sortname,args.kcluster,args.outdir)
 
@@ -116,9 +118,28 @@ def DimReduction(data, ncluster,seed=0,num_pca=10):
     pca = PCA(n_components=num_pca)
     pca.fit(data)
     matrix = pca.transform(data)
-    model = MiniBatchKMeans(random_state=seed, n_clusters=ncluster, max_iter=10000, batch_size=100)
-    kmeans = model.fit_predict(matrix)
-    return kmeans
+    if clustermethod=='minikmeans':
+        model = MiniBatchKMeans(random_state=seed, n_clusters=ncluster, max_iter=10000, batch_size=100)
+    elif clustermethod=='kmeans':
+        from sklearn.cluster import KMeans
+        model = KMeans(random_state=seed, n_clusters=ncluster)
+    elif clustermethod=='spectral':
+        from sklearn.cluster import SpectralClustering
+        model = SpectralClustering(random_state=seed, n_clusters=ncluster)
+    elif clustermethod=='meanshift':
+        from sklearn.cluster import MeanShift
+        model = MeanShift()
+    elif clustermethod=='dbscan':
+        from sklearn.cluster import DBSCAN
+        model = DBSCAN(eps=3, min_samples=2)
+    elif clustermethod=='affinity':
+        from sklearn.cluster import AffinityPropagation
+        AffinityPropagation(random_state=seed)
+    else:
+        raise("please use the correst cluster method")
+        exit(1)
+    outlabels = model.fit_predict(matrix)
+    return outlabels
 
 # add k-mean informatio to the last column
 kmeanDF = processedmt.copy(deep=True)
