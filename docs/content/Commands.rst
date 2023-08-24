@@ -476,13 +476,14 @@ Bismark.sh: Bisulfite sequencing analysis
 
 The results are output in ``Bismarkdir/``. If you want to specify the name of output directory, use ``-d`` option.
 
+
 churros_classheat
 -------------------------------------------------------
 
 **Churros** provides a ``classheat`` function for clustering and visualizing large-scale epigenomic profiles.
 This function takes regions of interest (e.g., specific protein binding sites) as input 1 and a folder of epigenomic signal files (either binary or continuous) as input 2. 
 
-    - In the binary model, ``classheat`` outputs a binary matrix (output 1) representing the overlap of epigenomic markers at given genomic regions. The binary matrix is then formatted and sorted by the user-defined column (i.e., the filename of the selected marker) to generate the processed matrix (output 2) and plot the sorted heatmap (output 3). Subsequently, ``classheat`` utilizes PCA followed by k-means clustering  (or other clustering methods) to produce the clustered matrix (output 4) and the clustered heatmap (output 5).
+    - In the binary mode, ``classheat`` outputs a binary matrix (output 1) representing the overlap of epigenomic markers at given genomic regions. The binary matrix is then formatted and sorted by the user-defined column (i.e., the filename of the selected marker) to generate the processed matrix (output 2) and plot the sorted heatmap (output 3). Subsequently, ``classheat`` utilizes PCA followed by k-means clustering  (or other clustering methods) to produce the clustered matrix (output 4) and the clustered heatmap (output 5).
     - In the continuous mode, ``classheat`` calculates the averaged read density of each epigenomic marker at given genomic regions (output 1). After logarithmic transformation, z-score normalization (optional method is 0-to-1 scaling), and sorting, ``classheat`` generates the remaining outputs in the same manner as in binary mode.
 
 The main usages are: 
