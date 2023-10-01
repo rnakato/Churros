@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.1 (2023-10-01)
+- Bug fix when the input sample is not provided
+
 ## 0.10.0 (2023-08-04)
 - Add `churros_classheat` function
 - Add [HOMER](http://homer.ucsd.edu/homer/): Motif analysis

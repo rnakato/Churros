@@ -138,6 +138,7 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir
             print (GD + " does not exist. skipping.")
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
+    df.fillna("", inplace=True)
     sGV = ""
     for index, row in df.iterrows():
         chip  = row[0]
@@ -168,6 +169,7 @@ def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, logdir, fileex
         param += " --showchr "
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
+    df.fillna("", inplace=True)
     s = ""
     for index, row in df.iterrows():
         chip  = row[0]
@@ -203,6 +205,7 @@ def visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, logdir, fileext
         param += " --showchr "
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
+    df.fillna("", inplace=True)
     s = ""
     for index, row in df.iterrows():
         chip  = row[0]

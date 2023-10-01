@@ -68,8 +68,7 @@ mkdir -p $mdir
 newlist=$mdir/samplepairlist.txt
 rm -rf $newlist
 array=""
-#peakarray=""
-#peaklist_simpson=""
+
 while read LINE; do
     array="$array $LINE"
 
@@ -83,14 +82,10 @@ while read LINE; do
     fi
     if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
        peak=$mdir_original/${label}_peaks.narrowPeak
-#       peak_chdir=$mdir/${label}_peaks.narrowPeak
     else
        peak=$mdir_original/${label}_peaks.broadPeak
-#       peak_chdir=$mdir/${label}_peaks.broadPeak
     fi
     echo "$chip,$input,$label,$mode,$peak" >> $newlist
-#    peakarray="$peakarray -f $peak_chdir -l $label"
-#    peaklist_simpson="$peaklist_simpson $peak_chdir"
 done < $samplepairlist
 
 do_macs(){
@@ -102,7 +97,8 @@ do_macs(){
     qval=$6
     force=$7
 
-    LINE=(${LINE//,/ })
+#    LINE=(${LINE//,/ })
+    IFS=, read -ra LINE <<< $LINE
     chip=${LINE[0]}
     input=${LINE[1]}
     label=${LINE[2]}
@@ -110,6 +106,8 @@ do_macs(){
     flen=${LINE[4]}
     IPbam=$bamdir/$chip.sort.bam
     Inputbam=$bamdir/$input.sort.bam
+
+    echo $chip $input $label $mode $flen
 
     if test "$mode" = ""; then mode="sharp"; fi
 
@@ -125,8 +123,10 @@ do_macs(){
         fi
     fi
     if test "$input" = ""; then
+#        echo "1 macs.sh $force -q $qval -d $mdir $flen $IPbam none $label $build $mode"
         macs.sh $force -q $qval -d $mdir $flen $IPbam none $label $build $mode
     else
+#        echo "2 macs.sh $force -q $qval -d $mdir $flen $IPbam $Inputbam $label $build $mode"
         macs.sh $force -q $qval -d $mdir $flen $IPbam $Inputbam $label $build $mode
     fi
 }

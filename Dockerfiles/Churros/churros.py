@@ -55,6 +55,7 @@ def do_fastqc(chdir, build, samplelist):
     os.makedirs(fastpdir, exist_ok=True)
 
     df = pd.read_csv(samplelist, sep="\t", header=None)
+    df.fillna("", inplace=True)
     for index, row in df.iterrows():
         if (len(row)<2 or row[1] == ""):
             print ("Error: specify fastq file in " + samplelist + ".")
@@ -91,6 +92,7 @@ def make_samplepairlist_withflen(samplepairlist, post, build, chdir):
         os.remove(samplepairlist_withflen)
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
+    df.fillna("", inplace=True)
     for index, row in df.iterrows():
         chip  = row[0]
         input = row[1]
@@ -101,7 +103,8 @@ def make_samplepairlist_withflen(samplepairlist, post, build, chdir):
         flen = int(sspstats["fragment length"])
 
         with open(samplepairlist_withflen, 'a') as f:
-            print(chip + "," + input + "," +label + "," +mode + "," + str(flen), file=f)
+#            print(chip + "," + input + "," + label + "," + mode + "," + str(flen), file=f)
+            print(f"{chip},{input},{label},{mode},{flen}", file=f)
 
     return samplepairlist_withflen
 
