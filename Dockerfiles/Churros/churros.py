@@ -128,6 +128,24 @@ def ask_to_proceed_with_overwrite(filepath):
         return False
     return True
 
+def is_exist_input(samplepairlist):
+    df = pd.read_csv(samplepairlist, sep=",", header=None)
+    df.fillna("", inplace=True)
+
+    nInput = 0
+    for index, row in df.iterrows():
+        chip  = row[0]
+        input = row[1]
+        label = row[2]
+
+        if input != "":
+            nInput += 1
+
+    if nInput == 0:
+        return False
+    else:
+        return True
+
 def exec_churros(args):
     samplelist = args.samplelist
     samplepairlist = args.samplepairlist
@@ -206,10 +224,16 @@ def exec_churros(args):
         print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
         print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich --logratio ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
     else:
+        df = pd.read_csv(samplepairlist, sep=",", header=None)
+        df.fillna("", inplace=True)
+
+        if is_exist_input(samplepairlist):
+            print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 --pvalue -P "--pthre_enrich 3 --scale_pvalue 3" ' + str(samplepairlist) + ' drompa+.pval.bin5M ' + build + ' ' + Ddir)
+            print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -G ' + str(samplepairlist) + ' ' + 'drompa+ ' + build + ' ' + Ddir)
+
         print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' ' + chdir + '/' + args.macsdir + '/samplepairlist.txt drompa+.macspeak ' + build + ' ' + Ddir)
         print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -P "--scale_tag 100" ' + str(samplepairlist) + ' drompa+.bin5M ' + build + ' ' + Ddir)
-        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 --pvalue -P "--pthre_enrich 3 --scale_pvalue 3" ' + str(samplepairlist) + ' drompa+.pval.bin5M ' + build + ' ' + Ddir)
-        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -G ' + str(samplepairlist) + ' ' + 'drompa+ ' + build + ' ' + Ddir)
+
 
 if(__name__ == '__main__'):
     parser = argparse.ArgumentParser()

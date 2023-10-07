@@ -111,6 +111,23 @@ def do_churros_visualize(args):
     else:
         visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir, chdir)
 
+def is_exist_input(samplepairlist):
+    df = pd.read_csv(samplepairlist, sep=",", header=None)
+    df.fillna("", inplace=True)
+
+    nInput = 0
+    for index, row in df.iterrows():
+        chip  = row[0]
+        input = row[1]
+        label = row[2]
+
+        if input != "":
+            nInput += 1
+
+    if nInput == 0:
+        return False
+    else:
+        return True
 
 def visualize_GV(args, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir, build):
     param = " " + args.drompaparam + " "
@@ -139,6 +156,11 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
     df.fillna("", inplace=True)
+
+    if not is_exist_input(samplepairlist):
+        print ("No ChIP sample with the input sample. Skipped.")
+        return
+
     sGV = ""
     for index, row in df.iterrows():
         chip  = row[0]
@@ -170,6 +192,11 @@ def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, logdir, fileex
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
     df.fillna("", inplace=True)
+
+    if not is_exist_input(samplepairlist):
+        print ("No ChIP sample with the input sample. Skipped.")
+        return
+
     s = ""
     for index, row in df.iterrows():
         chip  = row[0]
@@ -238,6 +265,7 @@ def visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, logdir, fileext
     if args.preset != "scer":
         os.remove(outputprefix + ".pdf")
     print_and_exec_shell("rm " + outputprefix + "*.peak.bed " + outputprefix + "*.peak.tsv")
+
 
 if(__name__ == '__main__'):
     parser = argparse.ArgumentParser()

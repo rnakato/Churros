@@ -1,55 +1,64 @@
 # Changelog
 
+## 0.10.2 (2023-10-07)
+- Omit the creation of PDF files for WG and p-value distributions when no input sample is provided
+
 ## 0.10.1 (2023-10-01)
-- Bug fix when the input sample is not provided
+- Fixed bug occurring when no input sample is provided
 
 ## 0.10.0 (2023-08-04)
-- Add `churros_classheat` function
-- Add [HOMER](http://homer.ucsd.edu/homer/): Motif analysis
+- Added `churros_classheat` function
+- Added [HOMER](http://homer.ucsd.edu/homer/) for Motif analysis
+
+
+0.9.0 (2023-04-25)
+
+Added GenMap for fast genome mappability computation
+Added utility scripts gen_samplelist.sh and gen_samplepairlist.sh for creating sample lists
 
 ## 0.9.3 (2023-07-06)
-- Add Genometable file for S.pombe
-- Modify `ssp.sh` to take a mptable as an argument
-- Modify `churros_mapping` to use the mptable in `Ddir/mappability_Mosaics_kmer`
-- Bug fix in `calculate_mappability_mosaics.sh`
-- Bug fix of `chrros_mapping stats` command when paired-end ChIP-seq data is applied
+- Added Genometable file for S.pombe
+- Modified `ssp.sh` to accept mptable as an argument
+- Modified `churros_mapping` to use mptable in `Ddir/mappability_Mosaics_kmer`
+- Fixed bug in `calculate_mappability_mosaics.sh`
+- Fixed bug in `chrros_mapping stats` command for paired-end ChIP-seq data
 
 ## 0.9.2 (2023-06-23)
-- Update ChromHMM from v1.23 to v1.24
+- Updated ChromHMM from v1.23 to v1.24
 
 ## 0.9.1 (2023-05-11)
-- Remove /root/.cpanm/work directory
+- Removed /root/.cpanm/work directory to avoid the user id error
 
 ## 0.9.0 (2023-04-25)
-- Changed the base image from rnakato/database to rnakato/mapping (to simplify installation)
-- Add [GenMap](https://github.com/cpockrandt/genmap): fast computation of genome mappability
-- Add `gen_samplelist.sh` and `gen_samplepairlist.sh`, utilities to create samplelist.txt and samplepairlist.txt.
+- Changed base image from `rnakato/database` to `rnakato/mapping` for simplified installation
+- Added [GenMap](https://github.com/cpockrandt/genmap) for fast genome mappability computation
+- Added utility scripts `gen_samplelist.sh` and `gen_samplepairlist.sh` for creating sample lists
 
 ## 0.8.0 (2023-02-19)
-- Update gene annotation for T2T genome
-- Update DROMPAplus to v1.17.1
-- Bigfix of calculate_mappability_mosaics.sh
+- Updated gene annotation for T2T genome
+- Updated DROMPAplus to v1.17.1
+- Fixed bug in `calculate_mappability_mosaics.sh`
 
 ## 0.7.1 (2023-02-10)
-- Fix bug in macs2.sh
+- Fixed bug in `macs2.sh`
 
 ## 0.7.0 (2023-02-08)
-- Change default value of peak-calling (MACS2) from `--nomodel` to default
+- Changed default value for peak-calling in MACS2 from `--nomodel` to default settings
 
 ## 0.6.0 (2023-01-30)
-- Add [TOBIAS](https://github.com/loosolab/TOBIAS): differential ATAC-seq analysis
-- Add [STITCHIT](https://github.com/SchulzLab/STITCHIT): link regulatory elements to genes
+- Added [TOBIAS](https://github.com/loosolab/TOBIAS) for differential ATAC-seq analysis
+- Added [STITCHIT](https://github.com/SchulzLab/STITCHIT) for link regulatory elements to genes
 
 ## 0.5.0 (2023-01-07)
-- Add [Bismark](https://github.com/FelixKrueger/Bismark) and Bismark.sh for bisulfite sequencing analysis
-- Add [TrimGalore](https://github.com/FelixKrueger/TrimGalore) for adapter and quality trimming of FastQ files
-- Add [Cutadapt](https://cutadapt.readthedocs.io/en/stable/index.html) for adapter trimming of FastQ files
+- Added [Bismark](https://github.com/FelixKrueger/Bismark) and the custom script `Bismark.sh` for bisulfite sequencing analysis
+- Added [TrimGalore](https://github.com/FelixKrueger/TrimGalore) for adapter and quality trimming of FastQ files
+- Added [Cutadapt](https://cutadapt.readthedocs.io/en/stable/index.html) for adapter trimming of FastQ files
 
 ## 0.4.1 (2022-11-24)
-- Add ChangeLog
-- Bugfix: removed a bug `duplicate 'row.names' are not allowed` in `churros_compare
-- Update DROMPA+ to `v1.17.0`.
+- Added this ChangeLog
+- Fixed bug: removed a bug `duplicate 'row.names' are not allowed` in `churros_compare`
+- Updated DROMPAplus to `v1.17.0`
 
 ## 0.4.0
 - Public release
-- Update manual
+- Updated manual
