@@ -2,7 +2,7 @@
 
 ## 0. Changelog
 
-See [Changelog](https://github.com/rnakato/Churros/blob/master/ChangeLog.md)
+See [Changelog](https://github.com/rnakato/Churros/blob/main/ChangeLog.md)
 
 ## 1. Installation
 
