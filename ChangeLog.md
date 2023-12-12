@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.4 (2023-12-12)
+- Added convert_SraRunTable_to_samplelist.py that makes samplelist.txt from SraRunTable.txt
+
 ## 0.10.3 (2023-11-06)
 - Added convert_SraRunTable_to_samplelist.py that makes samplelist.txt from SraRunTable.txt
 

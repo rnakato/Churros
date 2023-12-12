@@ -173,7 +173,7 @@ def exec_churros(args):
 
     ### FASTQC
     if args.nofastqc == False:
-        do_fastqc(chdir_build, build, samplelist)
+        do_fastqc(chdir, build, samplelist)
 
     ## churros_mapping
     do_mapping(args, samplelist, post, build, chdir)
@@ -189,7 +189,7 @@ def exec_churros(args):
         print_and_exec_shell('churros_callpeak' + param_macs + ' ' + samplepairlist + ' ' + build)
 
     ### MultiQC
-    print_and_exec_shell('multiqc -m fastqc -m fastp -m bowtie2 -m macs2 -f -o ' + chdir_build + ' ' + chdir_build)
+    print_and_exec_shell('multiqc -m fastqc -m fastp -m bowtie2 -m macs2 -f -o ' + chdir_build + ' ' + chdir)
 
     ### generate P-value bedGraph
     if args.outputpvalue:
