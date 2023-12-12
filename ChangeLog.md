@@ -1,7 +1,10 @@
 # Changelog
 
+## 0.10.3 (2023-11-06)
+- Added convert_SraRunTable_to_samplelist.py that makes samplelist.txt from SraRunTable.txt
+
 ## 0.10.2 (2023-10-07)
-- Omit the creation of PDF files for WG and p-value distributions when no input sample is provided
+- Omited the creation of PDF files for WG and p-value distributions when no input sample is provided
 
 ## 0.10.1 (2023-10-01)
 - Fixed bug occurring when no input sample is provided

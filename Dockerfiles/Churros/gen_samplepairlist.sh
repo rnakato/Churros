@@ -39,7 +39,7 @@ fi
 if test $none = "1"; then
     input="none"
 else
-    input="<input>"
+    input=""
 fi
 
 awk -F '\t' -v input="$input" -v mode="$mode" '{print $1","input","$1","mode""}' $file
