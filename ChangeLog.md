@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.10.4 (2023-12-12)
-- Added convert_SraRunTable_to_samplelist.py that makes samplelist.txt from SraRunTable.txt
+- Changed the directory of the fastqc and fastp output files from `Churros_result/$build` to `Churros_result/` because they are independent of the genome build.
 
 ## 0.10.3 (2023-11-06)
 - Added convert_SraRunTable_to_samplelist.py that makes samplelist.txt from SraRunTable.txt
@@ -15,12 +15,6 @@
 ## 0.10.0 (2023-08-04)
 - Added `churros_classheat` function
 - Added [HOMER](http://homer.ucsd.edu/homer/) for Motif analysis
-
-
-0.9.0 (2023-04-25)
-
-Added GenMap for fast genome mappability computation
-Added utility scripts gen_samplelist.sh and gen_samplepairlist.sh for creating sample lists
 
 ## 0.9.3 (2023-07-06)
 - Added Genometable file for S.pombe
