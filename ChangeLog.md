@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.5 (2023-12-21)
+- Bug fix in `gen_samplelist.sh`
+
 ## 0.10.4 (2023-12-12)
 - Changed the directory of the fastqc and fastp output files from `Churros_result/$build` to `Churros_result/` because they are independent of the genome build.
 
