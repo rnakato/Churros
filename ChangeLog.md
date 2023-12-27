@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.6 (2023-12-26)
+- Added warning messages in `churros` when there are the same raws in `samplelist.txt`.
+
 ## 0.10.5 (2023-12-21)
 - Bug fix in `gen_samplelist.sh`
 

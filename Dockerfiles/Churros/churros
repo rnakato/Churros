@@ -7,7 +7,7 @@ import argparse
 import pathlib
 import pandas as pd
 
-__version__ = '0.10.4'
+__version__ = '0.10.6'
 
 def print_and_exec_shell(command):
     print (command)
@@ -26,6 +26,38 @@ def check_dir(dir):
     else:
         print ("Error: " + dir + " does not exist.")
         exit()
+
+def check_fastq_in_samplelist(samplelist):
+    df = pd.read_csv(samplelist, sep="\t", header=None)
+    df.fillna("", inplace=True)
+    for index, row in df.iterrows():
+        if (len(row)<2 or row[1] == ""):
+            print ("Error: specify fastq file in " + samplelist + ".")
+            exit()
+
+        fq1 = row[1]
+        for fastq in fq1.split(","):
+            check_file(fastq)
+
+        if (len(row)>2): # for paired-end
+            fq2 = row[2]
+            for fastq in fq2.split(","):
+                check_file(fastq)
+
+def check_duplicates(file_path):
+    df = pd.read_csv(file_path, sep='\t', header=None, names=['Col1', 'Col2'])
+
+    duplicates_col1 = df['Col1'].duplicated(keep=False)
+    duplicates_col2 = df['Col2'].duplicated(keep=False)
+
+    if duplicates_col1.any():
+        print("Warning: Duplicate found in column 1")
+        print(df[duplicates_col1]['Col1'].value_counts())
+
+    if duplicates_col2.any():
+        print("Warning: Duplicate found in column 2")
+        print(df[duplicates_col2]['Col2'].value_counts())
+
 
 def get_mapfile_postfix(mapparam):
     post = mapparam.replace(' ', '')
@@ -146,6 +178,7 @@ def is_exist_input(samplepairlist):
     else:
         return True
 
+
 def exec_churros(args):
     samplelist = args.samplelist
     samplepairlist = args.samplepairlist
@@ -164,6 +197,10 @@ def exec_churros(args):
     # To absolute path
     samplelist = pathlib.Path(samplelist).resolve()
     samplepairlist = pathlib.Path(samplepairlist).resolve()
+
+    # check samplelist
+    check_fastq_in_samplelist(samplelist)
+    check_duplicates(samplelist)
 
     mapparam = args.mapparam
     post = get_mapfile_postfix(mapparam)
