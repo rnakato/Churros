@@ -10,7 +10,7 @@
 - Changed the directory of the fastqc and fastp output files from `Churros_result/$build` to `Churros_result/` because they are independent of the genome build.
 
 ## 0.10.3 (2023-11-06)
-- Added convert_SraRunTable_to_samplelist.py that makes samplelist.txt from SraRunTable.txt
+- Added `convert_SraRunTable_to_samplelist.py` that makes samplelist.txt from SraRunTable.txt
 
 ## 0.10.2 (2023-10-07)
 - Omited the creation of PDF files for WG and p-value distributions when no input sample is provided
