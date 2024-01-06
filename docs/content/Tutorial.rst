@@ -57,6 +57,8 @@ Multiple fastq files can be specified by separateing with ``,``.
     HepG2_H3K36me3  fastq/SRR227447.fastq.gz,fastq/SRR227448.fastq.gz
     HepG2_Control   fastq/SRR227552.fastq.gz,fastq/SRR227553.fastq.gz
 
+You can use 'gen_samplelist.sh <https://churros.readthedocs.io/en/latest/content/Commands.html#utility-tools>'_ to make the samplelist.txt.
+
 .. note:: 
     See :ref:`label_samplelist_pairedend` for paired-end fastqs.
 
@@ -83,6 +85,8 @@ Input samples can be omitted if unavailable.
     HepG2_H3K27ac,HepG2_Control,HepG2_H3K27ac,sharp
     HepG2_H3K27me3,HepG2_Control,HepG2_H3K27me3,broad
     HepG2_H3K36me3,HepG2_Control,HepG2_H3K36me3,broad
+
+You can use 'gen_samplepairlist.sh <https://churros.readthedocs.io/en/latest/content/Commands.html#utility-tools>'_ to make the initial template of samplepairlist.txt.
 
 
 Running Churros
