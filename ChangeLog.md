@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.7 (2023-12-31)
+- Updated SSP (v1.3.0 -> v1.3.1) and DROMPA+ (v1.18.0 -> v1.18.1).
+
 ## 0.10.6 (2023-12-26)
 - Added warning messages in `churros` when there are the same raws in `samplelist.txt`.
 
