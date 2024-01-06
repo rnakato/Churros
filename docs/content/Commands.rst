@@ -540,10 +540,6 @@ Example usage of continuous mode:
    churros_classheat -l samplelabel.tsv -s GATA3_ENCSR000EWV_rep1.bw -k 3 -n zscore continuous Rad21_ENCSR000BTQ_rep1_peaks.narrowPeak ./bwdir/
 
 
-
-
-
-
 Utility tools
 +++++++++++++++++++++++++++++++++++++++++++++++++
 

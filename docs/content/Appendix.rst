@@ -59,7 +59,7 @@ When using paired-end fastqs, use the second and the third columns to specify th
     HepG2_H3K36me3  fastq/SRR227447_1.fastq.gz  fastq/SRR227447_2.fastq.gz
     HepG2_Control   fastq/SRR227552_1.fastq.gz  fastq/SRR227552_2.fastq.gz
 
-You can use 'gen_samplelist.sh -p <https://churros.readthedocs.io/en/latest/content/Commands.html#utility-tools>'_ to make the samplelist.txt for paired-end samples.
+You can use `gen_samplelist.sh -p <https://churros.readthedocs.io/en/latest/content/Commands.html#utility-tools>`_ to make the samplelist.txt for paired-end samples.
 
 
 Make mappability files
