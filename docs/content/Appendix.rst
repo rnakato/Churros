@@ -61,9 +61,6 @@ When using paired-end fastqs, use the second and the third columns to specify th
 
 You can use `gen_samplelist.sh -p <https://churros.readthedocs.io/en/latest/content/Commands.html#utility-tools>`_ to make the samplelist.txt for paired-end samples.
 
-`gen_samplelist.sh -p <https://churros.readthedocs.io/en/latest/content/Commands.html#utility-tools>`_
-`gen_samplelist.sh  <https://churros.readthedocs.io/en/latest/content/Commands.html#utility-tools>`_
-
 Make mappability files
 --------------------------------------------------
 
