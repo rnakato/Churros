@@ -82,7 +82,7 @@ todo_include_todos = False
 ogp_site_url = "https://churros.readthedocs.io/en/latest/"
 ogp_image = "https://churros.readthedocs.io/en/latest/_static/churros_logo.png"
 
-html_logo = "_static/img/churros_logo.png"
+html_logo = "_static/img/Churros-06.webp"
 
 # -- Options for HTML output ----------------------------------------------
 
