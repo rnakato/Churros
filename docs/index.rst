@@ -18,8 +18,8 @@ The latest version of **Churros** uses the following tools internally.
 
 - ChIP-seq analysis
    - MACS2 v2.2.9.1
-   - DROMPA+ v1.18.0
-   - SSP v1.3.0
+   - DROMPA+ v1.18.1
+   - SSP v1.3.1
    - ROSE v0.1
    - ChromHMM v1.24
    - ChromImpute v1.0.3

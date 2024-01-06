@@ -557,32 +557,32 @@ By specifying the direcoty of fastq files, ``gen_samplelist.sh`` generates ``sam
    $ ls fastq/                                                                                                         
    SRR227447.fastq.gz  SRR227552.fastq.gz  SRR227563.fastq.gz  SRR227575.fastq.gz  SRR227598.fastq.gz  SRR227639.fastq.gz
    SRR227448.fastq.gz  SRR227553.fastq.gz  SRR227564.fastq.gz  SRR227576.fastq.gz  SRR227599.fastq.gz  SRR227640.fastq.gz
-   $ gen_samplelist.sh fastq/ > samplelist.txt
+   $ gen_samplelist.sh fastq > samplelist.txt
    $ cat samplelist.txt
-   SRR227447.fastq.gz      fastq//SRR227447.fastq.gz
-   SRR227448.fastq.gz      fastq//SRR227448.fastq.gz
-   SRR227552.fastq.gz      fastq//SRR227552.fastq.gz
-   SRR227553.fastq.gz      fastq//SRR227553.fastq.gz
-   SRR227563.fastq.gz      fastq//SRR227563.fastq.gz
-   SRR227564.fastq.gz      fastq//SRR227564.fastq.gz
-   SRR227575.fastq.gz      fastq//SRR227575.fastq.gz
-   SRR227576.fastq.gz      fastq//SRR227576.fastq.gz
-   SRR227598.fastq.gz      fastq//SRR227598.fastq.gz
-   SRR227599.fastq.gz      fastq//SRR227599.fastq.gz
-   SRR227639.fastq.gz      fastq//SRR227639.fastq.gz
-   SRR227640.fastq.gz      fastq//SRR227640.fastq.gz
+   SRR227447      fastq/SRR227447.fastq.gz
+   SRR227448      fastq/SRR227448.fastq.gz
+   SRR227552      fastq/SRR227552.fastq.gz
+   SRR227553      fastq/SRR227553.fastq.gz
+   SRR227563      fastq/SRR227563.fastq.gz
+   SRR227564      fastq/SRR227564.fastq.gz
+   SRR227575      fastq/SRR227575.fastq.gz
+   SRR227576      fastq/SRR227576.fastq.gz
+   SRR227598      fastq/SRR227598.fastq.gz
+   SRR227599      fastq/SRR227599.fastq.gz
+   SRR227639      fastq/SRR227639.fastq.gz
+   SRR227640      fastq/SRR227640.fastq.gz
 
 Supply ``-p`` option when using paired-end fastqs.
 
 .. code-block:: bash
 
-   $ gen_samplelist.sh -p fastq/ > samplelist.txt
+   $ gen_samplelist.sh -p fastq > samplelist.txt
 
 By default, ``gen_samplelist.sh`` assumes that the postfix of paired fastq files is "_1" and "_2". If it is "_R1" and "_R2", specify ``-r`` option.
 
 .. code-block:: bash
 
-   $ gen_samplelist.sh -p -r fastq/ > samplelist.txt
+   $ gen_samplelist.sh -p -r fastq > samplelist.txt
 
 
 gen_samplepairlist.sh: create samplepairlist.txt
@@ -601,14 +601,14 @@ gen_samplepairlist.sh: create samplepairlist.txt
    HepG2_Control   fastq/SRR227552.fastq.gz,fastq/SRR227553.fastq.gz
 
    $ gen_samplepairlist.sh samplelist.txt
-   HepG2_H2A.Z,<input>,HepG2_H2A.Z,sharp
-   HepG2_H3K4me3,<input>,HepG2_H3K4me3,sharp
-   HepG2_H3K27ac,<input>,HepG2_H3K27ac,sharp
-   HepG2_H3K27me3,<input>,HepG2_H3K27me3,sharp
-   HepG2_H3K36me3,<input>,HepG2_H3K36me3,sharp
-   HepG2_Control,<input>,HepG2_Control,sharp
+   HepG2_H2A.Z,,HepG2_H2A.Z,sharp
+   HepG2_H3K4me3,,HepG2_H3K4me3,sharp
+   HepG2_H3K27ac,,HepG2_H3K27ac,sharp
+   HepG2_H3K27me3,,HepG2_H3K27me3,sharp
+   HepG2_H3K36me3,,HepG2_H3K36me3,sharp
+   HepG2_Control,,HepG2_Control,sharp
 
-Change ``<input>`` to the exact label of Input samples.
+Please fill the label of Input samples.
 
 - Specify ``-n`` option when omitting input samples (outputs "none").
 - Specify ``-b`` option when the peak mode is "broad".
