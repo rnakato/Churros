@@ -82,6 +82,8 @@ todo_include_todos = False
 ogp_site_url = "https://churros.readthedocs.io/en/latest/"
 ogp_image = "https://churros.readthedocs.io/en/latest/_static/churros_logo.png"
 
+html_logo = "_static/img/churros_logo.png"
+
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
