@@ -264,6 +264,20 @@ It the number of peaks largely varies among samples, the comparison may become u
     - ``Peak_Number_overlap/`` ... results of peak-number level comparison (Simpson index). ``PairwiseComparison/`` contains the results of all pairs (overlapped peak list and Venn diagram) and the ``Peaks`` contains the top-ranked peaks of samples. This score is good for comparing sharp peaks such as transcription factors.
 
 
+.. figure:: img/heatmap_SpearmanCorr.100bp.png
+   :width: 500px
+   :align: center
+   :alt: Alternate
+
+   bigwigCorrelation
+
+.. figure:: img/Jaccard_heatmap.jpg
+   :width: 500px
+   :align: center
+   :alt: Alternate
+
+   Peak_Number_overlap
+
 churros_genPvalwig: generate P-value distribution as bedGraph
 --------------------------------------------------------------------
 
