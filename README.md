@@ -63,8 +63,3 @@ Then type:
 ## 5. Reference
 
 - Wang J, Nakato R, Churros: a Docker-based pipeline for large-scale epigenomic analysis, *DNA Research*, 2023. doi: [10.1093/dnares/dsad026](https://academic.oup.com/dnaresearch/article/31/1/dsad026/7475777)
-
-
-## 6. Contact
-
-Ryuichiro Nakato: rnakato AT iqb.u-tokyo.ac.jp
