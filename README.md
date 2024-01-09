@@ -1,5 +1,7 @@
 # Churros: Docker image for ChIP-seq/ATAC-seq analysis
 
+<img src = "image/Churros.jpg" width = 700ptx>
+
 ## 0. Changelog
 
 See [Changelog](https://github.com/rnakato/Churros/blob/main/ChangeLog.md)
