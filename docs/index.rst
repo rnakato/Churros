@@ -5,6 +5,12 @@ Churros
 **Churros** is a Docker-based epigenomics analysis pipeline.
 While **Churros** mainly focuses on the ChIP-seq analysis, it can also handle CUT&TAG, ATAC-seq and DNA methylation data.
 
+.. figure:: Churros.jpg
+   :width: 800px
+   :align: center
+   :alt: Alternate
+
+
 Contents:
 ---------------
 
