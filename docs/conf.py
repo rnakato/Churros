@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Churros'
-copyright = '2022-2023, Ryuichiro Nakato'
+copyright = '2022-2024, Ryuichiro Nakato'
 author = 'Ryuichiro Nakato'
 
 # The version info for the project you're documenting, acts as replacement for

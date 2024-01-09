@@ -10,6 +10,9 @@ The sample scripts are also available at `Chrros GitHub site <https://github.com
    | Example: ``singularity exec churros.sif download_genomedata.sh``
 
 
+.. contents:: 
+   :depth: 2
+
 Get data
 ------------------------
 
@@ -121,6 +124,16 @@ visualizes read distribution as pdf format.
         sacCer3 Referencedata_sacCer3 --preset scer --enrich
 
 ``--preset scer`` option changes the width and smoothing width for the small genome.
+
+
+.. figure:: img/Visualize_yeast_enrich.jpg
+   :width: 700px
+   :align: center
+   :alt: Alternate
+
+   ChIP/Input enrichment
+
+
 In addition, ``--logratio`` option makes the enrichment in log-scale.
 
 .. code-block:: bash
@@ -128,3 +141,9 @@ In addition, ``--logratio`` option makes the enrichment in log-scale.
     churros_visualize samplepairlist.txt drompa+.logscale \
         sacCer3 Referencedata_sacCer3 --preset scer --enrich --logratio
 
+.. figure:: img/Visualize_yeast_enrich.logscale.jpg
+   :width: 700px
+   :align: center
+   :alt: Alternate
+
+   ChIP/Input enrichment (log scale)

@@ -1,4 +1,4 @@
-Tutorial (DNA methylation analysis)
+DNA methylation analysis by Churros
 ===========================================
 
 This page describes how to analyze Bisulfite sequencing data for DNA methylation analysis.

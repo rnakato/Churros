@@ -1,6 +1,9 @@
 Appendix
 =====================
 
+.. contents:: 
+   :depth: 2
+
 Correspondence table for the genome build
 ---------------------------------------------------
 
@@ -19,8 +22,8 @@ While ``download_genomedata.sh`` uses the `Ensembl <https://asia.ensembl.org/ind
    "fly",   "BDGP6",  "dm6"
    "zebrafish", "GRCz11", "danRer11"
    "chicken", "GRCg6a", "galGal6"
-   "C. elegans", "WBcel235", "ce11"
-   "S. serevisiae", "R64-1-1", "sacCer3"
+   "C.elegans", "WBcel235", "ce11"
+   "S.serevisiae", "R64-1-1", "sacCer3"
 
 For example, to use human genome build GRCh38/hg38, specify GRCh38 or hg38 for ``download_genomedata.sh`` and hg38 for ``churros``.
 
@@ -32,34 +35,6 @@ For example, to use human genome build GRCh38/hg38, specify GRCh38 or hg38 for `
    download_genomedata.sh GRCh38 Ensembl-GRCh38/ 2>&1 | tee log/Ensembl-GRCh38
    churros -p 24 --mpbl samplelist.txt samplepairlist.txt hg38 Ensembl-GRCh38/
 
-
-.. _label_samplelist_pairedend:
-Make samplelist for paired-end fastq
-------------------------------------------------
-
-This is an example of a samplelist.txt for single-end fastqs.
-
-.. code-block:: bash
-
-    HepG2_H2A.Z     fastq/SRR227639.fastq.gz
-    HepG2_H3K4me3   fastq/SRR227563.fastq.gz
-    HepG2_H3K27ac   fastq/SRR227575.fastq.gz
-    HepG2_H3K27me3  fastq/SRR227598.fastq.gz
-    HepG2_H3K36me3  fastq/SRR227447.fastq.gz
-    HepG2_Control   fastq/SRR227552.fastq.gz
-
-When using paired-end fastqs, use the second and the third columns to specify the R1 and R2 fastqs like this: 
-
-.. code-block:: bash
-
-    HepG2_H2A.Z     fastq/SRR227639_1.fastq.gz  fastq/SRR227639_2.fastq.gz
-    HepG2_H3K4me3   fastq/SRR227563_1.fastq.gz  fastq/SRR227563_2.fastq.gz
-    HepG2_H3K27ac   fastq/SRR227575_1.fastq.gz  fastq/SRR227575_2.fastq.gz
-    HepG2_H3K27me3  fastq/SRR227598_1.fastq.gz  fastq/SRR227598_2.fastq.gz
-    HepG2_H3K36me3  fastq/SRR227447_1.fastq.gz  fastq/SRR227447_2.fastq.gz
-    HepG2_Control   fastq/SRR227552_1.fastq.gz  fastq/SRR227552_2.fastq.gz
-
-You can use `gen_samplelist.sh -p <https://churros.readthedocs.io/en/latest/content/Commands.html#utility-tools>`_ to make the samplelist.txt for paired-end samples.
 
 Make mappability files
 --------------------------------------------------
