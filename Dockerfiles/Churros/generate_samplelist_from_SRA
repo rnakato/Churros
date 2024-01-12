@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys
+import os
+import pandas as pd
+import xml.etree.ElementTree as ET
+
+def extract_sample_label_pairs(xml_file_path):
+    '''Extracts sample name and label from the XML file.'''
+    tree = ET.parse(xml_file_path)
+    root = tree.getroot()
+
+    sample_label_pairs = []
+    for experiment in root.findall('.//EXPERIMENT'):
+        sample_name = experiment.get('alias')
+        title = experiment.find('TITLE')
+        if sample_name and title is not None:
+            label = title.text.split(';')[0].split(': ', 1)[1] if ';' in title.text else title.text
+
+            sample_label_pairs.append((sample_name, label))
+    return sample_label_pairs
+
+def load_run_table(run_table_path):
+    '''Loads the run table from a CSV file.'''
+    return pd.read_csv(run_table_path, sep=',')
+
+def merge_data(sample_label_pairs, run_table_df):
+    '''Merges the sample-label pairs with the run table to find corresponding run names.'''
+    sample_label_df = pd.DataFrame(sample_label_pairs, columns=['Sample', 'Label'])
+    merged_df = pd.merge(run_table_df, sample_label_df, left_on='Sample Name', right_on='Sample', how='inner')
+    merged_df['Run'] = merged_df['Run'].apply(lambda x: f'fastq/{x}.fastq.gz')
+
+    return merged_df[['Label', 'Run']]
+
+
+def main():
+    usage = 'Usage: \n    {} <xml file> <SraRunTable> <output>'.format(os.path.basename(__file__))
+    arguments = sys.argv
+    if len(arguments) == 1:
+        print(usage)
+        exit()
+
+    xml_file_path = sys.argv[1]
+    run_table_path = sys.argv[2]
+    output_file_path = sys.argv[3]
+
+    sample_label_pairs = extract_sample_label_pairs(xml_file_path)
+    run_table_df = load_run_table(run_table_path)
+    label_run_pairs_df = merge_data(sample_label_pairs, run_table_df)
+
+    label_run_pairs_df.to_csv(output_file_path, sep='\t', index=False, header=False)
+    print(f'Output saved to {output_file_path}')
+
+if(__name__ == '__main__'):
+    main()

@@ -58,10 +58,17 @@ Five output files are generated:
    Output5_kmeans_heatmap.png
 
 
+.. figure:: img/classheat_kmeans.png
+   :width: 700px
+   :align: center
+   :alt: Alternate
+
+   Output5_kmeans_heatmap.png
+
+
 Example usage of continuous mode
 ++++++++++++++++++++++++++++++++++++++++
 
 .. code-block:: bash
 
    churros_classheat -l samplelabel.tsv -s GATA3_ENCSR000EWV_rep1.bw -k 3 -n zscore continuous Rad21_ENCSR000BTQ_rep1_peaks.narrowPeak ./bwdir/
-

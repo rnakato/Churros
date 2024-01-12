@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.8
+- Added a script `generate_samplelist_from_SRA.py` that generates the sample list from SraExperimentPackage.xml and SraRunTable.txt.
+
 ## 0.10.7 (2023-12-31)
 - Updated SSP (v1.3.0 -> v1.3.1) and DROMPA+ (v1.18.0 -> v1.18.1).
 - Update Manual

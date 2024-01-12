@@ -17,3 +17,5 @@ tutorial/mouse/log/
 tutorial/yeast/churros.QCstats.tsv
 tutorial/yeast/fastq/
 tutorial/yeast/log/
+Dockerfiles/ROSE_old/
+tutorial/classheat/

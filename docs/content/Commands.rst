@@ -561,6 +561,15 @@ By default, ``gen_samplelist.sh`` assumes that the postfix of paired fastq files
    $ gen_samplelist.sh -p -r fastq > samplelist.txt
 
 
+generate_samplelist_from_SRA
+--------------------------------------------------
+
+``generate_samplelist_from_SRA`` is a script that get the labels of each SRA ids from ``SraExperimentPackage.xml`` and ``SraRunTable.txt`` to make the sample list.
+
+.. code-block:: bash
+
+   generate_samplelist_from_SRA SraExperimentPackage.xml SraRunTable.txt samplelist.txt
+
 gen_samplepairlist.sh: create samplepairlist.txt
 --------------------------------------------------
 
