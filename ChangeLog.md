@@ -1,6 +1,11 @@
 # Changelog
 
-## 0.10.8
+## 0.10.9 (2024-1-30)
+- Added [STARE](https://stare.readthedocs.io/en/latest/index.html) for enhancer-promoter analysis
+- Updated SAMtools from 1.17 to 1.19.2
+- Updated SRAtoolkit from 3.0.2 to 3.0.10
+
+## 0.10.8 (2024-1-12)
 - Added a script `generate_samplelist_from_SRA.py` that generates the sample list from SraExperimentPackage.xml and SraRunTable.txt.
 
 ## 0.10.7 (2023-12-31)

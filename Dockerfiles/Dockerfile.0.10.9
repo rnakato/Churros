@@ -1,5 +1,5 @@
 ### Churros: Docker image for ChIP-seq analysis
-FROM rnakato/mapping:2023.12
+FROM rnakato/mapping:2024.01
 LABEL maintainer "Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>"
 
 WORKDIR /opt
@@ -7,24 +7,26 @@ USER root
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    build-essential \
-    fastqc \
-    libboost-all-dev \
-    libbz2-dev \
-    libcurl4-gnutls-dev \
-    libgtkmm-3.0-dev \
-    libgzstream0 \
-    libgzstream-dev \
-    liblzma-dev \
-    libz-dev \
-    lmodern \
-    cmake \
-    curl \
-    pandoc \
-    pigz \
-    python2 \
-    texlive-fonts-recommended \
-    texlive-xetex \
+        build-essential \
+        fastqc \
+        libboost-all-dev \
+        libbz2-dev \
+        libcurl4-gnutls-dev \
+        lld \
+        lldb \
+        libgtkmm-3.0-dev \
+        libgzstream0 \
+        libgzstream-dev \
+        liblzma-dev \
+        libz-dev \
+        lmodern \
+        cmake \
+        curl \
+        pandoc \
+        pigz \
+        python2 \
+        texlive-fonts-recommended \
+        texlive-xetex \
     && apt-get clean \
     && rm -rf /var/lib/apt/list
 
@@ -82,9 +84,24 @@ RUN git clone --recursive https://github.com/rnakato/DROMPAplus \
     && git submodule foreach git pull origin master \
     && make
 
-# Python (MultiQC, deepTools, intervene, TOBIAS, genmap, sambamba) pip install --no-cache-dir blosc2 \
+# Python (MultiQC, deepTools, intervene, TOBIAS, genmap, sambamba)
 RUN conda install -y -c bioconda genmap sambamba \
-    && pip install --no-cache-dir epilogos multiqc intervene argh deeptools tobias cutadapt threadpoolctl==3.1.0
+    && pip install --no-cache-dir epilogos multiqc intervene argh deeptools tobias cutadapt threadpoolctl==3.1.0 
+
+# STARE: https://stare.readthedocs.io/en/latest/index.html
+RUN git clone https://github.com/SchulzLab/STARE.git \
+    && cd STARE/Code \
+    && cmake . \
+    && cmake --build .
+
+# SNEEP: https://sneep.readthedocs.io/en/latest/index.html
+# Pythonのどのバージョンを入れても入らない
+#    && conda create -n sneep python=3.8 \
+#    && source activate sneep \
+#    && conda install sneep -c bioconda \
+#    && pip install --no-cache-dir session-info \
+#    && conda deactivate
+
 
 # scripts
 ENV CDIR Churros

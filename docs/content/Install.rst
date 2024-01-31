@@ -55,6 +55,7 @@ The latest version of **Churros** uses the following tools internally.
    - ChromHMM v1.24
    - ChromImpute v1.0.3
    - epilogos v0.1.2
+   - STAR v1.0.4
 
 - ATAC-seq analysis
    - TOBIAS
@@ -81,9 +82,9 @@ The latest version of **Churros** uses the following tools internally.
    - MultiQC v1.12
 
 - File processing
-   - `SAMtools <http://www.htslib.org/>`_ v1.17
+   - `SAMtools <http://www.htslib.org/>`_ v1.19.2
    - `sambamba <https://github.com/biod/sambamba>`_ v0.6.6
-   - `bedtools <https://bedtools.readthedocs.io/en/latest/>`_ v2.30.0
+   - `BEDtools <https://bedtools.readthedocs.io/en/latest/>`_ v2.31.0
    - `deepTools <https://deeptools.readthedocs.io/>`_  v3.5.2
 
 - Adapter trimming
@@ -95,4 +96,4 @@ The latest version of **Churros** uses the following tools internally.
    - `GenMap <https://github.com/cpockrandt/genmap>`_ v1.2.0
 
 - Utility tools
-   - `SRAtoolkit <https://github.com/ncbi/sra-tools>`_ v3.0.2
+   - `SRAtoolkit <https://github.com/ncbi/sra-tools>`_ v3.0.10
