@@ -45,6 +45,7 @@ if test $pair -eq 1; then  # paired-end
             else
                 prefix=$(basename "$fq1")
             fi
+            prefix=`echo $prefix | sed 's/'${postfix}'1//'`
 
             fq2=`echo $fq1 | sed 's/'${postfix}'1/'${postfix}'2/'`
             echo -e "$prefix\t$fq1\t$fq2"

@@ -76,17 +76,7 @@ def do_churros_visualize(args):
 
     pdir = chdir + "/bigWig/" + args.d + "/"
 
-#    if args.wigformat == 0:
- #       fileext = "wig.gz"
- #   elif args.wigformat == 1:
- #       fileext = "wig"
- #   elif args.wigformat == 2:
- #       fileext = "bedGraph"
- #   elif args.wigformat == 3:
     fileext = "bw"
-  #  else:
-   #     print("Error: specify [0-3] for '-f' option.")
-   #     exit()
 
     if args.postfix != "":
         post = args.postfix
@@ -178,7 +168,7 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir
     outputprefix =  pdfdir + "/" + head + ".GV.100000"
     logfile = logdir + head + ".GV.100000.log"
 
-    command = "drompa+ GV " + param + " " + sGV + " -o " + outputprefix + " | tee -a " + logfile
+    command = "drompa+ GV " + param + " " + sGV + " -o " + outputprefix + " > " + logfile
     echo_and_print_and_exec_shell(command, logfile)
 
 
@@ -213,9 +203,9 @@ def visualize_PCENRICH(args, param, samplepairlist, pdir, pdfdir, logdir, fileex
     outputprefix =  pdfdir + "/" + head + ".PCENRICH." + str(args.binsize)
     logfile_prefix = logdir + head + ".PCENRICH." + str(args.binsize)
 
-    command = "drompa+ PC_ENRICH " + param + " " + s + " -o " + outputprefix + " | tee -a " + logfile_prefix + ".log"
+    command = "drompa+ PC_ENRICH " + param + " " + s + " -o " + outputprefix + " > " + logfile_prefix + ".log"
     echo_and_print_and_exec_shell(command, logfile_prefix + ".log")
-    command = "drompa+ PC_ENRICH " + param + " --callpeak " + s + " -o " + outputprefix + ".callpeak | tee -a " + logfile_prefix + ".callpeak.log"
+    command = "drompa+ PC_ENRICH " + param + " --callpeak " + s + " -o " + outputprefix + ".callpeak > " + logfile_prefix + ".callpeak.log"
     echo_and_print_and_exec_shell(command, logfile_prefix + ".callpeak.log")
 
     if args.preset != "scer":
@@ -259,7 +249,7 @@ def visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, logdir, fileext
     outputprefix =  pdfdir + "/" + head + ".PCSHARP." + str(args.binsize)
     logfile = logdir + head + ".PCSHARP." + str(args.binsize) + ".log"
 
-    command = "drompa+ PC_SHARP " + param + " " + s + " -o " + outputprefix + " | tee -a " + logfile
+    command = "drompa+ PC_SHARP " + param + " " + s + " -o " + outputprefix + " > " + logfile
     echo_and_print_and_exec_shell(command, logfile)
 
     if args.preset != "scer":
@@ -273,7 +263,6 @@ if(__name__ == '__main__'):
     parser.add_argument("prefix", help="output prefix (directory will be omitted)", type=str)
     parser.add_argument("build", help="genome build (e.g., hg38)", type=str)
     parser.add_argument("Ddir", help="directory of reference data", type=str)
-#    parser.add_argument("-f", "--wigformat", help="input file format 0: compressed wig (.wig.gz)\n 1: uncompressed wig (.wig)\n 2: bedGraph (.bedGraph) \n 3 (default): bigWig (.bw)", type=int, default=3)
     parser.add_argument("-b", "--binsize", help="binsize of parse2wig+ (default: 100)", type=int, default=100)
     parser.add_argument("-l", "--linesize", help="line size for each page (kbp, defalt: 1000)", type=int, default=-1)
     parser.add_argument("--nompbl", help="do not consider genome mappability", action="store_true")

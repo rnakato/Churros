@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.0 (2024-2-3)
+- Added `checkQC.py` for checking the quality of the input ChIP-seq samples
+    - `checkQC.py` outputs the warnings in `Churros_result/<build>/QCcheck.log` if the samples do not meet the quality criteria.
+
 ## 0.10.9 (2024-1-30)
 - Added [STARE](https://stare.readthedocs.io/en/latest/index.html) for enhancer-promoter analysis
 - Updated SAMtools from 1.17 to 1.19.2

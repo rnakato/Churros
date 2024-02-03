@@ -74,17 +74,22 @@ def do_fastqc(chdir, build, samplelist):
 
 def do_mapping(args, samplelist, post, build, chdir):
     if args.nompbl:
-        param_churros_mapping = "-D " + chdir + " -k " + str(args.k) + " -p " + str(args.threads) + " -n"
+#        param_churros_mapping = "-D " + chdir + " -k " + str(args.k) + " -p " + str(args.threads) + " -n"
+        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} -n"
     else:
-        param_churros_mapping = "-D " + chdir + " -k " + str(args.k) + " -p " + str(args.threads)
+#        param_churros_mapping = "-D " + chdir + " -k " + str(args.k) + " -p " + str(args.threads)
+        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads}"
 
-    print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' exec ' + str(samplelist) + ' ' + build + ' ' + args.Ddir)
-
-    # header
-    os.system('churros_mapping ' + param_churros_mapping + ' header > ' + chdir + '/' + build + '/churros.QCstats.tsv')
+#    print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' exec ' + str(samplelist) + ' ' + build + ' ' + args.Ddir)
+    print_and_exec_shell(f'churros_mapping {param_churros_mapping} exec {samplelist} {build} {args.Ddir}')
 
     # stats
-    os.system('churros_mapping ' + param_churros_mapping + ' stats ' + str(samplelist) + ' ' + build + ' ' + args.Ddir + ' >> ' + chdir + '/' + build + '/churros.QCstats.tsv')
+    qcstatsfile = {chdir}/{build}/churros.QCstats.tsv'
+#    os.system('churros_mapping ' + param_churros_mapping + ' header > ' + chdir + '/' + build + '/churros.QCstats.tsv')
+    os.system(f'churros_mapping {param_churros_mapping} header > {qcstatsfile}')
+#    os.system('churros_mapping ' + param_churros_mapping + ' stats ' + str(samplelist) + ' ' + build + ' ' + args.Ddir + ' >> ' + chdir + '/' + build + '/churros.QCstats.tsv')
+    os.system(f'churros_mapping {param_churros_mapping} stats {samplelist} {build} {args.Ddir} >> {qcstatsfile}')
+
 
 def make_samplepairlist_withflen(samplepairlist, post, build, chdir):
     samplepairlist_withflen = chdir + "/churros.samplepairlist.withflen.txt"
@@ -188,6 +193,10 @@ def exec_churros(args):
     else:
         print_and_exec_shell('churros_callpeak' + param_macs + ' ' + samplepairlist + ' ' + build)
 
+    ## QC check
+    print ("\nCheck the quality of ChIP-seq samples...")
+    print_and_exec_shell(f'checkQC.py {chdir}/{build}/churros.QCstats.tsv {samplepairlist} | tee {chdir}/{build}/QCcheck.log')
+
     ### MultiQC
     print_and_exec_shell('multiqc -m fastqc -m fastp -m bowtie2 -m macs2 -f -o ' + chdir_build + ' ' + chdir_build)
 
@@ -198,7 +207,7 @@ def exec_churros(args):
         else:
             param_churros_genwig = " -D " + chdir + " "
 
-        print ("generate Pvalue bedGraph file...")
+        print ("\ngenerate Pvalue bedGraph file...")
         print_and_exec_shell('churros_genPvalwig ' + param_churros_genwig + str(samplepairlist) + ' bedGraph_Pval ' + build + ' ' + gt)
 
     ### make corremation heatmap
@@ -211,7 +220,7 @@ def exec_churros(args):
         print_and_exec_shell('churros_compare ' + param_churros_compare + ' ' + str(samplelist) + ' ' + str(samplepairlist) + ' ' + build)
 
     ### make pdf files
-    print ("generate pdf files by drompa+...")
+    print ("\ngenerate pdf files by drompa+...")
 
     if args.nompbl:
         param_churros_visualize = "-D " + chdir + " --nompbl"
@@ -221,18 +230,29 @@ def exec_churros(args):
         param_churros_visualize += " --preset T2T "
 
     if args.preset == "scer":
-        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
-        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich --logratio ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
+#        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
+        print_and_exec_shell(f'churros_visualize {param_churros_visualize} --preset scer --enrich {samplepairlist} drompa+.macspeak {build} {Ddir}')
+#        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich --logratio ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
+        print_and_exec_shell(f'churros_visualize {param_churros_visualize} --preset scer --enrich --logratio {samplepairlist} drompa+.macspeak {build} {Ddir}')
+
     else:
         df = pd.read_csv(samplepairlist, sep=",", header=None)
         df.fillna("", inplace=True)
 
         if is_exist_input(samplepairlist):
-            print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 --pvalue -P "--pthre_enrich 3 --scale_pvalue 3" ' + str(samplepairlist) + ' drompa+.pval.bin5M ' + build + ' ' + Ddir)
-            print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -G ' + str(samplepairlist) + ' ' + 'drompa+ ' + build + ' ' + Ddir)
+#            print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 --pvalue -P "--pthre_enrich 3 --scale_pvalue 3" ' + str(samplepairlist) + ' drompa+.pval.bin5M ' + build + ' ' + Ddir)
+            print_and_exec_shell(f'churros_visualize {param_churros_visualize} -b 5000 -l 8000 --pvalue -P "--pthre_enrich 3 --scale_pvalue 3" {samplepairlist} drompa+.pval.bin5M {build} {Ddir}')
 
-        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' ' + chdir + '/' + args.macsdir + '/samplepairlist.txt drompa+.macspeak ' + build + ' ' + Ddir)
-        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -P "--scale_tag 100" ' + str(samplepairlist) + ' drompa+.bin5M ' + build + ' ' + Ddir)
+#            print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -G ' + str(samplepairlist) + ' ' + 'drompa+ ' + build + ' ' + Ddir)
+            print_and_exec_shell(f'churros_visualize {param_churros_visualize} -G {samplepairlist} drompa+ {build} {Ddir}')
+
+
+#        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' ' + chdir + '/' + args.macsdir + '/samplepairlist.txt drompa+.macspeak ' + build + ' ' + Ddir)
+        print_and_exec_shell(f'churros_visualize {param_churros_visualize} {chdir}/{build}/{args.macsdir}/samplepairlist.txt drompa+.macspeak {build} {Ddir}')
+
+#        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -P "--scale_tag 100" ' + str(samplepairlist) + ' drompa+.bin5M ' + build + ' ' + Ddir)
+        print_and_exec_shell(f'churros_visualize {param_churros_visualize} -b 5000 -l 8000 -P "--scale_tag 100" {samplepairlist} drompa+.bin5M {build} {Ddir}')
+
 
 
 if(__name__ == '__main__'):
