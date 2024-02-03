@@ -138,10 +138,11 @@ If the samples do not meet the criteria, the script will output a warning messag
 - Read complexity > 0.8: This value reflects the amount of nonredundant reads in the sample. The low value indicates that the sample is overamplified by the PCR from a small amount of initial DNA, resulting in many false positive peaks.
 
 - Genome coverage > 0.6: The fraction of the reference genome covered by at least one mapped read. The low value indicates that the whole genome is not well sequenced and observed. Possible reasons are insufficient read depth and insufficient DNA fragmentation.
+
    - The exception is RNA polII, which often causes low genome coverage due to its extremely high signal-to-noise ratio.
 
-- GC content > 60%: The GC content of the mapped reads. This value is typically ranges from 40% to 60%. The higher value indicates that
-the reads are derived from the GC-rich regions (i.e., open chromatin), possibly due to the bias of sonication and/or PCR amplification.
+- GC content > 60%: The GC content of the mapped reads. This value is typically ranges from 40% to 60%. The higher value indicates that the reads are derived from the GC-rich regions (i.e., open chromatin), possibly due to the bias of sonication and/or PCR amplification.
+
    - However, it is noted that the appropriate value depends on the species and the target of the analysis. For example, RNA polII and H3K4me3 are enriched in the GC-rich regions and show high GC levels, but this is normal.
 
 - SSP-NSC < 3.0 (sharp), and < 1.5 (broad): SSP-NSC indicates the signal-to-noise ratio of the sample. The low value indicates that the sample is not enriched in the target regions, resulting in small number of peaks.
