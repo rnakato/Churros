@@ -118,6 +118,21 @@ The mapped reads are then quality-checked and converted to BigWig files.
     - log/ ... log files
 
 
+checkQC.py: Quality check of the input samples
+--------------------------------------------------
+
+Quality check (QC) is an important step in verifying the reliability of the results obtained.
+From verion ``0.11.0``. **Churros** provides a script ``checkQC.py`` to check the quality of all input samples.
+
+.. code-block:: bash
+
+    build=hg38
+    checkQC.py Churros_result/$build/churros.QCstats.tsv samplepairlist.txt
+
+If the samples do not meet the criteria, the script will output a warning message.
+
+See `Nakato et al., Brief Bioinform. 2017 <https://academic.oup.com/bib/article/18/2/279/2453282>`_ and `Nakato et al., Bioinformatics 2018 <https://academic.oup.com/bioinformatics/article/34/14/2356/4924717>`_ for the detailed criteria.
+
 churros_callpeak: call peaks by MACS2
 --------------------------------------------------
 

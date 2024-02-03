@@ -526,11 +526,6 @@ Utility tools
 gen_samplelist.sh: create samplelist.txt
 --------------------------------------------------
 
-By specifying the direcoty of fastq files, ``gen_samplelist.sh`` generates ``samplelist.txt`` for ``churros``.
-
-.. code-block:: bash
-
-   $ ls fastq/                                                                                                         
    SRR227447.fastq.gz  SRR227552.fastq.gz  SRR227563.fastq.gz  SRR227575.fastq.gz  SRR227598.fastq.gz  SRR227639.fastq.gz
    SRR227448.fastq.gz  SRR227553.fastq.gz  SRR227564.fastq.gz  SRR227576.fastq.gz  SRR227599.fastq.gz  SRR227640.fastq.gz
    $ gen_samplelist.sh fastq > samplelist.txt
@@ -597,3 +592,17 @@ Please fill the label of Input samples.
 
 - Specify ``-n`` option when omitting input samples (outputs "none").
 - Specify ``-b`` option when the peak mode is "broad".
+
+
+checkQC.py: check the quality of the input ChIP-seq samples
+-----------------------------------------------------------------------------
+
+``checkQC.py`` takes ``churros.QCstats.tsv`` and ``samplepairlist.txt`` and prints warnings if the samples do not meet the quality criteria.
+
+.. code-block:: bash
+
+    checkQC.py churros.QCstats.tsv samplepairlist.txt
+    Example:
+       checkQC.py Churros_result/hg38/churros.QCstats.tsv samplepairlist.txt
+
+See `Nakato et al., Brief Bioinform. 2017 <https://academic.oup.com/bib/article/18/2/279/2453282>`_ and `Nakato et al., Bioinformatics 2018 <https://academic.oup.com/bioinformatics/article/34/14/2356/4924717>`_ for the detailed criteria.
