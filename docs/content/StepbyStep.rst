@@ -131,7 +131,7 @@ From verion ``0.11.0``. **Churros** provides a script ``checkQC.py`` to check th
 
 If the samples do not meet the criteria, the script will output a warning message.
 
-See the `checkQC.py: check the quality of the input ChIP-seq samples <https://churros.readthedocs.io/en/latest/content/Commands.html#id31>`_ page for the detailed criteria.
+See the `checkQC.py: check the quality of the input ChIP-seq samples <https://churros.readthedocs.io/en/latest/content/Commands.html#checkqc-py-check-the-quality-of-the-input-chip-seq-samples>`_ page for the detailed criteria.
 
 churros_callpeak: call peaks by MACS2
 --------------------------------------------------
