@@ -42,24 +42,25 @@ Tools installed in Churros
 The latest version of **Churros** uses the following tools internally.
 
 - Mapping
-   - Bowtie v1.3.1
-   - Bowtie2 v2.4.5
-   - BWA v0.7.17
-   - chromap v0.2.4
+   - `Bowtie <https://bowtie-bio.sourceforge.net/manual.shtml>`_ v1.3.1
+   - `Bowtie2 <https://bowtie-bio.sourceforge.net/bowtie2/index.shtml>`_ v2.5.3
+   - `BWA <https://bio-bwa.sourceforge.net/>`_ v0.7.17
+   - `chromap <https://github.com/haowenz/chromap>`_ v0.2.5
 
 - ChIP-seq analysis
-   - MACS2 v2.2.9.1
-   - DROMPA+ v1.18.1
-   - SSP v1.3.1
-   - ROSE v0.1
-   - ChromHMM v1.24
-   - ChromImpute v1.0.3
-   - epilogos v0.1.2
-   - STAR v1.0.4
+   - `MACS2 <https://github.com/macs3-project/MACS>`_ v2.2.9.1
+   - `DROMPA+ <https://drompaplus.readthedocs.io/en/latest/>`_ v1.18.1
+   - `ROSE <http://younglab.wi.mit.edu/super_enhancer_code.html>`_ v0.1
+   - `STARE <https://stare.readthedocs.io/en/latest/index.html>`_ v1.0.4
+   - `ChromImpute <https://ernstlab.biolchem.ucla.edu/ChromImpute/>`_ v1.0.5
+
+- Chromatin state analysis
+   - `ChromHMM <https://compbio.mit.edu/ChromHMM/>`_ v1.25
+   - `epilogos <https://epilogos.altius.org/>`_ v0.1.2
 
 - ATAC-seq analysis
-   - TOBIAS
-   - HINT-ATAC
+   - `TOBIAS <https://github.com/loosolab/TOBIAS>`_ v0.14.0
+   - `HINT-ATAC <https://reg-gen.readthedocs.io/en/latest/hint/introduction.html>`_
 
 - Bisulfite sequencing (DNA methylation)
    - `Bismark <https://github.com/FelixKrueger/Bismark>`_  v0.22.3
@@ -77,9 +78,10 @@ The latest version of **Churros** uses the following tools internally.
    - `motifbreakR <https://bioconductor.org/packages/release/bioc/html/motifbreakR.html>`_ v2.14.2
 
 - Quality assessment
-   - FastQC v0.11.9
-   - fastp v0.23.2
-   - MultiQC v1.12
+   - `FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`_ v0.11.9
+   - `fastp <https://github.com/OpenGene/fastp>`_ v0.23.2
+   - `MultiQC <https://multiqc.info/>`_ v1.12
+   - `SSP <https://github.com/rnakato/SSP>`_ v1.3.1
 
 - File processing
    - `SAMtools <http://www.htslib.org/>`_ v1.19.2

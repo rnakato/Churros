@@ -3,6 +3,12 @@
 ## 0.11.0 (2024-2-3)
 - Added `checkQC.py` for checking the quality of the input ChIP-seq samples
     - `checkQC.py` outputs the warnings in `Churros_result/<build>/QCcheck.log` if the samples do not meet the quality criteria.
+- Installed `sudo`
+- Updated Miniconda from Python 3.9 to Python 3.10
+- Updated Bowtie2 from v2.4.5 to v2.5.3
+- Updated chromap from v0.2.4 to v0.2.5
+- Updated ChromHMM from v1.24 to v1.25
+- Updated ChromImpute from v1.0.3 to v1.0.5
 
 ## 0.10.9 (2024-1-30)
 - Added [STARE](https://stare.readthedocs.io/en/latest/index.html) for enhancer-promoter analysis

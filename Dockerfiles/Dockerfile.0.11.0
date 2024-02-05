@@ -1,5 +1,5 @@
 ### Churros: Docker image for ChIP-seq analysis
-FROM rnakato/mapping:2024.01
+FROM rnakato/mapping:2024.02
 LABEL maintainer "Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>"
 
 WORKDIR /opt
@@ -14,6 +14,7 @@ RUN apt-get update \
         libcurl4-gnutls-dev \
         lld \
         lldb \
+        libglpk-dev \
         libgtkmm-3.0-dev \
         libgzstream0 \
         libgzstream-dev \
@@ -35,23 +36,6 @@ RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeke
                                 'TxDb.Hsapiens.UCSC.hg38.knownGene', 'TxDb.Hsapiens.UCSC.hg19.knownGene', 'TxDb.Hsapiens.UCSC.mm39.knownGene', 'TxDb.Hsapiens.UCSC.mm10.knownGene'))" \
     && R -e "install.packages(c('snow', 'snowfall', 'bitops', 'caTools', 'VennDiagram'))"
 
-# ChromHMM v1.23, ChromImpute v1.0.3
-COPY ChromHMM.jar /opt/bin/ChromHMM.jar
-COPY ChromImpute.jar /opt/bin/ChromImpute.jar
-
-# Bismark v0.22.3
-COPY Bismark.0.22.3.tar.gz Bismark.0.22.3.tar.gz
-RUN tar zxvf Bismark.0.22.3.tar.gz \
-    && rm Bismark.0.22.3.tar.gz
-
-# fastp
-COPY fastp /opt/bin/fastp
-
-# TrimGalore v0.6.7
-COPY TrimGalore-0.6.7.tar.gz TrimGalore-0.6.7.tar.gz
-RUN tar zxvf TrimGalore-0.6.7.tar.gz \
-    && rm TrimGalore-0.6.7.tar.gz
-
 # HOMER v4.11
 RUN mkdir HOMER && cd HOMER \
     && mkdir bin cpp update \
@@ -71,6 +55,23 @@ RUN mkdir HOMER && cd HOMER \
     && perl configureHomer.pl -install galGal6 \
     && perl configureHomer.pl -install danRer11
 
+# ChromHMM & ChromImpute
+COPY ChromHMM.jar /opt/bin/ChromHMM.jar
+COPY ChromImpute.jar /opt/bin/ChromImpute.jar
+
+# Bismark v0.22.3
+COPY Bismark.0.22.3.tar.gz Bismark.0.22.3.tar.gz
+RUN tar zxvf Bismark.0.22.3.tar.gz \
+    && rm Bismark.0.22.3.tar.gz
+
+# fastp
+COPY fastp /opt/bin/fastp
+
+# TrimGalore v0.6.7
+COPY TrimGalore-0.6.7.tar.gz TrimGalore-0.6.7.tar.gz
+RUN tar zxvf TrimGalore-0.6.7.tar.gz \
+    && rm TrimGalore-0.6.7.tar.gz
+
 # STITCHIT
 RUN git clone https://github.com/SchulzLab/STITCHIT.git \
     && mkdir -p STITCHIT/build \
@@ -85,8 +86,10 @@ RUN git clone --recursive https://github.com/rnakato/DROMPAplus \
     && make
 
 # Python (MultiQC, deepTools, intervene, TOBIAS, genmap, sambamba)
+# Fix Error while loading conda entry point: conda-libmamba-solver (libarchive.so.19: cannot open shared object file: No such file or directory)
+# https://stackoverflow.com/questions/77617946/solve-conda-libmamba-solver-libarchive-so-19-error-after-updating-conda-to-23
 RUN conda install -y -c bioconda genmap sambamba \
-    && pip install --no-cache-dir epilogos multiqc intervene argh deeptools tobias cutadapt threadpoolctl==3.1.0 
+    && pip install --no-cache-dir epilogos multiqc intervene argh deeptools tobias cutadapt threadpoolctl==3.1.0
 
 # STARE: https://stare.readthedocs.io/en/latest/index.html
 RUN git clone https://github.com/SchulzLab/STARE.git \
@@ -101,7 +104,6 @@ RUN git clone https://github.com/SchulzLab/STARE.git \
 #    && conda install sneep -c bioconda \
 #    && pip install --no-cache-dir session-info \
 #    && conda deactivate
-
 
 # scripts
 ENV CDIR Churros
