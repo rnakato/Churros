@@ -29,7 +29,9 @@ With this command you can build the singularity file (.sif) of Churros:
 
    singularity build churros.sif docker://rnakato/churros
 
-Instead, you can download the Churros singularity image from our [Dropbox](https://www.dropbox.com/scl/fo/lptb68dirr9wcncy77wsv/h?rlkey=whhcaxuvxd1cz4fqoeyzy63bf&dl=0) (We use singularity version 3.8.5).
+Instead, you can download the Churros singularity image from our `Dropbox <https://www.dropbox.com/scl/fo/lptb68dirr9wcncy77wsv/h?rlkey=whhcaxuvxd1cz4fqoeyzy63bf&dl=0>`_ (We use singularity version 3.8.5).
+
+Then you can run Churros with the command:
 
 .. code-block:: bash
 
