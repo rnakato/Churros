@@ -11,23 +11,35 @@ See [Changelog](https://github.com/rnakato/Churros/blob/main/ChangeLog.md)
 Docker image is available at [DockerHub](https://hub.docker.com/r/rnakato/churros).
 
 ### 1.1 Docker
-To use docker command, type:
 
+To use the docker command, type:
+
+    # Pull docker image
     docker pull rnakato/churros
-    docker run -it --rm rnakato/churros <command>
 
+    # Container login
+    docker run --rm -it rnakato/churros /bin/bash
+    # Execute a command
+    docker run -it --rm rnakato/churros <command>
+    
 ### 1.2 Singularity
 
-Singularity can also be used to execute the docker image:
+Singularity is the alternative way to use the docker image.
+With this command you can build the singularity file (.sif) of Churros:
 
     singularity build churros.sif docker://rnakato/churros
+
+Instead, you can download the CustardPy singularity image from our [Dropbox](https://www.dropbox.com/scl/fo/lptb68dirr9wcncy77wsv/h?rlkey=whhcaxuvxd1cz4fqoeyzy63bf&dl=0) (We use singularity version 3.8.5).
+
+Then you can run RumBall with the command:
+
     singularity exec churros.sif <command>
 
-Singularity mounts the current directory automatically. If you access the files in the other directory, mount it by `--bind` option:
+Singularity will automatically mount the current directory. If you want to access the files in the other directory, use the `--bind` option, for instance:
 
     singularity exec --bind /work churros.sif <command>
 
-This command mounts `/work` directory.
+This command mounts the `/work` directory.
 
 ## 2. Quickstart
 
