@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.11.1 (2024-2-21)
+- Install MS core fonts (ttf-mscorefonts-installer)
+
 ## 0.11.0 (2024-2-3)
 - Added `checkQC.py` for checking the quality of the input ChIP-seq samples
     - `checkQC.py` outputs the warnings in `Churros_result/<build>/QCcheck.log` if the samples do not meet the quality criteria.

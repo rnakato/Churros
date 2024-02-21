@@ -1,5 +1,5 @@
 ### Churros: Docker image for ChIP-seq analysis
-FROM rnakato/mapping:2024.02
+FROM rnakato/mapping:2024.02.2
 LABEL maintainer "Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>"
 
 WORKDIR /opt
@@ -40,20 +40,20 @@ RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeke
 RUN mkdir HOMER && cd HOMER \
     && mkdir bin cpp update \
     && wget http://homer.ucsd.edu/homer/configureHomer.pl \
-    && perl configureHomer.pl -install \
-    && perl configureHomer.pl -install human-o \
-    && perl configureHomer.pl -install human-p \
-    && perl configureHomer.pl -install mouse-o \
-    && perl configureHomer.pl -install mouse-p \
-    && perl configureHomer.pl -install zebrafish-o \
-    && perl configureHomer.pl -install yeast-o \
-    && perl configureHomer.pl -install hg19 \
-    && perl configureHomer.pl -install hg38 \
-    && perl configureHomer.pl -install mm10 \
-    && perl configureHomer.pl -install sacCer3 \
-    && perl configureHomer.pl -install dm6 \
-    && perl configureHomer.pl -install galGal6 \
-    && perl configureHomer.pl -install danRer11
+    && perl configureHomer.pl -install >& /dev/null \
+    && perl configureHomer.pl -install human-o >& /dev/null \
+    && perl configureHomer.pl -install human-p >& /dev/null \
+    && perl configureHomer.pl -install mouse-o >& /dev/null \
+    && perl configureHomer.pl -install mouse-p >& /dev/null \
+    && perl configureHomer.pl -install zebrafish-o >& /dev/null \
+    && perl configureHomer.pl -install yeast-o >& /dev/null \
+    && perl configureHomer.pl -install hg19 >& /dev/null \
+    && perl configureHomer.pl -install hg38 >& /dev/null \
+    && perl configureHomer.pl -install mm10 >& /dev/null \
+    && perl configureHomer.pl -install sacCer3 >& /dev/null \
+    && perl configureHomer.pl -install dm6 >& /dev/null \
+    && perl configureHomer.pl -install galGal6 >& /dev/null \
+    && perl configureHomer.pl -install danRer11 >& /dev/null 
 
 # ChromHMM & ChromImpute
 COPY ChromHMM.jar /opt/bin/ChromHMM.jar
