@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.0 (2024-2-25)
+- Added [Cobind](https://cobind.readthedocs.io/en/latest/index.html) for evaluating overlap of peaks
+- Fixed a bug in `churros_mapping` where the `-n` option was not recognized.
+
 ## 0.11.1 (2024-2-21)
 - Install MS core fonts (ttf-mscorefonts-installer)
 

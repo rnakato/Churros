@@ -45,7 +45,7 @@ ncore=12
 csfasta=0
 chdir="Churros_result"
 
-while getopts cCb:z:a:k:f:P:p:D: option
+while getopts cCb:z:na:k:f:P:p:D: option
 do
     case ${option} in
         c) format=CRAM
