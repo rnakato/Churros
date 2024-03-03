@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.1 (2024-3-3)
+  - Fixed a bug in `download_genomedata.sh` that did not download the genome data correctly.
+  - Install MS core fonts (ttf-mscorefonts-installer)
+
 ## 0.12.0 (2024-2-25)
 - Added [Cobind](https://cobind.readthedocs.io/en/latest/index.html) for evaluating overlap of peaks
 - Fixed a bug in `churros_mapping` where the `-n` option was not recognized.
