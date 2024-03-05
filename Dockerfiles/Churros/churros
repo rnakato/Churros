@@ -105,36 +105,19 @@ def do_fastqc(chdir, build, samplelist):
 
 def do_mapping(args, samplelist, post, build, chdir):
     if args.nompbl:
-#        param_churros_mapping = "-D " + chdir + " -k " + str(args.k) + " -p " + str(args.threads) + " -n"
         param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} -n"
     else:
-#        param_churros_mapping = "-D " + chdir + " -k " + str(args.k) + " -p " + str(args.threads)
         param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads}"
 
-#    print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' exec ' + str(samplelist) + ' ' + build + ' ' + args.Ddir)
     print_and_exec_shell(f'churros_mapping {param_churros_mapping} exec {samplelist} {build} {args.Ddir}')
 
     # stats
-    qcstatsfile = '{chdir}/{build}/churros.QCstats.tsv'
-#    os.system('churros_mapping ' + param_churros_mapping + ' header > ' + chdir + '/' + build + '/churros.QCstats.tsv')
+    qcstatsfile = f'{chdir}/{build}/churros.QCstats.tsv'
     os.system(f'churros_mapping {param_churros_mapping} header > {qcstatsfile}')
-#    os.system('churros_mapping ' + param_churros_mapping + ' stats ' + str(samplelist) + ' ' + build + ' ' + args.Ddir + ' >> ' + chdir + '/' + build + '/churros.QCstats.tsv')
     os.system(f'churros_mapping {param_churros_mapping} stats {samplelist} {build} {args.Ddir} >> {qcstatsfile}')
-
-
-def old_do_mapping(args, samplelist, post, build, chdir):
-    if args.nompbl:
-        param_churros_mapping = "-D " + chdir + " -k " + str(args.k) + " -p " + str(args.threads) + " -n"
-    else:
-        param_churros_mapping = "-D " + chdir + " -k " + str(args.k) + " -p " + str(args.threads)
-
-    print_and_exec_shell('churros_mapping ' + param_churros_mapping + ' exec ' + str(samplelist) + ' ' + build + ' ' + args.Ddir)
-
-    # header
-    os.system('churros_mapping ' + param_churros_mapping + ' header > ' + chdir + '/' + build + '/churros.QCstats.tsv')
-
-    # stats
-    os.system('churros_mapping ' + param_churros_mapping + ' stats ' + str(samplelist) + ' ' + build + ' ' + args.Ddir + ' >> ' + chdir + '/' + build + '/churros.QCstats.tsv')
+    # convert to xlsx
+    os.system(f'churros_mapping {param_churros_mapping} stats {samplelist} {build} {args.Ddir} >> {qcstatsfile}')
+    os.system(f'csv2xlsx.pl -i {qcstatsfile} -o {chdir}/{build}/churros.QCstats.xlsx')
 
 
 def make_samplepairlist_withflen(samplepairlist, post, build, chdir):

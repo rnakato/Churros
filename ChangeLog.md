@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.12.2 (2024-3-5)
+  - Fixed a bug in `churros` that did not output the mapping statistics file properly.
+
 ## 0.12.1 (2024-3-3)
   - Fixed a bug in `download_genomedata.sh` that did not download the genome data correctly.
   - Install MS core fonts (ttf-mscorefonts-installer)
