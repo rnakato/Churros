@@ -70,7 +70,6 @@ The latest version of **Churros** uses the following tools internally.
 - ATAC-seq analysis
    - `ATACseqQC <https://bioconductor.org/packages/release/bioc/html/ATACseqQC.html>`_ v1.26.0
    - `TOBIAS <https://github.com/loosolab/TOBIAS>`_ v0.14.0
-   - `HINT-ATAC <https://reg-gen.readthedocs.io/en/latest/hint/introduction.html>`_
 
 - Bisulfite sequencing (DNA methylation)
    - `Bismark <https://github.com/FelixKrueger/Bismark>`_  v0.22.3

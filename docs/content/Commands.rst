@@ -47,6 +47,7 @@ The ``<odir>`` is used in the **Churros** commands below.
         Example:
             build-index.sh bowtie2 Referencedata_hg38
 
+
 Commands internally used in churros
 ++++++++++++++++++++++++++++++++++++++++++
 
@@ -59,38 +60,43 @@ churros
 
 .. code-block:: bash
 
-   usage: churros [-h] [--cram] [-f] [-b BINSIZE] [--nompbl] [--nofastqc] [-q QVAL] [--macsdir MACSDIR] [--mapparam MAPPARAM] [-p THREADS]
-               [--threads_comparative THREADS_COMPARATIVE] [--outputpvalue] [--comparative] [-D OUTPUTDIR] [--preset PRESET] [-v]
-               samplelist samplepairlist build Ddir
+   usage: churros [-h] [--cram] [-f] [-b BINSIZE] [-k K] [--nompbl] [--nofilter] [--noqc] [--fastqtrimming] [-q QVAL] [--macsdir MACSDIR]
+                  [--mapparam MAPPARAM] [--parse2wigparam PARSE2WIGPARAM] [-p THREADS] [--threads_comparative THREADS_COMPARATIVE]
+                  [--outputpvalue] [--comparative] [-D OUTPUTDIR] [--preset PRESET] [-v]
+                  samplelist samplepairlist build Ddir
 
    positional arguments:
-     samplelist            sample list
-     samplepairlist        ChIP/Input pair list
-     build                 genome build (e.g., hg38)
-     Ddir                  directory of reference data
+      samplelist            sample list
+      samplepairlist        ChIP/Input pair list
+      build                 genome build (e.g., hg38)
+      Ddir                  directory of reference data
 
-   optional arguments:
-     -h, --help            show this help message and exit
-     --cram                output as CRAM format (default: BAM)
-     -f, --force           overwrite if the output directory already exists
-     -b BINSIZE, --binsize BINSIZE
-                           binsize of parse2wig+ (default: 100)
-     -k K                  read length for mappability file ([28|36|50], default:50)
-     --nompbl              do not consider genome mappability in drompa+
-     --nofastqc            omit FASTQC
-     -q QVAL, --qval QVAL  threshould of MACS2 (default: 0.05)
-     --macsdir MACSDIR     output direcoty of macs2 (default: 'macs2')
-     --mapparam MAPPARAM   parameter of bowtie|bowtie2 (shouled be quated)
-     -p THREADS, --threads THREADS
-                           number of CPUs (default: 12)
-     --threads_comparative THREADS_COMPARATIVE
-                           number of CPUs for --comparative option (default: 8)
-     --outputpvalue        output ChIP/Input -log(p) distribution as a begraph format
-     --comparative         compare bigWigs and peaks among samples by churros_compare
-     -D OUTPUTDIR, --outputdir OUTPUTDIR
-                           output directory (default: 'Churros_result')
-     --preset PRESET       Preset parameters for mapping reads ([scer|T2T])
-     -v, --version         print version information and quit
+   options:
+      -h, --help            show this help message and exit
+      --cram                output as CRAM format (default: BAM)
+      -f, --force           overwrite if the output directory already exists
+      -b BINSIZE, --binsize BINSIZE
+                              binsize of parse2wig+ (default: 100)
+      -k K                  read length for mappability file ([28|36|50], default:50)
+      --nompbl              do not consider genome mappability in drompa+
+      --nofilter            do not filter PCR duplicate
+      --noqc                omit FASTQC and fastp
+      --fastqtrimming       Apply adapter trimming with fastp before mapping (omitted if '--noqc' is specified)
+      -q QVAL, --qval QVAL  threshould of MACS2 (default: 0.05)
+      --macsdir MACSDIR     output direcoty of macs2 (default: 'macs2')
+      --mapparam MAPPARAM   additional parameter for bowtie|bowtie2 (shouled be quated)
+      --parse2wigparam PARSE2WIGPARAM
+                              additional parameter for parse2wig+ (shouled be quated)
+      -p THREADS, --threads THREADS
+                              number of CPUs (default: 12)
+      --threads_comparative THREADS_COMPARATIVE
+                              number of CPUs for --comparative option (default: 8)
+      --outputpvalue        output ChIP/Input -log(p) distribution as a begraph format
+      --comparative         compare bigWigs and peaks among samples by churros_compare
+      -D OUTPUTDIR, --outputdir OUTPUTDIR
+                              output directory (default: 'Churros_result')
+      --preset PRESET       Preset parameters for mapping reads ([scer|T2T])
+      -v, --version         print version information and quit
 
 - Key points:
    - We recommend considering genome mappability as long as mappability files are available. 
@@ -118,36 +124,37 @@ The mapped reads are then quality-checked and converted to BigWig files.
 
 .. code-block:: bash
 
-    churros_mapping [options] <command> <fastq> <prefix> <build> <Ddir>
-       <command>:
-          exec: map + postprocess
-          map: mapping reads
-          postprocess: QC and generate wig files by ssp and parse2wig;
-          stats: show mapping/QC stats;
-          header: print header line of the stats
-       <fastq>: fastq file
-       <prefix>: output prefix
-       <build>: genome build (e.g., hg38)
-       <Ddir>: directory of bowtie|bowtie2 index
-       Options:
-          -c: output as CRAM format (defalt: BAM)
-          -b: binsize of parse2wig+ (defalt: 100)
-          -z: peak file for FRiP calculation (BED format, default: default MACS2 without control)
-          -m: consider genome mappability in parse2wig+
-          -k [28|36|50]: read length for mappability file (default:50)
-          -n: do not consider genome mappability
-          -C: for SOLiD data (csfastq, defalt: fastq)
-          -f: output format of parse2wig+ (default: 3)
-                   0: compressed wig (.wig.gz)
-                   1: uncompressed wig (.wig)
-                   2: bedGraph (.bedGraph)
-                   3: bigWig (.bw)
-          -P "param": parameter of bowtie|bowtie2 (shouled be quated)
-          -p: number of CPUs (default: 12)
-          -D: directory for execution (defalt: "Churros_result")
-       Example:
-          For single-end: churros_mapping exec chip.fastq.gz chip hg38 Referencedata_hg38
-          For paired-end: churros_mapping exec "-1 chip_1.fastq.gz -2 chip_2.fastq.gz" chip hg38 Referencedata_hg38
+   churros_mapping [options] <command> <samplelist> <build> <Ddir>
+      <command>:
+         exec: map & postprocess
+         map: mapping reads
+         postprocess: QC and generate wig files by ssp and parse2wig;
+         stats: show mapping/QC stats;
+         header: print header line of the stats
+      <fastq>: fastq file
+      <prefix>: output prefix
+      <build>: genome build (e.g., hg38)
+      <Ddir>: directory of bowtie|bowtie2 index
+      Options:
+         -c: output as CRAM format (defalt: BAM)
+         -b: binsize of parse2wig+ (defalt: 100)
+         -z: peak file for FRiP calculation (BED format, default: default MACS2 without control)
+         -k [28|36|50]: read length for mappability file (default:50)
+         -n: do not consider genome mappability
+         -N: do not filter PCR duplication
+         -C: for SOLiD data (csfastq, defalt: fastq)
+         -f: output format of parse2wig+ (default: 3)
+                  0: compressed wig (.wig.gz)
+                  1: uncompressed wig (.wig)
+                  2: bedGraph (.bedGraph)
+                  3: bigWig (.bw)
+         -P "param": additional parameter for bowtie|bowtie2 (shouled be quated)
+         -Q "param": additional parameter for parse2wig+ (shouled be quated)
+         -p: number of CPUs (default: 12)
+         -D: directory for execution (defalt: "Churros_result")
+      Example:
+         For single-end: churros_mapping exec chip.fastq.gz chip hg38 Referencedata_hg38
+         For paired-end: churros_mapping exec "-1 chip_1.fastq.gz -2 chip_2.fastq.gz" chip hg38 Referencedata_hg38
 
 - Key points:
    - There are two directories in ``bigWig`` directory, ``RawCount`` and ``TotalReadNormalized``. The former is a raw count of nonredundant mapped reads, while the latter stores the read number after total read normalization to 20 M. 
@@ -167,11 +174,12 @@ The results are output in ``macs`` directory by default.
       <build>: genome build (e.g., hg38)
       Options:
          -D : directory for execution (defalt: "Churros_result")
+         -d : directory for peaks (defalt: "macs")
          -q : threshould of MACS2 (defalt: 0.05)
          -b : bam direcoty (defalt: "bam")
-         -d : output direcoty (defalt: "macs")
          -F : overwrite MACS2 resilts if exist (defalt: skip)
          -p : number of CPUs (defalt: 4)
+         -s : postfix of the mapfile ($prefix$post.sort.bam, default: "")
 
 
 churros_visualize
@@ -182,40 +190,40 @@ The results are output in ``pdf`` directory by default.
 
 .. code-block:: bash
 
-   usage: churros_visualize [-h] [-b BINSIZE] [-l LINESIZE] [--nompbl] [-d D] [--postfix POSTFIX] [--pvalue] [--bowtie1] [-P DROMPAPARAM] [-G] [--enrich]
-                         [--logratio] [--preset PRESET] [-D OUTPUTDIR]
-                         samplepairlist prefix build Ddir
+   usage: churros_visualize [-h] [-b BINSIZE] [-l LINESIZE] [--nompbl] [--nofilter] [-d D] [--postfix POSTFIX] [--pvalue] [--bowtie1]
+                           [-P DROMPAPARAM] [-G] [--enrich] [--logratio] [--preset PRESET] [-D OUTPUTDIR]
+                           samplepairlist prefix build Ddir
 
    positional arguments:
-     samplepairlist        ChIP/Input pair list
-     prefix                output prefix (directory will be omitted)
-     build                 genome build (e.g., hg38)
-     Ddir                  directory of reference data
+   samplepairlist        ChIP/Input pair list
+   prefix                Output prefix (directory will be omitted)
+   build                 Genome build (e.g., hg38)
+   Ddir                  Directory of reference data
 
-   optional arguments:
-     -h, --help            show this help message and exit
-     -b BINSIZE, --binsize BINSIZE
-                           binsize of parse2wig+ (default: 100)
-     -l LINESIZE, --linesize LINESIZE
-                           line size for each page (kbp, defalt: 1000)
-     --nompbl              do not consider genome mappability
-     -d D                  directory of bigWig files (default: 'TotalReadNormalized/')
-     --postfix POSTFIX     param string of parse2wig+ files to be used (default: '.mpbl')
-     --pvalue              show p-value distribution instead of read distribution
-     --bowtie1             specified bowtie1
-     -P DROMPAPARAM, --drompaparam DROMPAPARAM
-                           additional parameters for DROMPA+ (shouled be quated)
-     -G                    genome-wide view (100kbp)
-     --enrich              PC_ENRICH: show ChIP/Input ratio (preferred for yeast)
-     --logratio            (for PC_ENRICH) show log-scaled ChIP/Input ratio
-     --preset PRESET       Preset parameters for mapping reads ([scer|T2T])
-     -D OUTPUTDIR, --outputdir OUTPUTDIR
-                           output directory (default: 'Churros_result')
-
+   options:
+   -h, --help            show this help message and exit
+   -b BINSIZE, --binsize BINSIZE
+                           Binsize of parse2wig+ (default: 100)
+   -l LINESIZE, --linesize LINESIZE
+                           Line size for each page (kbp, defalt: 1000)
+   --nompbl              Do not consider genome mappability
+   --nofilter            Use data where PCR duplication is not filtered
+   -d D                  Directory of bigWig files (default: 'TotalReadNormalized/')
+   --postfix POSTFIX     Parameter string of parse2wig+ files to be used (default: '.mpbl')
+   --pvalue              Show p-value distribution instead of read distribution
+   --bowtie1             Specified bowtie1
+   -P DROMPAPARAM, --drompaparam DROMPAPARAM
+                           Additional parameters for DROMPA+ (shouled be quated)
+   -G                    Genome-wide view (100kbp)
+   --enrich              PC_ENRICH: show ChIP/Input ratio (preferred for yeast)
+   --logratio            (for PC_ENRICH) Show log-scaled ChIP/Input ratio
+   --preset PRESET       Preset parameters for mapping reads ([scer|T2T])
+   -D OUTPUTDIR, --outputdir OUTPUTDIR
+                           Output directory (default: 'Churros_result')
 
 .. note::
 
-   If you supply ``-n`` option in ``churros_mapping`` (do not consider genome mappability), supply ``--nompbl`` optoon in ``churros_visualize`` to use the generated mappability-normalized bigWig files.
+   If you supply ``-n`` option in ``churros_mapping`` (do not consider genome mappability), supply ``--nompbl`` option in ``churros_visualize`` to use the generated mappability-normalized bigWig files.
 
 - Key points:
    - The default setting (100-bp bin and 1-Mbp page width) is adjusted to typical transcription factor analysis for human/mouse.
@@ -264,6 +272,7 @@ churros_compare
 
    If the number of samples is large (50~) and/or the number of peaks of each sample is large (100k~), the comparison will require a long time. In such a case, consider supplying a large number for ``-p``, though that will require a large memory size.
 
+
 churros_genPvalwig
 ----------------------------------------
 
@@ -290,6 +299,45 @@ The good usage of ``churros_genPvalwig`` is specifying ChIP files in two conditi
 .. note::
 
    If you supply ``-n`` option in ``churros_mapping`` (do not consider genome mappability), supply ``--nompbl`` optoon in ``churros_visualize`` to use the generated mappability-normalized bigWig files.
+
+
+churros_classheat
+-------------------------------------------------------
+
+**Churros** provides a ``classheat`` function for clustering and visualizing large-scale epigenomic profiles.
+This function takes regions of interest (e.g., specific protein binding sites) as input 1 and a folder of epigenomic signal files (either binary or continuous) as input 2.
+
+    - In the binary mode, ``classheat`` outputs a binary matrix (output 1) representing the overlap of epigenomic markers at given genomic regions. The binary matrix is then formatted and sorted by the user-defined column (i.e., the filename of the selected marker) to generate the processed matrix (output 2) and plot the sorted heatmap (output 3). Subsequently, ``classheat`` utilizes PCA followed by k-means clustering  (or other clustering methods) to produce the clustered matrix (output 4) and the clustered heatmap (output 5).
+    - In the continuous mode, ``classheat`` calculates the averaged read density of each epigenomic marker at given genomic regions (output 1). After logarithmic transformation, z-score normalization (optional method is 0-to-1 scaling), and sorting, ``classheat`` generates the remaining outputs in the same manner as in binary mode.
+
+.. code-block:: bash
+
+   churros_classheat mode region directory [-k kcluster] [-s sortname] [-l samplelabel] [-n normalize type] [-m cluster method]
+
+Example usage of binary mode:
+
+.. code-block:: bash
+
+   churros_classheat -l samplelabel.tsv binary Rad21_ENCSR000BTQ_rep1_peaks.narrowPeak ./peakdir/
+
+This command takes as input a file representing regions of interest (``Rad21_ENCSR000BTQ_rep1_peaks.narrowPeak``) and a directory  (``./peakdir/``) containing multiple epigenomic signals.
+We also assigned labels to the files in the ``./peakdir/`` directory.
+Five output files are generated:
+
+.. code-block:: bash
+
+   Output1_raw_matrix.tsv
+   Output2_sorted_matrix.tsv
+   Output3_sorted_heatmap.png
+   Output4_kmeans_matrix.tsv
+   Output5_kmeans_heatmap.png
+
+Example usage of continuous mode:
+
+.. code-block:: bash
+
+   churros_classheat -l samplelabel.tsv -s GATA3_ENCSR000EWV_rep1.bw -k 3 -n zscore continuous Rad21_ENCSR000BTQ_rep1_peaks.narrowPeak ./bwdir/
+
 
 
 Commands internally used in churros_mapping
@@ -325,18 +373,18 @@ bowtie2.sh
 
 .. code-block:: bash
 
-    bowtie2.sh [Options] <fastq> <prefix> <Ddir>
-       <fastq>: fastq file
-       <prefix>: output prefix
-       <Ddir>: directory of bowtie2 index
-       Options:
-          -c: output as CRAM format (defalt: BAM)
-          -p: number of CPUs (default: 12)
-          -P "bowtie2 param": parameter of bowtie2 (shouled be quated)
-          -D: output dir (defalt: ./)
-       Example:
-          For single-end: bowtie2.sh -p "--very-sensitive" chip.fastq.gz chip Referencedata_hg38
-          For paired-end: bowtie2.sh "\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz" chip Referencedata_hg38
+   bowtie2.sh [Options] <fastq> <prefix> <Ddir>
+      <fastq>: fastq file
+      <prefix>: output prefix
+      <Ddir>: directory of bowtie2 index
+      Options:
+         -c: output as CRAM format (defalt: BAM)
+         -p: number of CPUs (default: 12)
+         -P "bowtie2 param": parameter of bowtie2 (shouled be quated)
+         -D: output dir (defalt: ./)
+      Example:
+         For single-end: bowtie2.sh -p "--very-sensitive" chip.fastq.gz chip Referencedata_hg38
+         For paired-end: bowtie2.sh "\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz" chip Referencedata_hg38
 
 
 parse2wig+.sh
@@ -361,18 +409,21 @@ When ``-m`` option is supplied, ``parse2wig+.sh`` also normalizes the read based
          -k: read length for mappability calculation ([28|36|50], default: 50)
          -p: for paired-end file
          -t: number of CPUs (default: 4)
+         -n: do not filter PCR duplication
          -o: output directory (default: parse2wigdir+)
          -s: stats directory (default: log/parse2wig+)
          -f: output format of parse2wig+ (default: 3)
-               0: compressed wig (.wig.gz)
-               1: uncompressed wig (.wig)
-               2: bedGraph (.bedGraph)
-               3: bigWig (.bw)
+                  0: compressed wig (.wig.gz)
+                  1: uncompressed wig (.wig)
+                  2: bedGraph (.bedGraph)
+                  3: bigWig (.bw)
          -D outputdir: output dir (defalt: ./)
          -F: overwrite files if exist (defalt: skip)
+         -P: other options (should be quoted, see the help of parse2wig+ for the detail)
       Example:
          For single-end: parse2wig+.sh chip.sort.bam chip hg38 Referencedata_hg38
          For paired-end: parse2wig+.sh -p chip.sort.bam chip hg38 Referencedata_hg38
+
 
 Commands internally used in churros_callpeak
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -453,43 +504,6 @@ chromImpute.sh
 
 You can use chromImpute using ``chromImpute.sh <command>``, e.g., ``chromImpute.sh Convert``.
 See the `chromImpute website <https://ernstlab.biolchem.ucla.edu/ChromImpute/>`_ for the detail.
-
-churros_classheat
--------------------------------------------------------
-
-**Churros** provides a ``classheat`` function for clustering and visualizing large-scale epigenomic profiles.
-This function takes regions of interest (e.g., specific protein binding sites) as input 1 and a folder of epigenomic signal files (either binary or continuous) as input 2. 
-
-    - In the binary mode, ``classheat`` outputs a binary matrix (output 1) representing the overlap of epigenomic markers at given genomic regions. The binary matrix is then formatted and sorted by the user-defined column (i.e., the filename of the selected marker) to generate the processed matrix (output 2) and plot the sorted heatmap (output 3). Subsequently, ``classheat`` utilizes PCA followed by k-means clustering  (or other clustering methods) to produce the clustered matrix (output 4) and the clustered heatmap (output 5).
-    - In the continuous mode, ``classheat`` calculates the averaged read density of each epigenomic marker at given genomic regions (output 1). After logarithmic transformation, z-score normalization (optional method is 0-to-1 scaling), and sorting, ``classheat`` generates the remaining outputs in the same manner as in binary mode.
-
-.. code-block:: bash
-
-   churros_classheat mode region directory [-k kcluster] [-s sortname] [-l samplelabel] [-n normalize type] [-m cluster method]
-
-Example usage of binary mode:
-
-.. code-block:: bash
-
-   churros_classheat -l samplelabel.tsv binary Rad21_ENCSR000BTQ_rep1_peaks.narrowPeak ./peakdir/
-
-This command takes as input a file representing regions of interest (``Rad21_ENCSR000BTQ_rep1_peaks.narrowPeak``) and a directory  (``./peakdir/``) containing multiple epigenomic signals.
-We also assigned labels to the files in the ``./peakdir/`` directory.
-Five output files are generated:
-
-.. code-block:: bash
-
-   Output1_raw_matrix.tsv
-   Output2_sorted_matrix.tsv
-   Output3_sorted_heatmap.png
-   Output4_kmeans_matrix.tsv
-   Output5_kmeans_heatmap.png
-
-Example usage of continuous mode:
-
-.. code-block:: bash
-
-   churros_classheat -l samplelabel.tsv -s GATA3_ENCSR000EWV_rep1.bw -k 3 -n zscore continuous Rad21_ENCSR000BTQ_rep1_peaks.narrowPeak ./bwdir/
 
 
 Tools for DNA methylation analysis
