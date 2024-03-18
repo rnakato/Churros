@@ -1,5 +1,5 @@
 ### Churros: Docker image for ChIP-seq analysis
-FROM rnakato/mapping:2024.03 as base
+FROM rnakato/mapping:2024.03.2 as base
 LABEL maintainer "Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>"
 
 WORKDIR /opt
@@ -32,28 +32,24 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/list
 
 # R packages
-RUN R -e "BiocManager::install(c('edgeR', 'DESeq2', 'preprocessCore', 'ChIPseeker', 'Rsamtools', 'rGREAT', 'similaRpeak', 'metagene', 'Imetagene', 'clusterProfiler', 'motifbreakR', \
-                                'TxDb.Hsapiens.UCSC.hg38.knownGene', 'TxDb.Hsapiens.UCSC.hg19.knownGene', 'TxDb.Hsapiens.UCSC.mm39.knownGene', 'TxDb.Hsapiens.UCSC.mm10.knownGene'))" \
+RUN R -e "BiocManager::install(c('ATACseqQC', \
+                                 'ChIPseeker', \
+                                 'clusterProfiler', \
+                                 'DESeq2', \
+                                 'edgeR', \
+                                 'Imetagene', \
+                                 'metagene', \
+                                 'motifbreakR', \
+                                 'preprocessCore', \
+                                 'rGREAT', \
+                                 'Rsamtools', \
+                                 'similaRpeak', \
+                                 'TFBSTools', \
+                                 'TxDb.Hsapiens.UCSC.hg19.knownGene', \
+                                 'TxDb.Hsapiens.UCSC.hg38.knownGene', \
+                                 'TxDb.Hsapiens.UCSC.mm10.knownGene', \
+                                 'TxDb.Hsapiens.UCSC.mm39.knownGene'))" \
     && R -e "install.packages(c('snow', 'snowfall', 'bitops', 'caTools', 'VennDiagram'))"
-
-# HOMER v4.11
-#RUN mkdir HOMER && cd HOMER \
-#    && mkdir bin cpp update \
-#    && wget http://homer.ucsd.edu/homer/configureHomer.pl \
-#    && perl configureHomer.pl -install >& /dev/null \
-#    && perl configureHomer.pl -install human-o >& /dev/null \
-#    && perl configureHomer.pl -install human-p >& /dev/null \
-#    && perl configureHomer.pl -install mouse-o >& /dev/null \
-#    && perl configureHomer.pl -install mouse-p >& /dev/null \
-#    && perl configureHomer.pl -install zebrafish-o >& /dev/null \
-#    && perl configureHomer.pl -install yeast-o >& /dev/null \
-#    && perl configureHomer.pl -install hg19 >& /dev/null \
-#    && perl configureHomer.pl -install hg38 >& /dev/null \
-#    && perl configureHomer.pl -install mm10 >& /dev/null \
-#    && perl configureHomer.pl -install sacCer3 >& /dev/null \
-#    && perl configureHomer.pl -install dm6 >& /dev/null \
-#    && perl configureHomer.pl -install galGal6 >& /dev/null \
-#    && perl configureHomer.pl -install danRer11 >& /dev/null 
 
 # ChromHMM & ChromImpute
 COPY ChromHMM.jar /opt/bin/ChromHMM.jar
@@ -72,12 +68,18 @@ COPY TrimGalore-0.6.7.tar.gz TrimGalore-0.6.7.tar.gz
 RUN tar zxvf TrimGalore-0.6.7.tar.gz \
     && rm TrimGalore-0.6.7.tar.gz
 
-# STITCHIT
+# STITCHIT: https://github.com/SchulzLab/STITCHIT
 RUN git clone https://github.com/SchulzLab/STITCHIT.git \
     && mkdir -p STITCHIT/build \
     && cd STITCHIT/build \
     && cmake .. \
     && make
+
+# STARE: https://stare.readthedocs.io/en/latest/index.html
+RUN git clone https://github.com/SchulzLab/STARE.git \
+    && cd STARE/Code \
+    && cmake . \
+    && cmake --build .
 
 # DROMPAplus
 RUN git clone --recursive https://github.com/rnakato/DROMPAplus \
@@ -86,16 +88,20 @@ RUN git clone --recursive https://github.com/rnakato/DROMPAplus \
     && make
 
 # Python (MultiQC, deepTools, intervene, TOBIAS, genmap, sambamba)
+# RGTはvery old libpng12を使おうとするので却下
 # Fix Error while loading conda entry point: conda-libmamba-solver (libarchive.so.19: cannot open shared object file: No such file or directory)
 # https://stackoverflow.com/questions/77617946/solve-conda-libmamba-solver-libarchive-so-19-error-after-updating-conda-to-23
 RUN conda install -y -c bioconda genmap sambamba \
-    && pip install --no-cache-dir epilogos multiqc intervene argh deeptools tobias cutadapt threadpoolctl==3.1.0 cobind
-
-# STARE: https://stare.readthedocs.io/en/latest/index.html
-RUN git clone https://github.com/SchulzLab/STARE.git \
-    && cd STARE/Code \
-    && cmake . \
-    && cmake --build .
+    && pip install --no-cache-dir \
+      argh \
+      cobind \
+      cutadapt \
+      epilogos \
+      deeptools \
+      intervene \
+      multiqc \
+      threadpoolctl==3.1.0 \
+      tobias
 
 # SNEEP: https://sneep.readthedocs.io/en/latest/index.html
 # Pythonのどのバージョンを入れても入らない

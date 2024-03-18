@@ -7,7 +7,7 @@ import argparse
 import pathlib
 import pandas as pd
 
-__version__ = '0.11.0'
+__version__ = '0.13.0'
 
 def print_and_exec_shell(command):
     print (command)
@@ -59,28 +59,55 @@ def check_duplicates(file_path):
         print(df[duplicates_col2]['Col2'].value_counts())
 
 
-def get_mapfile_postfix(mapparam):
-    post = mapparam.replace(' ', '')
-    return post
+#def get_mapfile_postfix(mapparam):
+#    post = mapparam.replace(' ', '').replace("--", "-")
+#    return post
 
-def do_qualitycheck_fastq(fastq, fastqcdir, fastpdir):
+def do_fastqc(fastq, fastqcdir, fastpdir, ncore):
     prefix = os.path.basename(fastq).replace('.fastq', '').replace('.gz', '').replace('.fq', '')
     fastqc_output = fastqcdir + prefix + "_fastqc.zip"
-    fastp_output = fastpdir + prefix + ".fastp.json"
 
     if os.path.isfile(fastqc_output):
         print (fastqc_output + " already created. skipping.")
     else:
-        print_and_exec_shell('fastqc -t 4 -o ' + fastqcdir + ' ' + fastq)
+        print_and_exec_shell(f'fastqc --threads {ncore} -o {fastqcdir} {fastq}')
 
-    if os.path.isfile(fastp_output):
-        print (fastp_output + " already created. skipping.")
-    else:
-        print_and_exec_shell('fastp -w 4 -q 15 -n 5 -i ' + fastq
-                             + ' -h ' + fastpdir + prefix + '.fastp.html'
-                             + ' -j ' + fastpdir + prefix + '.fastp.json')
 
-def do_fastqc(chdir, build, samplelist):
+def do_fastp(fq1, fq2, fastpdir, fastqtrimming, ncore):
+    prefix = os.path.basename(fq1).replace('_R1.', '.').replace('_1.', '.').replace('.fastq', '').replace('.gz', '').replace('.fq', '')
+
+    fastp_param = f"--thread {ncore} -q 20 --length_required 20 -n 5"
+    if fq2 == "": # for single-end
+        if fastqtrimming:
+            fastp_output = f"{fastpdir}/{prefix}.trimmed.fastq.gz"
+            if os.path.isfile(fastp_output):
+                print (fastp_output + " already created. skipping.")
+            else:
+                print_and_exec_shell(f'fastp {fastp_param} -i {fq1} -h {fastpdir}/{prefix}.fastp.html -j {fastpdir}/{prefix}.fastp.json -o {fastp_output}')
+        else:
+            fastp_output = f"{fastpdir}/{prefix}.fastp.json"
+            if os.path.isfile(fastp_output):
+                print (fastp_output + " already created. skipping.")
+            else:
+                print_and_exec_shell(f'fastp {fastp_param} -i {fq1} -h {fastpdir}/{prefix}.fastp.html -j {fastpdir}/{prefix}.fastp.json')
+    else: # for paired-end
+        if fastqtrimming:
+            fastp_output = f"{fastpdir}/{prefix}_1.trimmed.fastq.gz"
+            fastp_output2 = f"{fastpdir}/{prefix}_2.trimmed.fastq.gz"
+            if os.path.isfile(fastp_output):
+                print (fastp_output + " already created. skipping.")
+            else:
+                print_and_exec_shell(f'fastp {fastp_param} -i {fq1} -I {fq2} -h {fastpdir}/{prefix}.fastp.html -j {fastpdir}/{prefix}.fastp.json -o {fastp_output} -O {fastp_output2}')
+
+        else:
+            fastp_output = f"{fastpdir}/{prefix}.fastp.json"
+            if os.path.isfile(fastp_output):
+                print (fastp_output + " already created. skipping.")
+            else:
+                print_and_exec_shell(f'fastp {fastp_param} -i {fq1} -I {fq2} -h {fastpdir}/{prefix}.fastp.html -j {fastpdir}/{prefix}.fastp.json ')
+
+
+def do_readQC(chdir, build, samplelist, fastqtrimming, ncore):
     fastqcdir = chdir + "/fastqc/"
     fastpdir =  chdir + "/fastp/"
     os.makedirs(fastqcdir, exist_ok=True)
@@ -96,31 +123,95 @@ def do_fastqc(chdir, build, samplelist):
         prefix = row[0]
         fq1 = row[1]
         for fastq in fq1.split(","):
-            do_qualitycheck_fastq(fastq, fastqcdir, fastpdir)
+            do_fastqc(fastq, fastqcdir, fastpdir, ncore)
 
         if (len(row)>2): # for paired-end
             fq2 = row[2]
             for fastq in fq2.split(","):
-                do_qualitycheck_fastq(fastq, fastqcdir, fastpdir)
+                do_fastqc(fastq, fastqcdir, fastpdir, ncore)
 
-def do_mapping(args, samplelist, post, build, chdir):
-    if args.nompbl:
-        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} -n"
+    for index, row in df.iterrows():
+        if (len(row)<2 or row[1] == ""):
+            print ("Error: specify fastq file in " + samplelist + ".")
+            exit()
+
+        prefix = row[0]
+        fq1 = row[1]
+        if (len(row)>2): # for paired-end
+            fq2 = row[2]
+            fq1s = fq1.split(",")
+            fq2s = fq2.split(",")
+            if len(fq1s) != len(fq2s):
+                print (f"Error: the number of fastq files in {row[1]} and {row[2]} is not the same.")
+                exit()
+            for i, fq1 in enumerate(fq1s):
+                fq2 = fq2s[i]
+                do_fastp(fq1, fq2, fastpdir, fastqtrimming, ncore)
+        else: # for single-end
+            for fq1 in fq1.split(","):
+                do_fastp(fq1, "", fastpdir, fastqtrimming, ncore)
+
+
+def do_mapping(args, samplelist, build, chdir):
+    if args.mapparam != "":
+        mapparam = f"-P \"{args.mapparam}\""
     else:
-        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads}"
+        mapparam = ""
+    if args.parse2wigparam != "":
+        parse2wigparam = f"-Q \"{args.parse2wigparam}\""
+    else:
+        parse2wigparam = ""
+    if args.nofilter:
+        param_filter = "-N"
+    else:
+        param_filter = ""
+
+    if args.nompbl:
+        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} {mapparam} {param_filter} {parse2wigparam} -n"
+    else:
+        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} {mapparam} {param_filter} {parse2wigparam}"
 
     print_and_exec_shell(f'churros_mapping {param_churros_mapping} exec {samplelist} {build} {args.Ddir}')
 
     # stats
     qcstatsfile = f'{chdir}/{build}/churros.QCstats.tsv'
-    os.system(f'churros_mapping {param_churros_mapping} header > {qcstatsfile}')
+    os.system(f'churros_mapping {param_churros_mapping} header {samplelist} {build} {args.Ddir} > {qcstatsfile}')
     os.system(f'churros_mapping {param_churros_mapping} stats {samplelist} {build} {args.Ddir} >> {qcstatsfile}')
     # convert to xlsx
-    os.system(f'churros_mapping {param_churros_mapping} stats {samplelist} {build} {args.Ddir} >> {qcstatsfile}')
     os.system(f'csv2xlsx.pl -i {qcstatsfile} -o {chdir}/{build}/churros.QCstats.xlsx')
 
+def make_trimmedsamplelist(chdir, samplelist):
+    samplelist_trimmed = chdir + "/samplelist.trimmed.txt"
+    if(os.path.isfile(samplelist_trimmed)):
+        os.remove(samplelist_trimmed)
 
-def make_samplepairlist_withflen(samplepairlist, post, build, chdir):
+    df = pd.read_csv(samplelist, sep="\t", header=None)
+    df.fillna("", inplace=True)
+
+    fastpdir =  chdir + "/fastp/"
+    for index, row in df.iterrows():
+        label = row[0]
+        fq1 = row[1]
+        fq2 = row[2]
+
+        fq1s = fq1.split(",")
+        fq2s = fq2.split(",")
+
+        if len(fq1s) != len(fq2s):
+            print (f"Error: the number of fastq files in {row[1]} and {row[2]} is not the same.")
+            exit()
+
+        for i, fq1 in enumerate(fq1s):
+            fq2 = fq2s[i]
+            prefix = os.path.basename(fq1).replace('_R1.', '.').replace('_1.', '.').replace('.fastq', '').replace('.gz', '').replace('.fq', '')
+            fastp_output = f"{fastpdir}/{prefix}_1.trimmed.fastq.gz"
+            fastp_output2 = f"{fastpdir}/{prefix}_2.trimmed.fastq.gz"
+            os.system(f'echo "{label}\t{fastp_output}\t{fastp_output2}" >> {samplelist_trimmed}')
+
+    check_fastq_in_samplelist(samplelist_trimmed)
+    return samplelist_trimmed
+
+def make_samplepairlist_withflen(samplepairlist, build, chdir):
     samplepairlist_withflen = chdir + "/churros.samplepairlist.withflen.txt"
     if(os.path.isfile(samplepairlist_withflen)):
         os.remove(samplepairlist_withflen)
@@ -133,7 +224,7 @@ def make_samplepairlist_withflen(samplepairlist, post, build, chdir):
         label = row[2]
         mode  = row[3]
 
-        sspstats = pd.read_csv(chdir + '/sspout/' + chip + post + '.stats.txt', sep="\t", header=0)
+        sspstats = pd.read_csv(chdir + '/sspout/' + chip + '.stats.txt', sep="\t", header=0)
         flen = int(sspstats["fragment length"])
 
         with open(samplepairlist_withflen, 'a') as f:
@@ -203,28 +294,37 @@ def exec_churros(args):
     check_fastq_in_samplelist(samplelist)
     check_duplicates(samplelist)
 
-    mapparam = args.mapparam
-    post = get_mapfile_postfix(mapparam)
+#    post = get_mapfile_postfix(args.mapparam)
     gt = Ddir + '/genometable.txt'
 
     os.makedirs(chdir, exist_ok=True)
 
     ### FASTQC
-    if args.nofastqc == False:
-        do_fastqc(chdir, build, samplelist)
+    if args.noqc == False:
+        do_readQC(chdir, build, samplelist, args.fastqtrimming, args.threads)
+
+    if args.fastqtrimming:
+        samplelist_trimmed = make_trimmedsamplelist(chdir, samplelist)
 
     ## churros_mapping
-    do_mapping(args, samplelist, post, build, chdir)
+    if args.fastqtrimming:
+        do_mapping(args, samplelist_trimmed, build, chdir)
+    else:
+        do_mapping(args, samplelist, build, chdir)
 
     ## make samplepairlist_withflen
-    samplepairlist_withflen = make_samplepairlist_withflen(samplepairlist, post, build, chdir_build)
+    samplepairlist_withflen = make_samplepairlist_withflen(samplepairlist, build, chdir_build)
 
     ## churros_callpeak
-    param_macs=' -b bam -p ' + str(args.threads) + ' -q ' + str(args.qval) + ' -d ' + args.macsdir + ' -D ' + chdir
+    param_macs = f' -b bam -p {args.threads} -q {args.qval} -d {args.macsdir} -D {chdir}'
+#    if args.mapparam != "":
+#        bowtiepost = get_mapfile_postfix(args.mapparam)
+#        param_macs += f' -s {bowtiepost}'
+
     if os.path.isfile(samplepairlist_withflen):
-        print_and_exec_shell('churros_callpeak' + param_macs + ' ' + samplepairlist_withflen + ' ' + build)
+            print_and_exec_shell(f'churros_callpeak {param_macs} {samplepairlist_withflen} {build}')
     else:
-        print_and_exec_shell('churros_callpeak' + param_macs + ' ' + samplepairlist + ' ' + build)
+        print_and_exec_shell(f'churros_callpeak {param_macs} {samplepairlist} {build}')
 
     ## QC check
     print ("\nCheck the quality of ChIP-seq samples...\n")
@@ -263,25 +363,21 @@ def exec_churros(args):
         param_churros_visualize = "-D " + chdir
     if args.preset == "T2T":
         param_churros_visualize += " --preset T2T "
+    if args.nofilter:
+        param_churros_visualize += " --nofilter"
 
     if args.preset == "scer":
-#        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
         print_and_exec_shell(f'churros_visualize {param_churros_visualize} --preset scer --enrich {samplepairlist} drompa+.macspeak {build} {Ddir}')
-#        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' --preset scer --enrich --logratio ' + str(samplepairlist) + ' drompa+.macspeak ' + build + ' ' + Ddir)
         print_and_exec_shell(f'churros_visualize {param_churros_visualize} --preset scer --enrich --logratio {samplepairlist} drompa+.macspeak {build} {Ddir}')
     else:
         df = pd.read_csv(samplepairlist, sep=",", header=None)
         df.fillna("", inplace=True)
 
         if is_exist_input(samplepairlist):
-#            print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 --pvalue -P "--pthre_enrich 3 --scale_pvalue 3" ' + str(samplepairlist) + ' drompa+.pval.bin5M ' + build + ' ' + Ddir)
             print_and_exec_shell(f'churros_visualize {param_churros_visualize} -b 5000 -l 8000 --pvalue -P "--pthre_enrich 3 --scale_pvalue 3" {samplepairlist} drompa+.pval.bin5M {build} {Ddir}')
-#            print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -G ' + str(samplepairlist) + ' ' + 'drompa+ ' + build + ' ' + Ddir)
             print_and_exec_shell(f'churros_visualize {param_churros_visualize} -G {samplepairlist} drompa+ {build} {Ddir}')
 
-#        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' ' + chdir + '/' + args.macsdir + '/samplepairlist.txt drompa+.macspeak ' + build + ' ' + Ddir)
         print_and_exec_shell(f'churros_visualize {param_churros_visualize} {chdir}/{build}/{args.macsdir}/samplepairlist.txt drompa+.macspeak {build} {Ddir}')
-#        print_and_exec_shell('churros_visualize '+ param_churros_visualize + ' -b 5000 -l 8000 -P "--scale_tag 100" ' + str(samplepairlist) + ' drompa+.bin5M ' + build + ' ' + Ddir)
         print_and_exec_shell(f'churros_visualize {param_churros_visualize} -b 5000 -l 8000 -P "--scale_tag 100" {samplepairlist} drompa+.bin5M {build} {Ddir}')
 
 if(__name__ == '__main__'):
@@ -295,11 +391,13 @@ if(__name__ == '__main__'):
     parser.add_argument("-b", "--binsize", help="binsize of parse2wig+ (default: 100)", type=int, default=100)
     parser.add_argument("-k", help="read length for mappability file ([28|36|50], default:50)", type=int, default=50)
     parser.add_argument("--nompbl", help="do not consider genome mappability in drompa+", action="store_true")
-    parser.add_argument("--nofastqc", help="omit FASTQC", action="store_true")
+    parser.add_argument("--nofilter", help="do not filter PCR duplicate", action="store_true")
+    parser.add_argument("--noqc", help="omit FASTQC and fastp", action="store_true")
+    parser.add_argument("--fastqtrimming", help="Apply adapter trimming with fastp before mapping (omitted if '--noqc' is specified)", action="store_true")
     parser.add_argument("-q", "--qval", help="threshould of MACS2 (default: 0.05)", type=float, default=0.05)
     parser.add_argument("--macsdir", help="output direcoty of macs2 (default: 'macs2')", type=str, default="macs")
-#    parser.add_argument("-f", "--format", help="output format of parse2wig+ 0: compressed wig (.wig.gz)\n 1: uncompressed wig (.wig)\n 2: bedGraph (.bedGraph) \n 3 (default): bigWig (.bw)", type=int, default=3)
-    parser.add_argument("--mapparam", help="parameter of bowtie|bowtie2 (shouled be quated)", type=str, default="")
+    parser.add_argument("--mapparam", help="additional parameter for bowtie|bowtie2 (shouled be quated)", type=str, default="")
+    parser.add_argument("--parse2wigparam", help="additional parameter for parse2wig+ (shouled be quated)", type=str, default="")
     parser.add_argument("-p", "--threads", help="number of CPUs (default: 12)", type=int, default=12)
     parser.add_argument("--threads_comparative", help="number of CPUs for --comparative option (default: 8)", type=int, default=8)
     parser.add_argument("--outputpvalue", help="output ChIP/Input -log(p) distribution as a begraph format", action="store_true")

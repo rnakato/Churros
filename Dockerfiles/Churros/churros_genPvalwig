@@ -10,9 +10,14 @@ function usage()
     echo '   Options:' 1>&2
     echo '      -b <int>: binsize (defalt: 100)' 1>&2
     echo '      -d <str>: directory of bigWig files (default: TotalReadNormalized/)' 1>&2
+    echo '      -e <int>: Output value
+                               0: ChIP/Input enrichment
+                               1: -log10(P) (ChIP internal)
+                               2 (default): -log10(P) (ChIP/Input enrichment)' 1>&2
     echo '      -n: do not consider genome mappability' 1>&2
     echo '      -y <str>: postfix of .bw files to be used (default: "-raw-GR")' 1>&2
     echo '      -D <str>: directory for execution (defalt: "Churros_result")' 1>&2
+    echo '      -x: Output as bigWig (defalt: bedGraph)' 1>&2
     echo "   Example:" 1>&2
     echo "      $cmdname samplelist.txt chip-seq hg38 genometable.hg38.txt" 1>&2
 }
@@ -22,15 +27,19 @@ pdir=TotalReadNormalized/
 mp=1
 post_predefined=""
 chdir="Churros_result"
+bigwig=0
+outputvalue=2
 
-while getopts b:d:ny:D: option
+while getopts b:d:e:ny:D:x option
 do
     case ${option} in
         b) binsize=${OPTARG};;
         d) pdir=${OPTARG};;
         n) mp=0;;
+        e) outputvalue=${OPTARG};;
         y) post_predefined=${OPTARG};;
         D) chdir=${OPTARG};;
+        s) bigwig=1;;
 	*)
 	    usage
 	    exit 1
@@ -62,6 +71,17 @@ logdir=$chdir/log/genPvalwig/
 odir=$chdir/$odir
 mkdir -p $logdir $odir
 
+if test $outputvalue -eq 0; then
+    outputdir=enrichment
+elif test $outputvalue -eq 1; then
+    outputdir=pval_internal
+elif test $outputvalue -eq 2; then
+    outputdir=pval_enrich
+else
+    echo "Error: outputvalue (-e) should be 0, 1, or 2."
+fi
+
+
 if test ! -e $gt; then
     echo "Error: $gt does not exist."
     exit 1
@@ -80,17 +100,36 @@ fi
 
 ex(){ echo $1; eval $1; }
 
+
+if test $bigwig -eq 1; then
+    param_format="--outputformat 3"
+else
+    param_format="--outputformat 2"
+fi
+
 while read LINE; do
     LINE=(${LINE//,/ })
     chip=${LINE[0]}
     input=${LINE[1]}
     label=${LINE[2]}
 
-    if test "$input" != ""; then
-        drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,${label}_up > $logdir/GENWIG.$chip$post.up
-        drompa+ GENWIG --outputvalue 2 --outputformat 2 --gt $gt -o $odir/pval -i $pdir/$input$post.$binsize.bw,$pdir/$chip$post.$binsize.bw,${label}_down  > $logdir/GENWIG.$chip$post.down
+    param="--outputvalue 2 $param_format --gt $gt -o $odir/$outputdir"
+    if test $outputvalue -eq 0; then
+        if test "$input" != ""; then
+            drompa+ GENWIG $param -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,${label} > $logdir/GENWIG.Enrichment.$chip$post
+        else
+            echo "Error: input sample is not specified for the sample $chip."
+            exit 1
+        fi
+    elif test $outputvalue -eq 1; then
+        drompa+ GENWIG $param -i $pdir/$chip$post.$binsize.bw,,${label} > $logdir/GENWIG.pval_internal.$chip$post
     else
-        echo "Error: input sample is not specified for the sample $chip."
-        exit 1
+        if test "$input" != ""; then
+            drompa+ GENWIG $param -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,${label}_up > $logdir/GENWIG.pval_enrich.$chip$post.up
+            drompa+ GENWIG $param -i $pdir/$input$post.$binsize.bw,$pdir/$chip$post.$binsize.bw,${label}_down > $logdir/GENWIG.pval_enrich.$chip$post.down
+        else
+            echo "Error: input sample is not specified for the sample $chip."
+            exit 1
+        fi
     fi
 done < $samplepairlist

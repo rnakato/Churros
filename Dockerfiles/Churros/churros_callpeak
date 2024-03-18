@@ -7,11 +7,12 @@ function usage()
     echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   Options:' 1>&2
     echo '      -D : directory for execution (defalt: "Churros_result")' 1>&2
+    echo '      -d : directory for peaks (defalt: "macs")' 1>&2
     echo '      -q : threshould of MACS2 (defalt: 0.05)' 1>&2
     echo '      -b : bam direcoty (defalt: "bam")' 1>&2
-    echo '      -d : output direcoty (defalt: "macs")' 1>&2
     echo '      -F : overwrite MACS2 resilts if exist (defalt: skip)' 1>&2
     echo '      -p : number of CPUs (defalt: 4)' 1>&2
+    echo '      -s : postfix of the mapfile ($prefix$post.sort.bam, default: "")' 1>&2
 }
 
 qval=0.05
@@ -20,8 +21,9 @@ bamdir=bam
 ncore=4
 chdir="Churros_result"
 force=""
+post=""
 
-while getopts D:b:q:d:p:F option
+while getopts D:b:q:d:p:Fs: option
 do
     case ${option} in
 	D) chdir=${OPTARG};;
@@ -32,6 +34,7 @@ do
            isnumber.sh $ncore "-p" || exit 1
 	   ;;
 	F) force="-F";;
+	s) post=${OPTARG};;
         *)
 	    usage
 	    exit 1
@@ -39,6 +42,7 @@ do
     esac
 done
 shift $((OPTIND - 1))
+
 
 if [ $# -ne 2 ]; then
   usage
@@ -96,16 +100,16 @@ do_macs(){
     newlist=$5
     qval=$6
     force=$7
+    post=$8
 
-#    LINE=(${LINE//,/ })
     IFS=, read -ra LINE <<< $LINE
     chip=${LINE[0]}
     input=${LINE[1]}
     label=${LINE[2]}
     mode=${LINE[3]}
     flen=${LINE[4]}
-    IPbam=$bamdir/$chip.sort.bam
-    Inputbam=$bamdir/$input.sort.bam
+    IPbam=$bamdir/$chip$post.sort.bam
+    Inputbam=$bamdir/$input$post.sort.bam
 
     echo $chip $input $label $mode $flen
 
@@ -132,6 +136,6 @@ do_macs(){
 }
 export -f do_macs
 
-echo ${array[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval $force"
-
+echo ${array[@]} | tr ' ' '\n' | xargs -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval \"$force\" \"$post\""
+#  xargs -n1 -I
 echo "churros_callpeak done."

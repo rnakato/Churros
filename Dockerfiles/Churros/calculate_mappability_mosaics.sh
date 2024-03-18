@@ -81,7 +81,7 @@ func_hashing(){
     unset LEN
     read_genometable $gt
 
-    echo ${CHR[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "func_hashing_eachchr $dir {} $hashdir"
+    echo ${CHR[@]} | tr ' ' '\n' | xargs -I {} -P $ncore bash -c "func_hashing_eachchr $dir {} $hashdir"
 }
 
 oligoFind(){

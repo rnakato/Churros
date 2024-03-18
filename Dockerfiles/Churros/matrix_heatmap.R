@@ -12,23 +12,28 @@ print.usage <- function() {
 	cat('\n',file=stderr())
 }
 
-args <- commandArgs(trailingOnly = T)
-
 t <- 0
 clst <- 0
 fsize <- 0.5
 k <- 3
 method <- "ward.D2"
+input_specified <- FALSE
+output_specified <- FALSE
+
+args <- commandArgs(trailingOnly = TRUE)
+
 for (each.arg in args) {
     if (grepl('^-i=',each.arg)) {
         arg.split <- strsplit(each.arg,'=',fixed=TRUE)[[1]]
         if (! is.na(arg.split[2]) ) {
+            input_specified <- TRUE
             infile <- arg.split[2]
         }
     }
     else if (grepl('^-o=',each.arg)) {
         arg.split <- strsplit(each.arg,'=',fixed=TRUE)[[1]]
         if (! is.na(arg.split[2]) ) {
+            output_specified <- TRUE
             outfile <- arg.split[2]
         }
     }
@@ -56,6 +61,15 @@ for (each.arg in args) {
             fsize <- as.numeric(arg.split[2])
         }
     }
+    else{
+        print.usage()
+        q()
+    }
+}
+
+if (!input_specified || !output_specified) {
+  print.usage()
+  q()
 }
 
 #infile
@@ -69,7 +83,6 @@ library(RColorBrewer)
 library(gplots)
 
 counts <- read.table(infile, header=T, sep="\t")
-#counts <- as.matrix(counts)
 counts <- as.matrix(data.frame(counts[,-1], row.names = counts[,1]))
 
 if(t == "T"){ counts <- t(counts) }

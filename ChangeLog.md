@@ -1,11 +1,31 @@
 # Changelog
 
+## 0.13.0 (2024-3-X)
+- Modified fastp execution to handle paired-end FASTQ files at a same time
+- Added `--nofilter`, `--fastqtrimming` and `--parse2wigparam` options to `churros`
+- Added `-N: do not filter PCR duplication` and `-Q: additional parameter for parse2wig+` options to `churros_mapping`
+- Added `-e` and `-x` options to `churros_genPvalwig` to generate different wig files for visualization.
+- Added `n: do not filter PCR duplication` and `-P: other options` options to `parse2wig+.sh`.
+- Added `mptable.UCSC.T2T.28mer.flen150.txt` and `mptable.UCSC.T2T.36mer.flen150.txt` in `SSP/data/mptable`.
+- Added the ideogram file for the T2T genome in `DROMPAplus/data/ideogram`.
+- Fixed a bug in `churros_mapping` and `churros_callpeak` that did not handle the name of the mapfiles correctly when passing additional parameters to `bowtie2.sh`.
+- Updated `churros_mapping` to show header correctly for paired-end FASTQ files.
+- Modified `download_genomedata.sh` to download the reference file of the T2T genome.
+- Added [ATACseqQC](https://bioconductor.org/packages/release/bioc/html/ATACseqQC.html) for quality check of ATAC-seq data
+- Added [TFBSTools](https://bioconductor.org/packages/release/bioc/html/TFBSTools.html) for motif search
+- Updated chromap from v0.2.5 to v0.2.6
+- Updated SSP and DROMPAplus to modify `parsestats4DROMPAplus.pl`
+- Fixed the warning of xargs in `churros_callpeak`
+
 ## 0.12.2 (2024-3-5)
-  - Fixed a bug in `churros` that did not output the mapping statistics file properly.
+- Fixed a bug in `churros` that did not output the mapping statistics file correctly.
+- Fixed a bug in `churros` that caused the header line in the stats file to be incorrect for paired-end files.
+- `churros_genPvalwig`: Added the `-e` and `-x` options to output different distribution files as well.
+- Added `csv2xlsx.pl` to convert `churros.QCstats.tsv` to `churros.QCstats.xlsx`.
 
 ## 0.12.1 (2024-3-3)
-  - Fixed a bug in `download_genomedata.sh` that did not download the genome data correctly.
-  - Install MS core fonts (ttf-mscorefonts-installer)
+- Fixed a bug in `download_genomedata.sh` that did not download the genome data correctly.
+- Install MS core fonts (ttf-mscorefonts-installer)
 
 ## 0.12.0 (2024-2-25)
 - Added [Cobind](https://cobind.readthedocs.io/en/latest/index.html) for evaluating overlap of peaks

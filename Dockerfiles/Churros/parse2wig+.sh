@@ -1,8 +1,8 @@
 #!/bin/bash
-cmdname=`basename $0`
+
 function usage()
 {
-    echo "$cmdname [options] <mapfile> <prefix> <build> <Ddir>" 1>&2
+    echo "parse2wig+.sh [options] <mapfile> <prefix> <build> <Ddir>" 1>&2
     echo '   <mapfile>: mapfile (SAM|BAM|CRAM|TAGALIGN format)' 1>&2
     echo '   <prefix>: output prefix' 1>&2
     echo '   <build>: genome build (e.g., hg38)' 1>&2
@@ -16,6 +16,7 @@ function usage()
     echo '      -k: read length for mappability calculation ([28|36|50], default: 50)' 1>&2
     echo '      -p: for paired-end file' 1>&2
     echo '      -t: number of CPUs (default: 4)' 1>&2
+    echo '      -n: do not filter PCR duplication' 1>&2
     echo '      -o: output directory (default: parse2wigdir+)' 1>&2
     echo '      -s: stats directory (default: log/parse2wig+)' 1>&2
     echo '      -f: output format of parse2wig+ (default: 3)' 1>&2
@@ -25,9 +26,10 @@ function usage()
     echo '               3: bigWig (.bw)' 1>&2
     echo '      -D outputdir: output dir (defalt: ./)' 1>&2
     echo '      -F: overwrite files if exist (defalt: skip)' 1>&2
+    echo '      -P: other options (should be quoted, see the help of parse2wig+ for the detail)' 1>&2
     echo "   Example:" 1>&2
-    echo "      For single-end: $cmdname chip.sort.bam chip hg38 Referencedata_hg38" 1>&2
-    echo "      For paired-end: $cmdname -p chip.sort.bam chip hg38 Referencedata_hg38" 1>&2
+    echo "      For single-end: parse2wig+.sh chip.sort.bam chip hg38 Referencedata_hg38" 1>&2
+    echo "      For paired-end: parse2wig+.sh -p chip.sort.bam chip hg38 Referencedata_hg38" 1>&2
 }
 
 binsize=100
@@ -43,8 +45,10 @@ ncore=4
 chdir="./"
 statsdir="log/parse2wig+"
 force=0
+nofilter=0
+otherparam=""
 
-while getopts ab:z:l:mk:o:s:f:pt:D:F option
+while getopts ab:z:l:mk:o:ns:f:pt:D:FP: option
 do
     case ${option} in
 	a) all=1;;
@@ -66,15 +70,17 @@ do
            isnumber.sh $k "-k" || exit 1
 	   ;;
 	o) pdir=${OPTARG};;
+	n) nofilter=1;;
 	f) of=${OPTARG}
            isnumber.sh $of "-f" || exit 1
 	   ;;
-        p) pair="--pair";;
-        t) ncore=${OPTARG}
-           isnumber.sh $ncore "-p" || exit 1
-           ;;
-        D) chdir=${OPTARG};;
+    p) pair="--pair";;
+    t) ncore=${OPTARG}
+        isnumber.sh $ncore "-p" || exit 1
+        ;;
+    D) chdir=${OPTARG};;
 	F) force=1;;
+	P) otherparam=${OPTARG};;
         *)
 	    usage
 	    exit 1
@@ -110,7 +116,6 @@ fi
 
 chrpath=$Ddir/chromosomes
 mptable=$Ddir/mappability_Mosaics_${k}mer/map_fragL150_genome.txt
-#mptable=/opt/SSP/data/mptable/mptable.UCSC.$build.${k}mer.flen150.txt
 mpbinary=$Ddir/mappability_Mosaics_${k}mer
 
 if test "$mp" -eq 1; then
@@ -122,8 +127,14 @@ else
     mpbin=""
 fi
 mpparam="--mptable $mptable"
-
-parse2wigparam="--gt $gt -i $bam $mpparam $pair $peak --outputformat $of -p $ncore $param_flen"
+parse2wigparam="--gt $gt -i $bam $mpparam $pair $peak --outputformat $of -p $ncore $param_flen $otherparam"
+if test "$nofilter" -eq 1; then
+    echo "do not filter PCR duplicates"
+    parse2wigparam="$parse2wigparam --nofilter"
+    filterpost="-nofilter"
+else
+    filterpost=""
+fi
 
 func(){
     if test $build = "scer" -o $build = "pombe" -o $build = "sacCer3" -o $build = "Spom"; then
@@ -140,8 +151,7 @@ func(){
             if test -e "$file" -a 1000 -lt `wc -c < $file` -a $force -eq 0 ; then
                 echo "$file already exist. skipping"
             else
-                ex "parse2wig+ --odir $rdir $parse2wigparam -o $prefix$mppost --binsize $b"
-#                rm $rdir/$prefix$mppost.$b.tsv
+                ex "parse2wig+ --odir $rdir $parse2wigparam -o $prefix$mppost$filterpost --binsize $b"
             fi
         done
     fi
@@ -149,25 +159,23 @@ func(){
     tdir=$pdir/TotalReadNormalized
     mkdir -p $tdir
     for b in $bins; do
-        file=$tdir/$prefix$mppost.$b.bw
+        file=$tdir/$prefix$mppost$filterpost.$b.bw
         if test -e "$file" -a 1000 -lt `wc -c < $file` -a $force -eq 0 ; then
             echo "$file already exist. skipping"
         else
-            ex "parse2wig+ --odir $tdir $parse2wigparam -o $prefix$mppost -n GR --binsize $b"
-#            cp $tdir/$prefix$mppost.$b.tsv $statsdir/$prefix.stats.tsv
-            parsestats4DROMPAplus.pl $tdir/$prefix$mppost.$b.tsv >& $statsdir/$prefix.stats.singleline.tsv
+            ex "parse2wig+ --odir $tdir $parse2wigparam -o $prefix$mppost$filterpost -n GR --binsize $b"
+            parsestats4DROMPAplus.pl $tdir/$prefix$mppost$filterpost.$b.tsv >& $statsdir/$prefix.stats.singleline.tsv
         fi
     done
     if test "$mp" -eq 1; then
-        file=$tdir/$prefix$mppost.GCnormed.100000.bw
+        file=$tdir/$prefix$mppost$filterpost.GCnormed.100000.bw
         if test -e "$file" -a 1000 -lt `wc -c < $file` -a $force -eq 0 ; then
             echo "$file already exist. skipping"
         else
-            ex "parse2wig+ --odir $tdir $parse2wigparam -o $prefix$mppost.GCnormed -n GR --chrdir $chrpath $mpbin --binsize 100000 --gcdepthoff"
+            ex "parse2wig+ --odir $tdir $parse2wigparam -o $prefix$mppost$filterpost.GCnormed -n GR --chrdir $chrpath $mpbin --binsize 100000 --gcdepthoff"
         fi
-#        mv $tdir/$prefix$mppost.GCnormed.100000.tsv $statsdir/$prefix.stats.GC.tsv
-        parsestats4DROMPAplus.pl $tdir/$prefix$mppost.GCnormed.100000.tsv >& $statsdir/$prefix.stats.singleline.GC.tsv
-        mv $tdir/$prefix$mppost.GCnormed.GCdist.tsv $statsdir/$prefix.GCdistribution.tsv
+        parsestats4DROMPAplus.pl $tdir/$prefix$mppost$filterpost.GCnormed.100000.tsv >& $statsdir/$prefix.stats.singleline.GC.tsv
+        mv $tdir/$prefix$mppost$filterpost.GCnormed.GCdist.tsv $statsdir/$prefix.GCdistribution.tsv
 
         # remove normal stats files if GC stats are available
         rm $statsdir/$prefix.stats.singleline.tsv

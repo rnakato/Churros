@@ -51,9 +51,9 @@ my $num_unaligned="";
 my $num_filtered="";
 
 if(!$pair){
-    print "\tSample\treads\tmapped $k time\t%\tmapped >$k time\t%\tmapped total\t%\tunmapped\t%\n";
+    print "\tSample\tReads\tMapped $k time\t%\tMapped >$k time\t%\tMapped total\t%\tUnmapped\t%\n";
 }else{
-    print "\tSample\treads\tpaired\t%\tmapped $k time\t%\tmapped >$k time\t%\tmapped total\t%\tunmapped\t%\n";
+    print "\tSample\tReads\tPaired\t%\tMapped $k time\t%\tMapped >$k time\t%\tMapped total\t%\tUnmapped\t%\n";
 }
 
 print "bowtie2 version $version\t";

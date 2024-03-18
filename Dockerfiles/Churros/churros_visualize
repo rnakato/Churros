@@ -46,9 +46,6 @@ def setparam(args):
         gene = "/opt/DROMPAplus/data/S_cerevisiae/SGD_features.tab"
         arsfile = "/opt/DROMPAplus/data/S_cerevisiae/ARS-oriDB_scer.txt"
         param = "--scale_ratio 4 --ls " + str(linesize) + " --sm 10 --lpp 3 -g " + gene + " --gftype 2 --ars " + arsfile
-#    elif args.preset == "T2T":
-#        gene = Ddir + "/chm13v2.refFlat"
-#        param = " --ls " + str(linesize) + " -g " + gene
     else:
         gene = Ddir + "/gtf_chrUCSC/chr.gene.refFlat"
         param = " --ls " + str(linesize) + " -g " + gene
@@ -85,6 +82,8 @@ def do_churros_visualize(args):
             post = ""
         else:
             post = ".mpbl"
+        if args.nofilter:
+            post += "-nofilter"
 
     # DROMPA+ param
     pdfdir = chdir + "/pdf"
@@ -127,22 +126,19 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir
     gt = Ddir + "/genometable.txt"
     check_file(gt)
 
-    if args.preset == "T2T":
-        param += " --gt " + gt
+    param += " --gt " + gt
+    if os.path.isfile(ideogram):
+        param += " --ideogram " + ideogram
     else:
-        param += " --gt " + gt
-        if os.path.isfile(ideogram):
-            param += " --ideogram " + ideogram
-        else:
-            print (ideogram + " does not exist. skipping.")
-        if os.path.isdir(GC):
-            param += " --GC " + GC + " --gcsize 500000"
-        else:
-            print (GC + " does not exist. skipping.")
-        if os.path.isdir(GD):
-            param += " --GD " + GD + " --gdsize 500000"
-        else:
-            print (GD + " does not exist. skipping.")
+        print (ideogram + " does not exist. skipping.")
+    if os.path.isdir(GC):
+        param += " --GC " + GC + " --gcsize 500000"
+    else:
+        print (GC + " does not exist. skipping.")
+    if os.path.isdir(GD):
+        param += " --GD " + GD + " --gdsize 500000"
+    else:
+        print (GD + " does not exist. skipping.")
 
     df = pd.read_csv(samplepairlist, sep=",", header=None)
     df.fillna("", inplace=True)
@@ -260,22 +256,23 @@ def visualize_PCSHARP(args, param, samplepairlist, pdir, pdfdir, logdir, fileext
 if(__name__ == '__main__'):
     parser = argparse.ArgumentParser()
     parser.add_argument("samplepairlist", help="ChIP/Input pair list", type=str)
-    parser.add_argument("prefix", help="output prefix (directory will be omitted)", type=str)
-    parser.add_argument("build", help="genome build (e.g., hg38)", type=str)
-    parser.add_argument("Ddir", help="directory of reference data", type=str)
-    parser.add_argument("-b", "--binsize", help="binsize of parse2wig+ (default: 100)", type=int, default=100)
-    parser.add_argument("-l", "--linesize", help="line size for each page (kbp, defalt: 1000)", type=int, default=-1)
-    parser.add_argument("--nompbl", help="do not consider genome mappability", action="store_true")
-    parser.add_argument("-d", help="directory of bigWig files (default: 'TotalReadNormalized/')", type=str, default="TotalReadNormalized/")
-    parser.add_argument("--postfix", help="param string of parse2wig+ files to be used (default: '.mpbl')", type=str, default="")
-    parser.add_argument("--pvalue", help="show p-value distribution instead of read distribution", action="store_true")
-    parser.add_argument("--bowtie1", help="specified bowtie1", action="store_true")
-    parser.add_argument("-P","--drompaparam", help="additional parameters for DROMPA+ (shouled be quated)", type=str, default="")
-    parser.add_argument("-G", help="genome-wide view (100kbp)", action="store_true")
+    parser.add_argument("prefix", help="Output prefix (directory will be omitted)", type=str)
+    parser.add_argument("build", help="Genome build (e.g., hg38)", type=str)
+    parser.add_argument("Ddir", help="Directory of reference data", type=str)
+    parser.add_argument("-b", "--binsize", help="Binsize of parse2wig+ (default: 100)", type=int, default=100)
+    parser.add_argument("-l", "--linesize", help="Line size for each page (kbp, defalt: 1000)", type=int, default=-1)
+    parser.add_argument("--nompbl", help="Do not consider genome mappability", action="store_true")
+    parser.add_argument("--nofilter", help="Use data where PCR duplication is not filtered", action="store_true")
+    parser.add_argument("-d", help="Directory of bigWig files (default: 'TotalReadNormalized/')", type=str, default="TotalReadNormalized/")
+    parser.add_argument("--postfix", help="Parameter string of parse2wig+ files to be used (default: '.mpbl')", type=str, default="")
+    parser.add_argument("--pvalue", help="Show p-value distribution instead of read distribution", action="store_true")
+    parser.add_argument("--bowtie1", help="Specified bowtie1", action="store_true")
+    parser.add_argument("-P","--drompaparam", help="Additional parameters for DROMPA+ (shouled be quated)", type=str, default="")
+    parser.add_argument("-G", help="Genome-wide view (100kbp)", action="store_true")
     parser.add_argument("--enrich", help="PC_ENRICH: show ChIP/Input ratio (preferred for yeast)", action="store_true")
-    parser.add_argument("--logratio", help="(for PC_ENRICH) show log-scaled ChIP/Input ratio", action="store_true")
+    parser.add_argument("--logratio", help="(for PC_ENRICH) Show log-scaled ChIP/Input ratio", action="store_true")
     parser.add_argument("--preset", help="Preset parameters for mapping reads ([scer|T2T])", type=str, default="")
-    parser.add_argument("-D", "--outputdir", help="output directory (default: 'Churros_result')", type=str, default="Churros_result")
+    parser.add_argument("-D", "--outputdir", help="Output directory (default: 'Churros_result')", type=str, default="Churros_result")
 
     args = parser.parse_args()
 #    print(args)

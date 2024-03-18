@@ -1,4 +1,4 @@
-#sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.9.0.sif"
+#sing="singularity exec --bind /work,/work2,/work3 /work3/SingularityImages/churros.0.13.0.sif"
 sing="singularity exec churros.sif"
 
 build=mm10
@@ -6,6 +6,7 @@ Ddir=Referencedata_mm10/
 ncore=24
 
 $sing churros -p $ncore samplelist.txt samplepairlist.txt $build $Ddir
+
 
 # specify output directory
 $sing churros -p $ncore -D outputdir samplelist.txt samplepairlist.txt $build $Ddir

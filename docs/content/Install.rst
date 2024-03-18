@@ -68,6 +68,7 @@ The latest version of **Churros** uses the following tools internally.
    - `epilogos <https://epilogos.altius.org/>`_ v0.1.2
 
 - ATAC-seq analysis
+   - `ATACseqQC <https://bioconductor.org/packages/release/bioc/html/ATACseqQC.html>`_ v1.26.0
    - `TOBIAS <https://github.com/loosolab/TOBIAS>`_ v0.14.0
    - `HINT-ATAC <https://reg-gen.readthedocs.io/en/latest/hint/introduction.html>`_
 
@@ -80,11 +81,15 @@ The latest version of **Churros** uses the following tools internally.
 
 - Functional analysis
    - `ChIPseeker <https://bioconductor.org/packages/release/bioc/html/ChIPseeker.html>`_ v1.36.0
-   - `HOMER <http://homer.ucsd.edu/homer/>`_ v4.11
    - `STITCHIT <https://github.com/SchulzLab/STITCHIT>`_: link regulatory elements to genes
    - `clusterProfiler <https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html>`_ v4.8.2
    - `rGREAT <https://bioconductor.org/packages/release/bioc/html/rGREAT.html>`_ v2.2.0
+
+- Motif analysis
+   - `HOMER <http://homer.ucsd.edu/homer/>`_ v4.11
+   - `TFBSTools <https://bioconductor.org/packages/release/bioc/html/TFBSTools.html>`_ v1.40.0
    - `motifbreakR <https://bioconductor.org/packages/release/bioc/html/motifbreakR.html>`_ v2.14.2
+
 
 - Quality assessment
    - `FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`_ v0.11.9

@@ -51,7 +51,7 @@ fi
 fastq=$1
 prefix=$2
 Ddir=$3
-post=`echo $param | tr -d ' '`
+#post=`echo $param | tr -d ' ' | sed -e 's/--/-/g'`
 
 logdir=$chdir/log/bowtie2
 bamdir=$chdir/$bamdir

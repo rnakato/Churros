@@ -98,7 +98,7 @@ do_compare_bs(){
 }
 export -f do_compare_bs
 
-echo ${array[@]} | tr ' ' '\n' | xargs -n1 -I {} -P $ncore bash -c "do_compare_bs {} $npeak $peakdir $compdir"
+echo ${array[@]} | tr ' ' '\n' | xargs -I {} -P $ncore bash -c "do_compare_bs {} $npeak $peakdir $compdir"
 echo "done."
 
 for peak1 in $peaklist; do
