@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.13.0 (2024-3-X)
+## 0.13.0 (2024-3-18)
 - Modified fastp execution to handle paired-end FASTQ files at a same time
 - Added `--nofilter`, `--fastqtrimming` and `--parse2wigparam` options to `churros`
 - Added `-N: do not filter PCR duplication` and `-Q: additional parameter for parse2wig+` options to `churros_mapping`

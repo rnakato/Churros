@@ -170,6 +170,7 @@ Use Adapter-Trimmed Reads for Mapping
 
 Churros maps raw reads by default to save on time and storage.
 However, if the mapping ratio is quite low, it is recommended to opt for mapping with adapter-trimmed reads by using the ``--fastqtrimming`` option.
+
 When this option is selected, Churros will run ``fastp`` to remove the adapter sequences from the reads. The resulting trimmed reads are then stored in the ``fastp/`` directory.
 Additionally, a modified version of ``samplelist.txt``, named ``samplelist.trimed.txt``, is saved in the ``Churros_result/`` directory. This is used for the mapping process with ``churros_mapping``.
 
