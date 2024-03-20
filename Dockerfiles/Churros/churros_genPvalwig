@@ -75,11 +75,11 @@ odir=$chdir/$odir
 mkdir -p $logdir $odir
 
 if test $outputvalue -eq 0; then
-    outputdir=enrichment
+    outputdir=Enrichment
 elif test $outputvalue -eq 1; then
-    outputdir=pval_internal
+    outputdir=Pval_internal
 elif test $outputvalue -eq 2; then
-    outputdir=pval_enrich
+    outputdir=Pval_enrich
 else
     echo "Error: outputvalue (-e) should be 0, 1, or 2."
 fi
@@ -117,7 +117,7 @@ while IFS=',' read -ra LINE; do
     input=${LINE[1]:-""}
     label=${LINE[2]:-""}
 
-    param="--outputvalue 2 $param_format --gt $gt -o $odir/$outputdir"
+    param="--outputvalue $outputvalue $param_format --gt $gt -o $odir/$outputdir"
     if test $outputvalue -eq 0; then
         if test "$input" != ""; then
             drompa+ GENWIG $param -i $pdir/$chip$post.$binsize.bw,$pdir/$input$post.$binsize.bw,${label} > $logdir/GENWIG.Enrichment.$chip$post

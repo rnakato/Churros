@@ -20,6 +20,7 @@
 - `download_genomedata.sh`: 
     - Updated the version of Ensemble data from 106 to 111.
     - Added `Medaka` genome.
+- Changed `churros_visualize` to allow ChIP samples even without the input sample when the `-G` option is specified. 
 
 ## 0.12.2 (2024-3-5)
 - Fixed a bug in `churros` that did not output the mapping statistics file correctly.
