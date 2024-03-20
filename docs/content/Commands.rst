@@ -289,16 +289,18 @@ The good usage of ``churros_genPvalwig`` is specifying ChIP files in two conditi
       <gt>: genome_table file
       Options:
          -b <int>: binsize (defalt: 100)
-         -d <str>: directory of bigWig files (default: 'TotalReadNormalized/')
-         -n: do not consider genome mappability
-         -y <str>: postfix of .bw files to be used (default: '.mpbl')
+         -d <str>: directory of bigWig files (default: TotalReadNormalized/)
+         -e <int>: Output value
+            0: ChIP/Input enrichment
+            1: -log10(P) (ChIP internal)
+            2 (default): -log10(P) (ChIP/Input enrichment)
+         -n: do not filter PCR duplicate
+         -m: do not consider genome mappability
+         -y <str>: postfix of .bw files to be used (default: "-raw-GR")
          -D <str>: directory for execution (defalt: "Churros_result")
+         -x: Output as bigWig (defalt: bedGraph)
       Example:
          churros_genPvalwig samplelist.txt chip-seq hg38 genometable.hg38.txt
-
-.. note::
-
-   If you supply ``-n`` option in ``churros_mapping`` (do not consider genome mappability), supply ``--nompbl`` optoon in ``churros_visualize`` to use the generated mappability-normalized bigWig files.
 
 
 churros_classheat

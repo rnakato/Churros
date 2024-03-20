@@ -14,7 +14,8 @@ function usage()
     echo '           0: ChIP/Input enrichment' 1>&2
     echo '           1: -log10(P) (ChIP internal)' 1>&2
     echo '           2 (default): -log10(P) (ChIP/Input enrichment)' 1>&2
-    echo '      -n: do not consider genome mappability' 1>&2
+    echo '      -n: do not filter PCR duplicate' 1>&2
+    echo '      -m: do not consider genome mappability' 1>&2
     echo '      -y <str>: postfix of .bw files to be used (default: "-raw-GR")' 1>&2
     echo '      -D <str>: directory for execution (defalt: "Churros_result")' 1>&2
     echo '      -x: Output as bigWig (defalt: bedGraph)' 1>&2
@@ -25,17 +26,19 @@ function usage()
 binsize=100
 pdir=TotalReadNormalized/
 mp=1
+nofilter=0
 post_predefined=""
 chdir="Churros_result"
 bigwig=0
 outputvalue=2
 
-while getopts b:d:e:ny:D:x option
+while getopts b:d:e:nmy:D:x option
 do
     case ${option} in
         b) binsize=${OPTARG};;
         d) pdir=${OPTARG};;
-        n) mp=0;;
+        m) nofilter=1;;
+        m) mp=0;;
         e) outputvalue=${OPTARG};;
         y) post_predefined=${OPTARG};;
         D) chdir=${OPTARG};;
@@ -81,7 +84,6 @@ else
     echo "Error: outputvalue (-e) should be 0, 1, or 2."
 fi
 
-
 if test ! -e $gt; then
     echo "Error: $gt does not exist."
     exit 1
@@ -93,6 +95,9 @@ if test "$post_predefined" = ""; then
         post=.mpbl
     else
         post=""
+    fi
+    if test $nofilter -eq 1; then
+        post=$post-nofilter
     fi
 else
     post=$post_predefined
