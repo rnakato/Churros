@@ -10,10 +10,10 @@ function usage()
     echo '   Options:' 1>&2
     echo '      -b <int>: binsize (defalt: 100)' 1>&2
     echo '      -d <str>: directory of bigWig files (default: TotalReadNormalized/)' 1>&2
-    echo '      -e <int>: Output value
-                               0: ChIP/Input enrichment
-                               1: -log10(P) (ChIP internal)
-                               2 (default): -log10(P) (ChIP/Input enrichment)' 1>&2
+    echo '      -e <int>: Output value' 1>&2
+    echo '           0: ChIP/Input enrichment' 1>&2
+    echo '           1: -log10(P) (ChIP internal)' 1>&2
+    echo '           2 (default): -log10(P) (ChIP/Input enrichment)' 1>&2
     echo '      -n: do not consider genome mappability' 1>&2
     echo '      -y <str>: postfix of .bw files to be used (default: "-raw-GR")' 1>&2
     echo '      -D <str>: directory for execution (defalt: "Churros_result")' 1>&2
@@ -39,7 +39,7 @@ do
         e) outputvalue=${OPTARG};;
         y) post_predefined=${OPTARG};;
         D) chdir=${OPTARG};;
-        s) bigwig=1;;
+        x) bigwig=1;;
 	*)
 	    usage
 	    exit 1

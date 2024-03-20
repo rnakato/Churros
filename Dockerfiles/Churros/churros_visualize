@@ -143,9 +143,9 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir
     df = pd.read_csv(samplepairlist, sep=",", header=None)
     df.fillna("", inplace=True)
 
-    if not is_exist_input(samplepairlist):
-        print ("No ChIP sample with the input sample. Skipped.")
-        return
+#    if not is_exist_input(samplepairlist):
+#        print ("No ChIP sample with the input sample. Skipped.")
+#        return
 
     sGV = ""
     for index, row in df.iterrows():
