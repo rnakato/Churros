@@ -158,7 +158,8 @@ def visualize_GV(args, samplepairlist, pdir, pdfdir, logdir, fileext, post, Ddir
                           + pdir + input + post + ".100000." + fileext + "," \
                           + label
         else:
-            print ("sample " + chip + " does not have the input sample. skipped..")
+            sGV += " -i " + pdir + chip  + post + ".100000." + fileext + ",," + label
+#            print ("sample " + chip + " does not have the input sample. skipped..")
 
     head = os.path.basename(args.prefix)
     outputprefix =  pdfdir + "/" + head + ".GV.100000"
