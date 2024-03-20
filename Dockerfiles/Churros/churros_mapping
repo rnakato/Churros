@@ -164,19 +164,27 @@ func_map(){
     fi
 
     if test $csfasta -eq 1; then
-       echo "mapping by bowtie: $fastq..."
-       if test $format = "CRAM"; then
-            ex "bowtie.sh -t csfastq -c -p $ncore -P \"$bowtieparam\" -D $chdir \"$fastq\" $prefix $Ddir"
-       else
-            ex "bowtie.sh -t csfastq    -p $ncore -P \"$bowtieparam\" -D $chdir \"$fastq\" $prefix $Ddir"
-       fi
+        echo "mapping by bowtie: $fastq..."
+        if test $format = "CRAM"; then
+                ex "bowtie.sh -t csfastq -c -p $ncore -P \"$bowtieparam\" -D $chdir \"$fastq\" $prefix $Ddir"
+        else
+                ex "bowtie.sh -t csfastq    -p $ncore -P \"$bowtieparam\" -D $chdir \"$fastq\" $prefix $Ddir"
+        fi
     else
-       echo "mapping by bowtie2: $fastq..."
-       if test $format = "CRAM"; then
-           ex "bowtie2.sh -c -p $ncore -P \"$bowtieparam\" -D $chdir \"$fastq\" $prefix $Ddir"
-       else
-           ex "bowtie2.sh    -p $ncore -P \"$bowtieparam\" -D $chdir \"$fastq\" $prefix $Ddir"
-       fi
+        echo "mapping by bowtie2: $fastq..."
+        if test $format = "CRAM"; then
+            cramparam="-c"
+        else
+            cramparam=""
+        fi
+        if test "$bowtieparam" != ""; then
+            p_param="-P \"$bowtieparam\""
+#            ex "bowtie2.sh -c -p $ncore -P \"$bowtieparam\" -D $chdir \"$fastq\" $prefix $Ddir"
+        else
+            p_param=""
+ #           ex "bowtie2.sh    -p $ncore -P \"$bowtieparam\" -D $chdir \"$fastq\" $prefix $Ddir"
+        fi
+        ex "bowtie2.sh $cramparam -p $ncore $p_param -D $chdir \"$fastq\" $prefix $Ddir"
     fi
 }
 
@@ -222,7 +230,11 @@ func_postprocess(){
         exit 1
     fi
     flen=`cut -f5 $chdir/sspout/$head.stats.txt | tail -n1`
-    parseparam="$parseparam -l $flen -P \"$parse2wigparam\""
+    if test "$parse2wigparam" != ""; then
+       parseparam="$parseparam -l $flen -P \"$parse2wigparam\""
+    else
+       parseparam="$parseparam -l $flen"
+    fi
 
     if test $format = "CRAM"; then
        ex "parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir"

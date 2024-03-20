@@ -57,7 +57,7 @@ if test ! -e $samplepairlist; then
     exit 1
 fi
 
-check_build.sh $build || exit 1
+#check_build.sh $build || exit 1
 chdir=$chdir/$build
 
 ex(){ echo $1; eval $1; }
@@ -77,10 +77,10 @@ while read LINE; do
     array="$array $LINE"
 
     LINE=(${LINE//,/ })
-    chip=${LINE[0]}
-    input=${LINE[1]}
-    label=${LINE[2]}
-    mode=${LINE[3]}
+    chip=${LINE[0]:-""}
+    input=${LINE[1]:-""}
+    label=${LINE[2]:-""}
+    mode=${LINE[3]:-""}
     if test "$mode" = ""; then
        mode="sharp"
     fi
@@ -103,18 +103,21 @@ do_macs(){
     post=$8
 
     IFS=, read -ra LINE <<< $LINE
-    chip=${LINE[0]}
-    input=${LINE[1]}
-    label=${LINE[2]}
-    mode=${LINE[3]}
-    flen=${LINE[4]}
+    chip=${LINE[0]:-""}
+    input=${LINE[1]:-""}
+    label=${LINE[2]:-""}
+    mode=${LINE[3]:-""}
+    flen=${LINE[4]:-""}
     IPbam=$bamdir/$chip$post.sort.bam
     Inputbam=$bamdir/$input$post.sort.bam
 
-    echo $chip $input $label $mode $flen
+#    echo $chip
+#    echo $input
+#    echo $label
+#    echo $mode
+#    echo $flen
 
     if test "$mode" = ""; then mode="sharp"; fi
-
     if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
         peak=$mdir/${label}_peaks.narrowPeak
         if test "$flen" != ""; then

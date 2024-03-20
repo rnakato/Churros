@@ -107,11 +107,10 @@ else
     param_format="--outputformat 2"
 fi
 
-while read LINE; do
-    LINE=(${LINE//,/ })
-    chip=${LINE[0]}
-    input=${LINE[1]}
-    label=${LINE[2]}
+while IFS=',' read -ra LINE; do
+    chip=${LINE[0]:-""}
+    input=${LINE[1]:-""}
+    label=${LINE[2]:-""}
 
     param="--outputvalue 2 $param_format --gt $gt -o $odir/$outputdir"
     if test $outputvalue -eq 0; then

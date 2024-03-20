@@ -80,7 +80,7 @@ fi
 
 while read LINE; do
     LINE=($LINE)
-    prefix=${LINE[0]}
+    prefix=${LINE[0]:-""}
     array="$array `ls $chdir/bigWig/TotalReadNormalized/$prefix$post.100.bw`"
 
     sample=`ls $chdir/bigWig/TotalReadNormalized/$prefix$post.100000.bw 2> /dev/null`
@@ -136,14 +136,11 @@ jacdir=$odir/Peak_BPlevel_overlap
 mkdir -p $jacdir
 peakarray=""
 peaklist_simpson=""
-while read LINE; do
-    array="$array $LINE"
-
-    LINE=(${LINE//,/ })
-    chip=${LINE[0]}
-    input=${LINE[1]}
-    label=${LINE[2]}
-    mode=${LINE[3]}
+while IFS=',' read -ra LINE; do
+    chip=${LINE[0]:-""}
+    input=${LINE[1]:-""}
+    label=${LINE[2]:-""}
+    mode=${LINE[3]:-""}
     if test "$mode" = ""; then
        mode="sharp"
     fi

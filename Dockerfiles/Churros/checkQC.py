@@ -24,6 +24,8 @@ with open(samplepairlist, 'r') as file:
         value = columns[3]
         data_dict[key] = value
 
+
+column_name = data.columns.get_loc("Sample")
 column_maprate = data.columns.get_loc("Mapped 1 time") + 1
 column_uniquereads = data.columns.get_loc("Nonredundant")
 column_complexity = data.columns.get_loc("Complexity for10M")
@@ -36,7 +38,7 @@ column_nsc = data.columns.get_loc("NSC")
 column_bu = data.columns.get_loc("Background uniformity")
 
 for index, row in data.iterrows():
-    label = row[1]
+    label = row[column_name]
 
     # mapping rate
     mapratio = row[column_maprate]

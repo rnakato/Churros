@@ -9,6 +9,7 @@
 - Added `mptable.UCSC.T2T.28mer.flen150.txt` and `mptable.UCSC.T2T.36mer.flen150.txt` in `SSP/data/mptable`.
 - Added the ideogram file for the T2T genome in `DROMPAplus/data/ideogram`.
 - Fixed a bug in `churros_mapping` and `churros_callpeak` that did not handle the name of the mapfiles correctly when passing additional parameters to `bowtie2.sh`.
+- Fixed a bug in `churros_peakcall` that did not create `macs/samplepairlist.txt` correctly when input samples were not specified.
 - Updated `churros_mapping` to show header correctly for paired-end FASTQ files.
 - Modified `download_genomedata.sh` to download the reference file of the T2T genome.
 - Added [ATACseqQC](https://bioconductor.org/packages/release/bioc/html/ATACseqQC.html) for quality check of ATAC-seq data
@@ -16,6 +17,9 @@
 - Updated chromap from v0.2.5 to v0.2.6
 - Updated SSP and DROMPAplus to modify `parsestats4DROMPAplus.pl`
 - Fixed the warning of xargs in `churros_callpeak`
+- `download_genomedata.sh`: 
+    - Updated the version of Ensemble data from 106 to 111.
+    - Added `Medaka` genome.
 
 ## 0.12.2 (2024-3-5)
 - Fixed a bug in `churros` that did not output the mapping statistics file correctly.

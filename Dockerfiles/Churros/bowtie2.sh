@@ -79,11 +79,11 @@ ex_hiseq(){
     bowtie2 --version
 
     if test $format = "BAM"; then
-	ex "bowtie2 $param -p $ncore -x $index \"$fastq\" | samtools sort > $file"
-	if test ! -e $file.bai; then samtools index $file; fi
-    else
-	ex "bowtie2 $param -p $ncore -x $index \"$fastq\" | samtools view -C - -T $genome | samtools sort -O cram > $file"
-	if test ! -e $file.crai; then samtools index $file; fi
+        ex "bowtie2 $param -p $ncore -x $index \"$fastq\" | samtools sort > $file"
+        if test ! -e $file.bai; then samtools index $file; fi
+        else
+        ex "bowtie2 $param -p $ncore -x $index \"$fastq\" | samtools view -C - -T $genome | samtools sort -O cram > $file"
+        if test ! -e $file.crai; then samtools index $file; fi
     fi
 
 }

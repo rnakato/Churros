@@ -180,6 +180,7 @@ def do_mapping(args, samplelist, build, chdir):
     # convert to xlsx
     os.system(f'csv2xlsx.pl -i {qcstatsfile} -o {chdir}/{build}/churros.QCstats.xlsx')
 
+
 def make_trimmedsamplelist(chdir, samplelist):
     samplelist_trimmed = chdir + "/samplelist.trimmed.txt"
     if(os.path.isfile(samplelist_trimmed)):
@@ -211,6 +212,7 @@ def make_trimmedsamplelist(chdir, samplelist):
     check_fastq_in_samplelist(samplelist_trimmed)
     return samplelist_trimmed
 
+
 def make_samplepairlist_withflen(samplepairlist, build, chdir):
     samplepairlist_withflen = chdir + "/churros.samplepairlist.withflen.txt"
     if(os.path.isfile(samplepairlist_withflen)):
@@ -232,6 +234,7 @@ def make_samplepairlist_withflen(samplepairlist, build, chdir):
 
     return samplepairlist_withflen
 
+
 def ask_to_proceed_with_overwrite(filepath):
     """Produces a prompt asking about overwriting a file.
 
@@ -251,6 +254,7 @@ def ask_to_proceed_with_overwrite(filepath):
     if overwrite == 'n':
         return False
     return True
+
 
 def is_exist_input(samplepairlist):
     df = pd.read_csv(samplepairlist, sep=",", header=None)
@@ -379,6 +383,7 @@ def exec_churros(args):
 
         print_and_exec_shell(f'churros_visualize {param_churros_visualize} {chdir}/{build}/{args.macsdir}/samplepairlist.txt drompa+.macspeak {build} {Ddir}')
         print_and_exec_shell(f'churros_visualize {param_churros_visualize} -b 5000 -l 8000 -P "--scale_tag 100" {samplepairlist} drompa+.bin5M {build} {Ddir}')
+
 
 if(__name__ == '__main__'):
     parser = argparse.ArgumentParser()
