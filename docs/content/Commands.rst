@@ -505,9 +505,6 @@ which calculates the fraction of mapped reads that fall within ChIP-seq peak reg
 
 .. code-block:: bash
 
-   FRiR
-   ===============
-
    Usage: FRiR [option] -r <repeatfile> -i <inputfile> -o <output> --gt <genome_table>
 
    Example:
