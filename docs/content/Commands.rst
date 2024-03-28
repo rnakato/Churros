@@ -495,6 +495,26 @@ Input bam file is optional.
          -d : maximum distance between two regions that will be stitched together (default: 12500)
          -e : exclude regions contained within +/- this distance from TSS in order to account for promoter biases (default: 0, recommended if used: 2500)
 
+FRiR: Repeat Analysis
+---------------------------------
+
+Similar to the FRiP (fraction of reads in peaks) score of `Landt et al. (2012) <https://genome.cshlp.org/content/22/9/1813.abstract>`_,
+which calculates the fraction of mapped reads that fall within ChIP-seq peak regions,
+**Churros** calculates the FRiR (fraction of reads in repeats) score as the fraction of mapped reads that fall within repeat regions annotated by `RemeatMasker <https://www.repeatmasker.org/>`_.
+
+
+.. code-block:: bash
+
+   FRiR
+   ===============
+
+   Usage: FRiR [option] -r <repeatfile> -i <inputfile> -o <output> --gt <genome_table>
+
+   Example:
+      FRiR -r Referencedata_hg38/RepeatMasker.txt.gz -o FRiRresult --gt Referencedata_hg38/genometable.txt -i Churros_result/hg38/bam/Sample.sort.bam --repeattype class
+
+<repeatfile> is the RepeatMasker file downloaded with `download_genomefa.sh`. FRiR can allow a gzipped repeat file. The `--repeattype` option specifies the type of repeat classification of the output. The default is "class" (e.g., SINE, LINE, LTR, DNA, and others). The output is a text file with the FRiR score for each repeat type.
+
 chromHMM.sh
 ------------------------------------------------
 
