@@ -191,23 +191,33 @@ def make_trimmedsamplelist(chdir, samplelist):
 
     fastpdir =  chdir + "/fastp/"
     for index, row in df.iterrows():
-        label = row[0]
-        fq1 = row[1]
-        fq2 = row[2]
+        if (len(row)<3): # single-end
+            label = row[0]
+            fq1 = row[1]
+            fq1s = fq1.split(",")
+            for i, fq1 in enumerate(fq1s):
+                prefix = os.path.basename(fq1).replace('_R1.', '.').replace('_1.', '.').replace('.fastq', '').replace('.gz', '').replace('.fq', '')
+                fastp_output = f"{fastpdir}/{prefix}.trimmed.fastq.gz"
+                os.system(f'echo "{label}\t{fastp_output}" >> {samplelist_trimmed}')
 
-        fq1s = fq1.split(",")
-        fq2s = fq2.split(",")
+        else: # paired-end
+            label = row[0]
+            fq1 = row[1]
+            fq2 = row[2]
 
-        if len(fq1s) != len(fq2s):
-            print (f"Error: the number of fastq files in {row[1]} and {row[2]} is not the same.")
-            exit()
+            fq1s = fq1.split(",")
+            fq2s = fq2.split(",")
 
-        for i, fq1 in enumerate(fq1s):
-            fq2 = fq2s[i]
-            prefix = os.path.basename(fq1).replace('_R1.', '.').replace('_1.', '.').replace('.fastq', '').replace('.gz', '').replace('.fq', '')
-            fastp_output = f"{fastpdir}/{prefix}_1.trimmed.fastq.gz"
-            fastp_output2 = f"{fastpdir}/{prefix}_2.trimmed.fastq.gz"
-            os.system(f'echo "{label}\t{fastp_output}\t{fastp_output2}" >> {samplelist_trimmed}')
+            if len(fq1s) != len(fq2s):
+                print (f"Error: the number of fastq files in {row[1]} and {row[2]} is not the same.")
+                exit()
+
+            for i, fq1 in enumerate(fq1s):
+                fq2 = fq2s[i]
+                prefix = os.path.basename(fq1).replace('_R1.', '.').replace('_1.', '.').replace('.fastq', '').replace('.gz', '').replace('.fq', '')
+                fastp_output = f"{fastpdir}/{prefix}_1.trimmed.fastq.gz"
+                fastp_output2 = f"{fastpdir}/{prefix}_2.trimmed.fastq.gz"
+                os.system(f'echo "{label}\t{fastp_output}\t{fastp_output2}" >> {samplelist_trimmed}')
 
     check_fastq_in_samplelist(samplelist_trimmed)
     return samplelist_trimmed
@@ -274,6 +284,20 @@ def is_exist_input(samplepairlist):
     else:
         return True
 
+def check_labels(samplelist, samplepairlist):
+    with open(samplelist, 'r') as f:
+        labels = set(line.strip().split('\t')[0] for line in f)
+    
+    with open(samplepairlist, 'r') as f:
+        for line_number, line in enumerate(f, 1):
+            row = line.strip().split(',')
+            if row[0] not in labels:
+                print (f"\nError at line {line_number}: Labels '{row[0]}' in {samplepairlist} not found in {samplelist}.")
+                exit()
+            if row[1] not in labels:
+                print (f"\nError at line {line_number}: Labels '{row[1]}' in {samplepairlist} not found in {samplelist}.")
+                exit()
+
 
 def exec_churros(args):
     samplelist = args.samplelist
@@ -297,6 +321,7 @@ def exec_churros(args):
     # check samplelist
     check_fastq_in_samplelist(samplelist)
     check_duplicates(samplelist)
+    check_labels(samplelist, samplepairlist)
 
 #    post = get_mapfile_postfix(args.mapparam)
     gt = Ddir + '/genometable.txt'

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.13.1 (2024-3-29)
+- Fixed a bug in `churros` when applying single-end reads with the `--fastqtrimming` option.
+
 ## 0.13.0 (2024-3-18)
 - Modified fastp execution to handle paired-end FASTQ files at a same time
 - Added `--nofilter`, `--fastqtrimming` and `--parse2wigparam` options to `churros`
