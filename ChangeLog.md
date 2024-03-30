@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.13.1 (2024-3-29)
+- Added to `churros` the function that checks if the samples shown in samplepairlist.txt are in samplelist.txt.
 - Fixed a bug in `churros` when applying single-end reads with the `--fastqtrimming` option.
 
 ## 0.13.0 (2024-3-18)
