@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0 (2024-5-19)
+- Added `churros_mapping_spikein` for spike-in normalization.
+- Changed Python environment from conda to micromamba (`/opt/micromamba`)
+
 ## 0.13.2 (2024-4-6)
 - Big fix when no input samples are specified in samplepairlist.txt.
 
@@ -136,4 +140,4 @@
 
 ## 0.4.0
 - Public release
-- Updated 
+- Updated manual

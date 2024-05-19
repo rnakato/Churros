@@ -63,23 +63,22 @@ The latest version of **Churros** uses the following tools internally.
    - `STARE <https://stare.readthedocs.io/en/latest/index.html>`_ v1.0.4
    - `ChromImpute <https://ernstlab.biolchem.ucla.edu/ChromImpute/>`_ v1.0.5
 
-- Chromatin state analysis
-   - `ChromHMM <https://compbio.mit.edu/ChromHMM/>`_ v1.25
-   - `epilogos <https://epilogos.altius.org/>`_ v0.1.2
-
 - ATAC-seq analysis
    - `ATACseqQC <https://bioconductor.org/packages/release/bioc/html/ATACseqQC.html>`_ v1.26.0
-   - `TOBIAS <https://github.com/loosolab/TOBIAS>`_ v0.14.0
-
+   - `TOBIAS <https://github.com/loosolab/TOBIAS>`_ v0.16.1
+   
 - Bisulfite sequencing (DNA methylation)
    - `Bismark <https://github.com/FelixKrueger/Bismark>`_  v0.22.3
+
+- Peak analysis 
+   - `ChIPseeker <https://bioconductor.org/packages/release/bioc/html/ChIPseeker.html>`_ v1.36.0
+   - `intervene <https://intervene.readthedocs.io/en/latest/install.html>`_ v0.6.5
 
 - Differential analysis
    - `edgeR <https://bioconductor.org/packages/release/bioc/html/edgeR.html>`_ v3.42.4
    - `DESeq2 <https://bioconductor.org/packages/release/bioc/html/DESeq2.html>`_ v1.40.2
 
 - Functional analysis
-   - `ChIPseeker <https://bioconductor.org/packages/release/bioc/html/ChIPseeker.html>`_ v1.36.0
    - `STITCHIT <https://github.com/SchulzLab/STITCHIT>`_: link regulatory elements to genes
    - `clusterProfiler <https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html>`_ v4.8.2
    - `rGREAT <https://bioconductor.org/packages/release/bioc/html/rGREAT.html>`_ v2.2.0
@@ -89,21 +88,24 @@ The latest version of **Churros** uses the following tools internally.
    - `TFBSTools <https://bioconductor.org/packages/release/bioc/html/TFBSTools.html>`_ v1.40.0
    - `motifbreakR <https://bioconductor.org/packages/release/bioc/html/motifbreakR.html>`_ v2.14.2
 
+- Chromatin state analysis
+   - `ChromHMM <https://compbio.mit.edu/ChromHMM/>`_ v1.25
+   - `epilogos <https://epilogos.altius.org/>`_ v0.1.2
 
 - Quality assessment
    - `FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`_ v0.11.9
    - `fastp <https://github.com/OpenGene/fastp>`_ v0.23.2
-   - `MultiQC <https://multiqc.info/>`_ v1.12
+   - `MultiQC <https://multiqc.info/>`_ v1.21
    - `SSP <https://github.com/rnakato/SSP>`_ v1.3.1
 
 - File processing
    - `SAMtools <http://www.htslib.org/>`_ v1.19.2
    - `sambamba <https://github.com/biod/sambamba>`_ v0.6.6
    - `BEDtools <https://bedtools.readthedocs.io/en/latest/>`_ v2.31.0
-   - `deepTools <https://deeptools.readthedocs.io/>`_  v3.5.2
+   - `deepTools <https://deeptools.readthedocs.io/>`_  v3.5.5
 
 - Adapter trimming
-   - `Cutadapt <https://cutadapt.readthedocs.io/en/stable/index.html>`_ v4.4
+   - `Cutadapt <https://cutadapt.readthedocs.io/en/stable/index.html>`_ v4.7
    - `TrimGalore <https://github.com/FelixKrueger/TrimGalore>`_ v0.6.7
 
 - Mappability calculation

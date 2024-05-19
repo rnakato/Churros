@@ -1,0 +1,380 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import argparse
+import pandas as pd
+import subprocess
+import sys
+
+def exec_shell(command):
+#    os.system(command)
+    try:
+        subprocess.call(command, shell=True)
+    except Exception as e:
+        print(f"An error occurred while executing the command: {e}")
+
+def print_and_exec_shell(command):
+    print (command)
+#    os.system(command)
+    try:
+        subprocess.call(command, shell=True)
+    except Exception as e:
+        print(f"An error occurred while executing the command: {e}")
+
+def echo_and_print_and_exec_shell(command, logfile):
+    os.system("echo '" + command + "' >" + logfile)
+    print_and_exec_shell(command)
+
+
+def check_file(file):
+    if os.path.isfile(file):
+        pass
+    else:
+        print ("Error: " + file + " does not exist.")
+        exit()
+
+def check_dir(dir):
+    if os.path.isdir(dir):
+        pass
+    else:
+        print ("Error: " + dir + " does not exist.")
+        exit()
+
+
+def func_map(args, odir_ref, odir_spikein, prefix, fq1, fq2):
+    if fq2 == "":
+        check_file(fq1)
+        fastq = fq1
+    else:
+        check_file(fq1)
+        check_file(fq2)
+        fastq = f"-1 {fq1} -2 {fq2}"
+
+    if args.bowtieparam == "":
+        bowtieparam = ""
+    else:
+        bowtieparam = "-P \"{args.bowtieparam}\""
+
+    cramparam = "-c" if args.cram else ""
+
+    ncore = args.threads
+    Ddir_ref = args.Ddir_ref
+    Ddir_spikein = args.Ddir_spikein
+    outputdir = args.outputdir
+
+    print(f"mapping by bowtie2: {fastq}...")
+#    cmd = f"~/DockerFiles/Churros/Dockerfiles/Churros/bowtie2.sh {cramparam} -p {ncore} {bowtieparam} -D {odir_ref} \"{fastq}\" {prefix} {Ddir_ref}"
+    cmd = f"bowtie2.sh {cramparam} -p {ncore} {bowtieparam} -D {odir_ref} \"{fastq}\" {prefix} {Ddir_ref}"
+    exec_shell(cmd)
+#    cmd = f"~/DockerFiles/Churros/Dockerfiles/Churros/bowtie2.sh {cramparam} -p {ncore} {bowtieparam} -D {odir_spikein} \"{fastq}\" {prefix} {Ddir_spikein}"
+    cmd = f"bowtie2.sh {cramparam} -p {ncore} {bowtieparam} -D {odir_spikein} \"{fastq}\" {prefix} {Ddir_spikein}"
+    exec_shell(cmd)
+
+
+def func_postprocess(args, odir_ref, odir_spikein, prefix, fq1, fq2):
+    ncore = args.threads
+    build = args.build
+    binsize = args.binsize
+    Ddir_ref = args.Ddir_ref
+    Ddir_spikein = args.Ddir_spikein
+    outputdir = args.outputdir
+    pair = "-p" if fq2 != "" else ""
+
+    gt = f'{Ddir_ref}/genometable.txt'
+    mptable = f'{Ddir_ref}/mappability_Mosaics_{args.kmer}mer/map_fragL150_genome.txt'
+
+    mapfile = f'{odir_ref}/bam/{prefix}.sort.cram' if args.cram else f'{odir_ref}/bam/{prefix}.sort.bam'
+
+    print ("churros_mapping: quality check by SSP...")
+#    cmd = f"~/DockerFiles/Churros/Dockerfiles/Churros/ssp.sh -t {ncore} {pair} -D {odir_ref} {mapfile} {prefix} {build} {gt} {mptable}"
+    cmd = f"ssp.sh -t {ncore} {pair} -D {odir_ref} {mapfile} {prefix} {build} {gt} {mptable}"
+    print_and_exec_shell(cmd)
+
+    sspstats = f"{odir_ref}/sspout/{prefix}.stats.txt"
+    if not os.path.exists(sspstats):
+        print(f"Error: {sspstats} was not created correctly.")
+        sys.exit(1)
+        
+    try:
+        command = f"cut -f5 {sspstats} | tail -n1"
+        flen = subprocess.check_output(command, shell=True, text=True).strip()
+    except subprocess.CalledProcessError as e:
+        print("Failed to execute shell command:", e)
+        sys.exit(1)
+
+    parseparam = f"-a -D {odir_ref} {pair} -s stats -o bigWig -t {ncore} {pair} -f {args.output_format} -l {flen}"
+
+    if not args.nompbl:
+        parseparam += f" -m -k {args.kmer}"
+    if args.nofilter:
+        parseparam += " -n"
+    if args.param_parse2wig != "":
+       parseparam += f' -P \"{args.param_parse2wig}\"'
+
+    os.makedirs(f"{odir_ref}/log/parse2wig+", exist_ok=True)
+#    cmd = f"~/DockerFiles/Churros/Dockerfiles/Churros/parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref}"
+    cmd = f"parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref} > {odir_ref}/log/parse2wig+/{prefix}.log 2>&1"
+    print_and_exec_shell(cmd)
+
+    path=f"{odir_spikein}/parse2wigdir+/{prefix}.100000.tsv"
+    if os.path.isfile(path):
+        print(f"{path} already exists. skipping.")
+    else:
+        os.makedirs(f"{odir_spikein}/log/parse2wig+", exist_ok=True)
+        cmd = f"parse2wig+ -b 100000 -i {odir_spikein}/bam/{prefix}.sort.bam --gt {Ddir_spikein}/genometable.txt -p {ncore} -o {prefix} --odir {odir_spikein}/parse2wigdir+ > {odir_spikein}/log/parse2wig+/{prefix}.spikein.log"
+        print_and_exec_shell(cmd)
+
+
+def run_parsebowtielog2(file_path):
+    result = subprocess.run(['parsebowtielog2.pl', file_path], capture_output=True, text=True)
+    return result.stdout.strip().split('\n')[-1]
+
+
+def run_parsestats(file_path):
+    command = f"parsestats4DROMPAplus.pl {file_path} | cut -f6 | tail -n1 | cut -f1 -d' '"
+    result = subprocess.run(command, shell=True, text=True, capture_output=True)
+
+    return int(result.stdout.strip().split('\n')[-1])
+
+
+def Output_scalingfactor_Hu(args, chip, input, label, odir_ref, odir_spikein, sfdir):
+    num_ChIP_ref    = run_parsestats(f'{odir_ref}/bigWig/TotalReadNormalized/{chip}.100.tsv')
+    num_ChIP_spike  = run_parsestats(f'{odir_spikein}/parse2wigdir+/{chip}.100000.tsv')
+    num_Input_ref   = run_parsestats(f'{odir_ref}/bigWig/TotalReadNormalized/{input}.100.tsv')
+    num_Input_spike = run_parsestats(f'{odir_spikein}/parse2wigdir+/{input}.100000.tsv')
+
+    rIP =  num_ChIP_ref / num_ChIP_spike if num_ChIP_ref else 0
+    rcell = num_Input_spike / num_Input_ref if num_Input_ref else 0
+    occupancy_ratio = rIP * rcell
+#    sf_rpm = args.spikein_constant / num_ChIP_ref if num_ChIP_ref else 0
+    nNormed_rpm = args.spikein_constant * 200000
+    nNormed = int(occupancy_ratio * nNormed_rpm)
+
+    outputfile = f"{sfdir}/{label}.tsv"
+
+    with open(outputfile, 'w') as f:
+        print(f"Label\tMapped reads (ChIP, reference)\tMapped reads (ChIP, spikein)\tMapped reads (Input, reference)\tMapped reads (Input, spikein)\tReference reads/Spikein reads (ChIP)\tSpikein reads/Reference reads (Input)\tOccupancy ratio\tNormalized reads", file=f)
+        print(f"{label}\t{num_ChIP_ref}\t{num_ChIP_spike}\t{num_Input_ref}\t{num_Input_spike}\t{rIP:.6f}\t{rcell:.6f}\t{occupancy_ratio:.6f}\t{nNormed}", file=f)
+
+    print (f"The scaling factor for the spike-in normalization is written in {outputfile}.")
+
+    return nNormed
+
+
+def Output_scalingfactor_Orlando(args, chip, input, label, odir_ref, odir_spikein, sfdir):
+    num_ChIP_ref    = run_parsestats(f'{odir_ref}/bigWig/TotalReadNormalized/{chip}.100.tsv')
+    num_ChIP_spike  = run_parsestats(f'{odir_spikein}/parse2wigdir+/{chip}.100000.tsv')
+
+    sf = args.spikein_constant * 50000 / num_ChIP_spike if num_ChIP_spike else 0
+    nNormed = int(sf * num_ChIP_ref)
+    outputfile = f"{sfdir}/{label}.tsv"
+
+    with open(outputfile, 'w') as f:
+        print(f"Label\tMapped reads (ChIP, reference)\tMapped reads (ChIP, spikein)\tScaling factor\tNormalized reads", file=f)
+        print(f"{label}\t{num_ChIP_ref}\t{num_ChIP_spike}\t{sf:.6f}\t{nNormed:d}", file=f)
+
+    print (f"The scaling factor for the spike-in normalization is written in {outputfile}.")
+
+    return nNormed
+
+
+def create_spikein_bw(args, odir_ref, chip, nNormed):
+    ncore = args.threads
+    build = args.build
+    binsize = args.binsize
+    Ddir_ref = args.Ddir_ref
+    outputdir = args.outputdir
+
+    with open(args.samplelist, 'r') as file:
+        for line in file:
+            line = line.strip().split()
+            prefix = line[0]
+            fq1 = line[1]
+            fq2 = line[2] if len(line) > 2 else ""
+            pair = "-p" if fq2 else ""
+            if prefix == chip:
+                break
+
+    gt = f'{Ddir_ref}/genometable.txt'
+    mptable = f'{Ddir_ref}/mappability_Mosaics_{args.kmer}mer/map_fragL150_genome.txt'
+    mapfile = f'{odir_ref}/bam/{prefix}.sort.cram' if args.cram else f'{odir_ref}/bam/{prefix}.sort.bam'
+
+    sspstats = f"{odir_ref}/sspout/{prefix}.stats.txt"
+    try:
+        command = f"cut -f5 {sspstats} | tail -n1"
+        flen = subprocess.check_output(command, shell=True, text=True).strip()
+    except subprocess.CalledProcessError as e:
+        print("Failed to execute shell command:", e)
+        sys.exit(1)
+
+    parseparam = f"-a -D {odir_ref} {pair} -s stats -o bigWig -t {ncore} {pair} -f {args.output_format} -l {flen} -S {nNormed}"
+
+    if not args.nompbl:
+        parseparam += f" -m -k {args.kmer}"
+    if args.nofilter:
+        parseparam += " -n"
+    if args.param_parse2wig != "":
+       parseparam += f' -P \"{args.param_parse2wig}\"'
+
+    os.makedirs(f"{odir_ref}/log/parse2wig+", exist_ok=True)
+#    cmd = f"~/DockerFiles/Churros/Dockerfiles/Churros/parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref}"
+    cmd = f"parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref} > {odir_ref}/log/parse2wig+/{prefix}.spikein.log 2>&1"
+    print_and_exec_shell(cmd)
+
+
+def mapping_spikein(args):
+    samplelist = pd.read_csv(args.samplelist, sep="\t", header=None)
+    samplelist.fillna("", inplace=True)
+    
+    odir_ref = f'{args.outputdir}/{args.build}'
+    odir_spikein = f'{args.outputdir}/{args.build_spikein}'
+
+    for index, row in samplelist.iterrows():
+        prefix = row[0]
+        fq1 = row[1]
+        if (len(row)>2):
+            fq2 = row[2]
+        else:
+            fq2 = ""
+        func_map(args, odir_ref, odir_spikein, prefix, fq1, fq2)
+        func_postprocess(args, odir_ref, odir_spikein, prefix, fq1, fq2)
+
+    sfdir = f'{odir_ref}/spikein_scalingfactor'
+    sffile = f'{sfdir}/scaling_factors.tsv'
+    os.makedirs(sfdir, exist_ok=True)
+
+    df = pd.read_csv(args.samplepairlist, sep=",", header=None)
+    df.fillna("", inplace=True)
+    on = 0
+    for index, row in df.iterrows():
+        chip  = row[0]
+        input = row[1]
+        label = row[2]
+        if args.spikein_simple:
+            nNormed = Output_scalingfactor_Orlando(args, chip, input, label, odir_ref, odir_spikein, sfdir)
+        else:
+            nNormed = Output_scalingfactor_Hu(args, chip, input, label, odir_ref, odir_spikein, sfdir)
+
+        if on == 0:
+            print_and_exec_shell(f"cat {sfdir}/{label}.tsv > {sffile}")
+            on = 1
+        else:
+            print_and_exec_shell(f"tail -n1 {sfdir}/{label}.tsv >> {sffile}")
+        create_spikein_bw(args, odir_ref, chip, nNormed)
+
+
+def func_stats(args):
+    odir_ref = f'{args.outputdir}/{args.build}'
+
+    with open(args.samplelist, 'r') as file:
+        for line in file:
+            line = line.strip().split()
+            prefix = line[0]
+            fq1 = line[1]
+            fq2 = line[2] if len(line) > 2 else ""
+            pair = "-p" if fq2 else ""
+
+            odir_ref = f'{args.outputdir}/{args.build}'
+            logdir = odir_ref + "/log"
+            statsdir = odir_ref + "/stats"
+
+            log_path = f"{logdir}/bowtie2/{prefix}.txt"
+            cmd = f"parsebowtielog2.pl {pair} {log_path}"
+
+            a = subprocess.check_output(f"{cmd} | grep -v Sample | cut -f2-", shell=True).decode().strip()
+
+            if args.nompbl:
+                stats_file = f"{prefix}.stats.singleline.tsv"
+                fields = "11,12,13"
+            else:
+                stats_file = f"{prefix}.stats.singleline.GC.tsv"
+                fields = "11,12,13,14"
+
+            stats_file_path = os.path.join(statsdir, stats_file)
+            cmd = f"cat {stats_file_path} | grep -v Sample"
+
+            b = subprocess.check_output(f"{cmd} | cut -f6,7,8,9", shell=True).decode().strip()
+            gcov = subprocess.check_output(f"{cmd} | cut -f10", shell=True).decode().strip()
+            b2 = subprocess.check_output(f"{cmd} | cut -f{fields}", shell=True).decode().strip()
+
+            sspout_file_path = f"{odir_ref}/sspout/{prefix}.stats.txt"
+            sspout_data = subprocess.check_output(f"tail -n1 {sspout_file_path} | cut -f4,5,6,7,8,9,10,11,12,13,14", shell=True).decode().strip()
+
+            print(f"{a}\t{b}\t{gcov}\t{b2}\t{sspout_data}")
+
+
+def process_header(samplelist):
+    odir_ref = f'{args.outputdir}/{args.build}'
+
+    with open(args.samplelist, 'r') as file:
+        for line in file:
+            line = line.strip().split()
+            prefix = line[0]
+            fq1 = line[1]
+            fq2 = line[2] if len(line) > 2 else ""
+
+            pair = "-p" if fq2 else ""
+
+            logdir = odir_ref + "/log"
+
+            bowtie2_log_path = f"{logdir}/bowtie2/{prefix}.txt"
+            cmd = f"parsebowtielog2.pl {pair} {bowtie2_log_path} | head -n1 | cut -f2-"
+            a = subprocess.check_output(cmd, shell=True).decode().strip()
+
+            statsdir = odir_ref + "/stats"
+
+            if args.nompbl:
+                stats_file_path = f"{statsdir}/{prefix}.stats.singleline.tsv"
+                cmd = f"cat {stats_file_path} | head -n1 | cut -f6,7,8,9,10,11,12,13"
+                b = subprocess.check_output(cmd, shell=True).decode().strip()
+            else:
+                stats_file_path = f"{statsdir}/{prefix}.stats.singleline.GC.tsv"
+                cmd = f"cat {stats_file_path} | head -n1 | cut -f6,7,8,9,10,11,12,13,14"
+                b = subprocess.check_output(cmd, shell=True).decode().strip()
+
+            sspout_file_path = f'{odir_ref}/sspout/{prefix}.stats.txt'
+            cmd = f"head -n1 {sspout_file_path} | cut -f4,5,6,7,8,9,10,11,12,13,14"
+            sspout_data = subprocess.check_output(cmd, shell=True).decode().strip()
+
+            print(f"{a}\t{b}\t{sspout_data}")
+
+            sys.exit()
+
+if(__name__ == '__main__'):
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument("command", help='[exec|stats|header]\n    exec: mapping and postprocess\n    stats: show mapping/QC stats\n    header: print header line of the stats', type=str)
+    parser.add_argument("samplelist", help="Sample list", type=str)
+    parser.add_argument("samplepairlist", help="ChIP/Input pair list", type=str)
+    parser.add_argument("build", help="genome build (e.g., hg38)", type=str)
+    parser.add_argument("build_spikein", help="genome build (e.g., mm39)", type=str)
+    parser.add_argument("Ddir_ref", help="Directory of genome index for reference", type=str)
+    parser.add_argument("Ddir_spikein", help="Directory of genome index for spike-in", type=str)
+    parser.add_argument("--spikein_simple", help="Spikein: Use ChIP samples only", action="store_true")
+    parser.add_argument("--spikein_constant", help="Scaling Constant for the number of reads after normalization (default: 100)", type=int, default=100)
+    parser.add_argument("--cram", help="Output as CRAM format (defalt: BAM)", action="store_true")
+    parser.add_argument("-p","--threads", help="Number of CPUs (default: 12)", type=int, default=12)
+    parser.add_argument("-D", "--outputdir", help="Output directory (default: 'Churros_result')", type=str, default="Churros_result")
+    parser.add_argument("--bowtieparam", help="Additional parameter for bowtie|bowtie2 (shouled be quated)", type=str, default="")
+    parser.add_argument("-b", "--binsize", help="Binsize of parse2wig+ (default: 100)", type=int, default=100)
+    parser.add_argument("--peak", help="Peak file for FRiP calculation (BED format, default: MACS2 without control)", type=str, default="")
+    parser.add_argument("--param_parse2wig", help=" Additional parameter for parse2wig+ (shouled be quated)", type=str, default="")
+    parser.add_argument("--output_format", help="Output format of parse2wig+ (default: 3)\n    0: compressed wig (.wig.gz)\n    1: uncompressed wig (.wig)\n    2: bedGraph (.bedGraph)\n    3: bigWig (.bw)", type=int, default=3)
+    parser.add_argument("--nompbl", help="Do not consider genome mappability", action="store_true")
+    parser.add_argument("--nofilter", help="Use data where PCR duplication is not filtered", action="store_true")
+    parser.add_argument("-k","--kmer", help="Read length for mappability file ([28|36|50], default:50)", type=int, default=50)
+
+    args = parser.parse_args()
+#    print(args)
+
+    if args.command == "exec":
+        mapping_spikein(args)
+    elif args.command == "stats":
+        func_stats(args)
+    elif args.command == "header":
+        process_header(args)
+    else:
+        print ("Error: command should be [exec|stats|header].")
+        exit()
+
+#    print ("churros_mapping_spikein finished.")

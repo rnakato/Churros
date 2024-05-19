@@ -1,9 +1,11 @@
 ### Churros: Docker image for ChIP-seq analysis
-FROM rnakato/mapping:2024.03.3 as base
+FROM rnakato/mapping:2024.04 as base
 LABEL maintainer "Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>"
 
 WORKDIR /opt
 USER root
+
+SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -32,6 +34,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/list
 
 # R packages
+ENV Ncpus 16
 RUN R -e "BiocManager::install(c('ATACseqQC', \
                                  'ChIPseeker', \
                                  'clusterProfiler', \
@@ -91,25 +94,12 @@ RUN git clone --recursive https://github.com/rnakato/DROMPAplus \
 # RGTはvery old libpng12を使おうとするので却下
 # Fix Error while loading conda entry point: conda-libmamba-solver (libarchive.so.19: cannot open shared object file: No such file or directory)
 # https://stackoverflow.com/questions/77617946/solve-conda-libmamba-solver-libarchive-so-19-error-after-updating-conda-to-23
-RUN conda install -y -c bioconda genmap sambamba \
-    && pip install --no-cache-dir \
-      argh \
-      cobind \
-      cutadapt \
-      epilogos \
-      deeptools \
-      intervene \
-      multiqc \
-      threadpoolctl==3.1.0 \
-      tobias
-
-# SNEEP: https://sneep.readthedocs.io/en/latest/index.html
-# Pythonのどのバージョンを入れても入らない
-#    && conda create -n sneep python=3.8 \
-#    && source activate sneep \
-#    && conda install sneep -c bioconda \
-#    && pip install --no-cache-dir session-info \
-#    && conda deactivate
+COPY env.yaml /opt/env.yaml
+RUN eval "$(micromamba shell hook --shell bash)" \
+    && micromamba activate base \
+    && micromamba install -y -f /opt/env.yaml \
+    && micromamba clean --all --yes \
+    && rm /opt/env.yaml
 
 # scripts
 COPY Churros /opt/Churros
@@ -119,7 +109,7 @@ RUN make -C /opt/Churros/MOSAiCS_mappability/
 
 COPY rose /opt/ROSE
 
-FROM rnakato/mapping:2024.03.3
+FROM rnakato/mapping:2024.04
 COPY --from=base / /
 COPY --from=rnakato/homer:20.04 /opt/HOMER /opt/HOMER
 LABEL maintainer "Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>"
@@ -129,4 +119,5 @@ ENV PATH ${PATH}:/opt/scripts:/opt/Churros:/opt/SSP/bin:/opt/DROMPAplus/bin:/opt
 
 USER ubuntu
 WORKDIR /home/ubuntu
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["churros"]

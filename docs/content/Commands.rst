@@ -131,26 +131,25 @@ The mapped reads are then quality-checked and converted to BigWig files.
          postprocess: QC and generate wig files by ssp and parse2wig;
          stats: show mapping/QC stats;
          header: print header line of the stats
-      <fastq>: fastq file
-      <prefix>: output prefix
-      <build>: genome build (e.g., hg38)
-      <Ddir>: directory of bowtie|bowtie2 index
+      <samplelist>: Samplelist file
+      <build>: Genome build (e.g., hg38)
+      <Ddir>: Directory of bowtie|bowtie2 index
       Options:
-         -c: output as CRAM format (defalt: BAM)
-         -b: binsize of parse2wig+ (defalt: 100)
-         -z: peak file for FRiP calculation (BED format, default: default MACS2 without control)
-         -k [28|36|50]: read length for mappability file (default:50)
-         -n: do not consider genome mappability
-         -N: do not filter PCR duplication
-         -C: for SOLiD data (csfastq, defalt: fastq)
-         -f: output format of parse2wig+ (default: 3)
+         -c: Output as CRAM format (defalt: BAM)
+         -b: Binsize of parse2wig+ (defalt: 100)
+         -z: Peak file for FRiP calculation (BED format, default: default MACS2 without control)
+         -k [28|36|50]: Read length for mappability file (default:50)
+         -n: Do not consider genome mappability
+         -N: Do not filter PCR duplication
+         -C: For SOLiD data (csfastq, defalt: fastq)
+         -f: Output format of parse2wig+ (default: 3)
                   0: compressed wig (.wig.gz)
                   1: uncompressed wig (.wig)
                   2: bedGraph (.bedGraph)
                   3: bigWig (.bw)
-         -P "param": additional parameter for bowtie|bowtie2 (shouled be quated)
-         -Q "param": additional parameter for parse2wig+ (shouled be quated)
-         -p: number of CPUs (default: 12)
+         -P "param": Additional parameter for bowtie|bowtie2 (shouled be quated)
+         -Q "param": Additional parameter for parse2wig+ (shouled be quated)
+         -p: Number of CPUs (default: 12)
          -D: directory for execution (defalt: "Churros_result")
       Example:
          For single-end: churros_mapping exec chip.fastq.gz chip hg38 Referencedata_hg38
@@ -159,6 +158,81 @@ The mapped reads are then quality-checked and converted to BigWig files.
 - Key points:
    - There are two directories in ``bigWig`` directory, ``RawCount`` and ``TotalReadNormalized``. The former is a raw count of nonredundant mapped reads, while the latter stores the read number after total read normalization to 20 M. 
    - **Churros** uses ``TotalReadNormalized`` in the downstream analysis, while MACS2 (peak calling) uses the former.
+
+
+churros_mapping_spikein
+--------------------------------------------
+
+``churros_mapping_spikein`` is similar to ``churros_mapping`` and applies spike-in normalization.
+
+``churros_mapping_spikein`` has 3 commands: ``exec``, ``stats`` and ``header``.
+
+By default, ``churros_mapping_spikein`` uses the Calibrating ChIP-seq normalization proposed by `Hu et al., NAR 2015 <https://academic.oup.com/nar/article/43/20/e132/1398246>`_, which requires the input sample obtained from WCE. If this is not available, use the ``--spikein_simple`` option, which applies a simpler normalization using only the ChIP samples proposed by `Orlando et al., Cell Rep, 2014 <https://www.cell.com/cell-reports/fulltext/S2211-1247(14)00872-9>`_. 
+
+This is an example command. The reference genome is human and the spike-in genome is mouse.
+
+.. code-block:: bash
+
+   build=hg38
+   build_spikein=mm39
+   Ddir_ref=Referencedata_$build
+   Ddir_spikein=Referencedata_$build_spikein
+   ncore=48
+
+   churros -p $ncore --spikein samplelist.txt samplepairlist.txt \
+         $build $Ddir_ref --build_spikein $build_spikein --Ddir_spikein $Ddir_spikein
+
+   or 
+
+   churros_mapping_spikein exec samplelist.txt samplepairlist.txt $build $build_spikein \
+         $Ddir_ref $Ddir_spikein -p $ncore
+
+.. code-block:: bash
+
+   usage: churros_mapping_spikein [-h] [--spikein_simple] [--spikein_constant SPIKEIN_CONSTANT] [--cram] [-p THREADS] [-D OUTPUTDIR]
+                               [--bowtieparam BOWTIEPARAM] [-b BINSIZE] [--peak PEAK] [--param_parse2wig PARAM_PARSE2WIG]
+                               [--output_format OUTPUT_FORMAT] [--nompbl] [--nofilter] [-k KMER]
+                               command samplelist samplepairlist build build_spikein Ddir_ref Ddir_spikein
+
+   positional arguments:
+   command               [exec|stats|header]
+                              exec: mapping and postprocess
+                              stats: show mapping/QC stats
+                              header: print header line of the stats
+   samplelist            Sample list
+   samplepairlist        ChIP/Input pair list
+   build                 genome build (e.g., hg38)
+   build_spikein         genome build (e.g., mm39)
+   Ddir_ref              Directory of genome index for reference
+   Ddir_spikein          Directory of genome index for spike-in
+
+   options:
+   -h, --help            show this help message and exit
+   --spikein_simple      Spikein: Use ChIP samples only
+   --spikein_constant SPIKEIN_CONSTANT
+                           Scaling Constant for the number of reads after normalization (default: 100)
+   --cram                Output as CRAM format (defalt: BAM)
+   -p THREADS, --threads THREADS
+                           Number of CPUs (default: 12)
+   -D OUTPUTDIR, --outputdir OUTPUTDIR
+                           Output directory (default: 'Churros_result')
+   --bowtieparam BOWTIEPARAM
+                           Additional parameter for bowtie|bowtie2 (shouled be quated)
+   -b BINSIZE, --binsize BINSIZE
+                           Binsize of parse2wig+ (default: 100)
+   --peak PEAK           Peak file for FRiP calculation (BED format, default: MACS2 without control)
+   --param_parse2wig PARAM_PARSE2WIG
+                           Additional parameter for parse2wig+ (shouled be quated)
+   --output_format OUTPUT_FORMAT
+                           Output format of parse2wig+ (default: 3)
+                              0: compressed wig (.wig.gz)
+                              1: uncompressed wig (.wig)
+                              2: bedGraph (.bedGraph)
+                              3: bigWig (.bw)
+   --nompbl              Do not consider genome mappability
+   --nofilter            Use data where PCR duplication is not filtered
+   -k KMER, --kmer KMER  Read length for mappability file ([28|36|50], default:50)
+
 
 churros_callpeak
 -------------------------------------
@@ -477,6 +551,28 @@ The one-by-one comparison results (overlapped peak list and Venn diagram) are al
 Tools for Advanced Usage
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
+FRiR: Repeat Analysis
+---------------------------------
+
+Similar to the FRiP (fraction of reads in peaks) score of `Landt et al. (2012) <https://genome.cshlp.org/content/22/9/1813.abstract>`_,
+which calculates the fraction of mapped reads that fall within ChIP-seq peak regions,
+**Churros** calculates the FRiR (fraction of reads in repeats) score as the fraction of mapped reads that fall within repeat regions annotated by `RemeatMasker <https://www.repeatmasker.org/>`_.
+
+
+.. code-block:: bash
+
+   Usage: FRiR [option] -r <repeatfile> -i <inputfile> -o <output> --gt <genome_table>
+
+   Example:
+      FRiR -r Referencedata_hg38/RepeatMasker.txt.gz -o FRiRresult --gt Referencedata_hg38/genometable.txt -i Churros_result/hg38/bam/Sample.sort.bam --repeattype class
+
+<repeatfile> is the RepeatMasker file downloaded with `download_genomefa.sh`. FRiR can allow a gzipped repeat file. The `--repeattype` option specifies the type of repeat classification of the output. The default is "class" (e.g., SINE, LINE, LTR, DNA, and others). The output is a text file with the FRiR score for each repeat type.
+
+.. note::
+
+   Selecting ``--repeattype name`` results in a long computation time due to an extremely large number of classes.
+
+
 rose: Super-enhancer analysis
 ------------------------------------
 
@@ -495,22 +591,6 @@ Input bam file is optional.
          -d : maximum distance between two regions that will be stitched together (default: 12500)
          -e : exclude regions contained within +/- this distance from TSS in order to account for promoter biases (default: 0, recommended if used: 2500)
 
-FRiR: Repeat Analysis
----------------------------------
-
-Similar to the FRiP (fraction of reads in peaks) score of `Landt et al. (2012) <https://genome.cshlp.org/content/22/9/1813.abstract>`_,
-which calculates the fraction of mapped reads that fall within ChIP-seq peak regions,
-**Churros** calculates the FRiR (fraction of reads in repeats) score as the fraction of mapped reads that fall within repeat regions annotated by `RemeatMasker <https://www.repeatmasker.org/>`_.
-
-
-.. code-block:: bash
-
-   Usage: FRiR [option] -r <repeatfile> -i <inputfile> -o <output> --gt <genome_table>
-
-   Example:
-      FRiR -r Referencedata_hg38/RepeatMasker.txt.gz -o FRiRresult --gt Referencedata_hg38/genometable.txt -i Churros_result/hg38/bam/Sample.sort.bam --repeattype class
-
-<repeatfile> is the RepeatMasker file downloaded with `download_genomefa.sh`. FRiR can allow a gzipped repeat file. The `--repeattype` option specifies the type of repeat classification of the output. The default is "class" (e.g., SINE, LINE, LTR, DNA, and others). The output is a text file with the FRiR score for each repeat type.
 
 chromHMM.sh
 ------------------------------------------------

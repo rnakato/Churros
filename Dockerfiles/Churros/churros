@@ -152,6 +152,41 @@ def do_readQC(chdir, build, samplelist, fastqtrimming, ncore):
                 do_fastp(fq1, "", fastpdir, fastqtrimming, ncore)
 
 
+def do_mapping_spikein(args, samplelist, samplepairlist, build, chdir):
+    build_spikein = args.build_spikein
+    Ddir_ref = args.Ddir
+    Ddir_spikein = args.Ddir_spikein
+
+    if args.mapparam != "":
+        mapparam = f"--bowtieparam \"{args.mapparam}\""
+    else:
+        mapparam = ""
+    if args.parse2wigparam != "":
+        parse2wigparam = f"--param_parse2wig \"{args.parse2wigparam}\""
+    else:
+        parse2wigparam = ""
+    if args.nofilter:
+        param_filter = "--nofilter"
+    else:
+        param_filter = ""
+
+    if args.nompbl:
+        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} {mapparam} {param_filter} {parse2wigparam} --nompbl"
+    else:
+        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} {mapparam} {param_filter} {parse2wigparam}"
+    if args.spikein_simple:
+        param_churros_mapping += f" --spikein_simple --spikein_constant {args.spikein_constant}"
+
+    print_and_exec_shell(f'churros_mapping_spikein {param_churros_mapping} exec {samplelist} {samplepairlist} {build} {build_spikein} {Ddir_ref} {Ddir_spikein}')
+
+    # stats
+    qcstatsfile = f'{chdir}/{build}/churros.QCstats.tsv'
+    os.system(f'churros_mapping_spikein {param_churros_mapping} header {samplelist} {samplepairlist} {build} {build_spikein} {Ddir_ref} {Ddir_spikein} > {qcstatsfile}')
+    os.system(f'churros_mapping_spikein {param_churros_mapping} stats {samplelist} {samplepairlist} {build} {build_spikein} {Ddir_ref} {Ddir_spikein} >> {qcstatsfile}')
+    # convert to xlsx
+    os.system(f'csv2xlsx.pl -i {qcstatsfile} -o {chdir}/{build}/churros.QCstats.xlsx')
+
+
 def do_mapping(args, samplelist, build, chdir):
     if args.mapparam != "":
         mapparam = f"-P \"{args.mapparam}\""
@@ -288,16 +323,18 @@ def check_labels(samplelist, samplepairlist):
     with open(samplelist, 'r') as f:
         labels = set(line.strip().split('\t')[0] for line in f)
     
+    iserror = False
     with open(samplepairlist, 'r') as f:
         for line_number, line in enumerate(f, 1):
             row = line.strip().split(',')
-            if row[0] not in labels:
-                print (f"\nError at line {line_number}: Labels '{row[0]}' in {samplepairlist} not found in {samplelist}.")
-                exit()
-            if row[1] not in labels:
-                print (f"\nError at line {line_number}: Labels '{row[1]}' in {samplepairlist} not found in {samplelist}.")
-                exit()
-
+            if row[0] != "" and row[0] not in labels:
+                print (f"Error: Label '{row[0]}' in {samplepairlist} not found in {samplelist}.")
+                iserror = True
+            if row[1] != "" and row[1] not in labels:
+                print (f"Error: Label '{row[1]}' in {samplepairlist} not found in {samplelist}.")
+                iserror = True
+    if iserror:
+        exit()
 
 def exec_churros(args):
     samplelist = args.samplelist
@@ -337,9 +374,15 @@ def exec_churros(args):
 
     ## churros_mapping
     if args.fastqtrimming:
-        do_mapping(args, samplelist_trimmed, build, chdir)
+        if args.spikein:
+            do_mapping_spikein(args, samplelist_trimmed, samplepairlist, build, chdir)
+        else:
+            do_mapping(args, samplelist_trimmed, build, chdir)
     else:
-        do_mapping(args, samplelist, build, chdir)
+        if args.spikein:
+            do_mapping_spikein(args, samplelist, samplepairlist, build, chdir)
+        else:
+            do_mapping(args, samplelist, build, chdir)
 
     ## make samplepairlist_withflen
     samplepairlist_withflen = make_samplepairlist_withflen(samplepairlist, build, chdir_build)
@@ -383,18 +426,30 @@ def exec_churros(args):
         print_and_exec_shell('churros_compare ' + param_churros_compare + ' ' + str(samplelist) + ' ' + str(samplepairlist) + ' ' + build)
 
     ### make pdf files
-    print ("\ngenerate pdf files by drompa+...")
-    print (f"The log files are in {chdir}/{build}/log/pdf/")
+    if args.spikein:
+        do_visualize(args, chdir, build, samplepairlist, Ddir, args.spikein)
+    do_visualize(args, chdir, build, samplepairlist, Ddir, False)
 
-    if args.nompbl:
-        param_churros_visualize = "-D " + chdir + " --nompbl"
+def do_visualize(args, chdir, build, samplepairlist, Ddir, is_spikein):
+    print ("\ngenerate pdf files by drompa+...")
+
+    if is_spikein:
+        if args.spikein_simple:
+            param_churros_visualize = f"-D {chdir} --pdfdir pdf_spikein --chipdirectory Spikein --inputdirectory TotalReadNormalized"
+        else:
+            param_churros_visualize = f"-D {chdir} --pdfdir pdf_spikein --chipdirectory Spikein --inputdirectory TotalReadNormalized"
+        logfile = f"{chdir}/{build}/log/pdf_spikein/"
     else:
-        param_churros_visualize = "-D " + chdir
+        param_churros_visualize = f"-D {chdir}"
+        logfile = f"{chdir}/{build}/log/pdf/"
+    if args.nompbl:
+        param_churros_visualize += " --nompbl"
     if args.preset == "T2T":
         param_churros_visualize += " --preset T2T "
     if args.nofilter:
-        param_churros_visualize += " --nofilter"
+        param_churros_visualize += " --nofilter --pdfdir pdf_nofilter"
 
+    print (f"The log files are in {logfile}")
     if args.preset == "scer":
         print_and_exec_shell(f'churros_visualize {param_churros_visualize} --preset scer --enrich {samplepairlist} drompa+.macspeak {build} {Ddir}')
         print_and_exec_shell(f'churros_visualize {param_churros_visualize} --preset scer --enrich --logratio {samplepairlist} drompa+.macspeak {build} {Ddir}')
@@ -412,29 +467,34 @@ def exec_churros(args):
 
 if(__name__ == '__main__'):
     parser = argparse.ArgumentParser()
-    parser.add_argument("samplelist", help="sample list", type=str)
+    parser.add_argument("samplelist", help="Sample list", type=str)
     parser.add_argument("samplepairlist", help="ChIP/Input pair list", type=str)
-    parser.add_argument("build", help="genome build (e.g., hg38)", type=str)
-    parser.add_argument("Ddir", help="directory of reference data", type=str)
-    parser.add_argument("--cram", help="output as CRAM format (default: BAM)", action="store_true")
-    parser.add_argument("-f", "--force", help="overwrite if the output directory already exists", action="store_true")
-    parser.add_argument("-b", "--binsize", help="binsize of parse2wig+ (default: 100)", type=int, default=100)
-    parser.add_argument("-k", help="read length for mappability file ([28|36|50], default:50)", type=int, default=50)
-    parser.add_argument("--nompbl", help="do not consider genome mappability in drompa+", action="store_true")
-    parser.add_argument("--nofilter", help="do not filter PCR duplicate", action="store_true")
-    parser.add_argument("--noqc", help="omit FASTQC and fastp", action="store_true")
+    parser.add_argument("build", help="Genome build (e.g., hg38)", type=str)
+    parser.add_argument("Ddir", help="Directory of reference data", type=str)
+    parser.add_argument("--cram", help="Output as CRAM format (default: BAM)", action="store_true")
+    parser.add_argument("-f", "--force", help="Overwrite if the output directory already exists", action="store_true")
+    parser.add_argument("-b", "--binsize", help="Binsize of parse2wig+ (default: 100)", type=int, default=100)
+    parser.add_argument("-k", help="Read length for mappability file ([28|36|50], default:50)", type=int, default=50)
+    parser.add_argument("--nompbl", help="Do not consider genome mappability in drompa+", action="store_true")
+    parser.add_argument("--nofilter", help="Do not filter PCR duplicate", action="store_true")
+    parser.add_argument("--noqc", help="Omit FASTQC and fastp", action="store_true")
     parser.add_argument("--fastqtrimming", help="Apply adapter trimming with fastp before mapping (omitted if '--noqc' is specified)", action="store_true")
-    parser.add_argument("-q", "--qval", help="threshould of MACS2 (default: 0.05)", type=float, default=0.05)
-    parser.add_argument("--macsdir", help="output direcoty of macs2 (default: 'macs2')", type=str, default="macs")
-    parser.add_argument("--mapparam", help="additional parameter for bowtie|bowtie2 (shouled be quated)", type=str, default="")
-    parser.add_argument("--parse2wigparam", help="additional parameter for parse2wig+ (shouled be quated)", type=str, default="")
-    parser.add_argument("-p", "--threads", help="number of CPUs (default: 12)", type=int, default=12)
-    parser.add_argument("--threads_comparative", help="number of CPUs for --comparative option (default: 8)", type=int, default=8)
-    parser.add_argument("--outputpvalue", help="output ChIP/Input -log(p) distribution as a begraph format", action="store_true")
-    parser.add_argument("--comparative", help="compare bigWigs and peaks among samples by churros_compare", action="store_true")
-    parser.add_argument("-D", "--outputdir", help="output directory (default: 'Churros_result')", type=str, default="Churros_result")
+    parser.add_argument("-q", "--qval", help="Threshould of MACS2 (default: 0.05)", type=float, default=0.05)
+    parser.add_argument("--macsdir", help="Output direcoty of macs2 (default: 'macs2')", type=str, default="macs")
+    parser.add_argument("--mapparam", help="Additional parameter for bowtie|bowtie2 (shouled be quated)", type=str, default="")
+    parser.add_argument("--parse2wigparam", help="Additional parameter for parse2wig+ (shouled be quated)", type=str, default="")
+    parser.add_argument("--spikein", help="Spike-in mode", action="store_true")
+    parser.add_argument("--build_spikein", help="(For Spike-in mode) Genome build of spikein genome (e.g., mm39)", type=str)
+    parser.add_argument("--Ddir_spikein", help="(For Spike-in mode) Directory of spikein genome data", type=str)
+    parser.add_argument("--spikein_simple", help="Spikein: Use ChIP samples only", action="store_true")
+    parser.add_argument("--spikein_constant", help="Scaling Constant for the number of reads after normalization (default: 100)", type=int, default=100)
+    parser.add_argument("-p", "--threads", help="Number of CPUs (default: 12)", type=int, default=12)
+    parser.add_argument("--threads_comparative", help="Number of CPUs for --comparative option (default: 8)", type=int, default=8)
+    parser.add_argument("--outputpvalue", help="Output ChIP/Input -log(p) distribution as a begraph format", action="store_true")
+    parser.add_argument("--comparative", help="Compare bigWigs and peaks among samples by churros_compare", action="store_true")
+    parser.add_argument("-D", "--outputdir", help="Output directory (default: 'Churros_result')", type=str, default="Churros_result")
     parser.add_argument("--preset", help="Preset parameters for mapping reads ([scer|T2T])", type=str, default="")
-    parser.add_argument("-v", "--version", help="print version information and quit", action='version', version=__version__)
+    parser.add_argument("-v", "--version", help="Print version information and quit", action='version', version=__version__)
 
     args = parser.parse_args()
     #    print(args)

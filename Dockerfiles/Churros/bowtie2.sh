@@ -10,7 +10,10 @@ function usage()
     echo '      -c: output as CRAM format (defalt: BAM)' 1>&2
     echo '      -p: number of CPUs (default: 12)' 1>&2
     echo '      -P "bowtie2 param": parameter of bowtie2 (shouled be quated)' 1>&2
-    echo '      -D: output dir (defalt: ./)' 1>&2
+    echo '      -D: output dir (defalt: "./")' 1>&2
+    echo '      -B: Directory for BAM/CRAM files (defalt: "bam/ or cram/")' 1>&2
+    echo '      -L: Log directory of bowtie2 (default: "bowtie2")' 1>&2
+    echo '      -x: do not output mapped file (statistics only, for spike-in genome)' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname -p \"--very-sensitive\" chip.fastq.gz chip Referencedata_hg38" 1>&2
     echo "      For paired-end: $cmdname \"\-1 chip_1.fastq.gz \-2 chip_2.fastq.gz\" chip Referencedata_hg38" 1>&2
@@ -23,18 +26,23 @@ bamdir=bam
 param=""
 ncore=12
 chdir="./"
+no_output=0
+logdir="bowtie2"
 
-while getopts cP:p:D: option
+while getopts cP:p:D:B:L:x option
 do
     case ${option} in
 	c) format=CRAM
-           bamdir=cram
-           ;;
-        p) ncore=${OPTARG}
-           isnumber.sh $ncore "-p" || exit 1
-           ;;
+        bamdir=cram
+        ;;
+    p) ncore=${OPTARG}
+        isnumber.sh $ncore "-p" || exit 1
+        ;;
 	P) param=${OPTARG};;
-        D) chdir=${OPTARG};;
+    D) chdir=${OPTARG};;
+    B) bamdir=${OPTARG};;
+	L) logdir=${OPTARG};;
+    x) no_output=1;;
 	*)
 	    usage
 	    exit 1
@@ -53,7 +61,7 @@ prefix=$2
 Ddir=$3
 #post=`echo $param | tr -d ' ' | sed -e 's/--/-/g'`
 
-logdir=$chdir/log/bowtie2
+logdir=$chdir/log/$logdir
 bamdir=$chdir/$bamdir
 mkdir -p $logdir $bamdir
 
@@ -65,11 +73,6 @@ else
     file=$bamdir/$prefix$post.sort.cram
 fi
 
-if test -e "$file" && test 1000 -lt `wc -c < $file` ; then
-    echo "$file already exist. skipping"
-    exit 0
-fi
-
 ex(){ echo $1; eval $1; }
 
 ex_hiseq(){
@@ -78,14 +81,28 @@ ex_hiseq(){
 
     bowtie2 --version
 
-    if test $format = "BAM"; then
+    if test $no_output -eq 1; then
+        ex "bowtie2 $param -p $ncore -x $index \"$fastq\" > /dev/null"
+    elif test $format = "BAM"; then
         ex "bowtie2 $param -p $ncore -x $index \"$fastq\" | samtools sort > $file"
         if test ! -e $file.bai; then samtools index $file; fi
-        else
+    else
         ex "bowtie2 $param -p $ncore -x $index \"$fastq\" | samtools view -C - -T $genome | samtools sort -O cram > $file"
         if test ! -e $file.crai; then samtools index $file; fi
     fi
-
 }
 
-ex_hiseq >& $logdir/$prefix.txt
+#if test -e "$file" && test 1000 -lt `wc -c < $file` ; then
+#    echo "$file already exist. skipping"
+#    exit 0
+#fi
+
+logfile=$logdir/$prefix.txt
+#if test -e $logfile; then
+#    echo "$logfile already exist. skipping"
+
+if test -e "$file" && test 1000 -lt `wc -c < $file` ; then
+    echo "$file already exist. skipping"
+else
+    ex_hiseq >& $logfile
+fi

@@ -9,26 +9,25 @@ function usage()
     echo '      postprocess: QC and generate wig files by ssp and parse2wig;' 1>&2
     echo '      stats: show mapping/QC stats;' 1>&2
     echo '      header: print header line of the stats' 1>&2
-    echo '   <fastq>: fastq file' 1>&2
-    echo '   <prefix>: output prefix' 1>&2
-    echo '   <build>: genome build (e.g., hg38)' 1>&2
-    echo '   <Ddir>: directory of bowtie|bowtie2 index' 1>&2
+    echo '   <samplelist>: Samplelist file' 1>&2
+    echo '   <build>: Genome build (e.g., hg38)' 1>&2
+    echo '   <Ddir>: Directory of bowtie|bowtie2 index' 1>&2
     echo '   Options:' 1>&2
-    echo '      -c: output as CRAM format (defalt: BAM)' 1>&2
-    echo '      -b: binsize of parse2wig+ (defalt: 100)' 1>&2
-    echo '      -z: peak file for FRiP calculation (BED format, default: default MACS2 without control)' 1>&2
-    echo '      -k [28|36|50]: read length for mappability file (default:50)' 1>&2
-    echo '      -n: do not consider genome mappability' 1>&2
-    echo '      -N: do not filter PCR duplication' 1>&2
-    echo '      -C: for SOLiD data (csfastq, defalt: fastq)' 1>&2
-    echo '      -f: output format of parse2wig+ (default: 3)' 1>&2
+    echo '      -c: Output as CRAM format (defalt: BAM)' 1>&2
+    echo '      -b: Binsize of parse2wig+ (defalt: 100)' 1>&2
+    echo '      -z: Peak file for FRiP calculation (BED format, default: MACS2 without control)' 1>&2
+    echo '      -k [28|36|50]: Read length for mappability file (default:50)' 1>&2
+    echo '      -n: Do not consider genome mappability' 1>&2
+    echo '      -N: Do not filter PCR duplication' 1>&2
+    echo '      -C: For SOLiD data (csfastq, defalt: fastq)' 1>&2
+    echo '      -f: Output format of parse2wig+ (default: 3)' 1>&2
     echo '               0: compressed wig (.wig.gz)' 1>&2
     echo '               1: uncompressed wig (.wig)' 1>&2
     echo '               2: bedGraph (.bedGraph)' 1>&2
     echo '               3: bigWig (.bw)' 1>&2
-    echo '      -P "param": additional parameter for bowtie|bowtie2 (shouled be quated)' 1>&2
-    echo '      -Q "param": additional parameter for parse2wig+ (shouled be quated)' 1>&2
-    echo '      -p: number of CPUs (default: 12)' 1>&2
+    echo '      -P "param": Additional parameter for bowtie|bowtie2 (shouled be quated)' 1>&2
+    echo '      -Q "param": Additional parameter for parse2wig+ (shouled be quated)' 1>&2
+    echo '      -p: Number of CPUs (default: 12)' 1>&2
     echo '      -D: directory for execution (defalt: "Churros_result")' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname exec chip.fastq.gz chip hg38 Referencedata_hg38" 1>&2
@@ -131,7 +130,6 @@ if test $1 = "header"; then
         echo -e "`head -n1 $chdir/sspout/$prefix$post.stats.txt | cut -f4,5,6,7,8,9,10,11,12,13,14`"
         exit
     done < $samplelist
-    exit
 fi
 
 if [ $# -ne 4 ]; then
@@ -236,11 +234,13 @@ func_postprocess(){
        parseparam="$parseparam -l $flen"
     fi
 
+    logdir=$chdir/log/parse2wig+
+    mkdir -p $logdir
     if test $format = "CRAM"; then
-       ex "parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir"
+       ex "parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir >& $logdir/$head.txt"
     else
        if test "$peak" != ""; then
-           ex "parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir"
+           ex "parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir >& $logdir/$head.txt"
        else
 	   mkdir -p $chdir/tmp
            macspeak="$chdir/tmp/${prefix}_forFRiP_peaks.narrowPeak"
@@ -248,7 +248,7 @@ func_postprocess(){
                echo "execute MACS2 without Input to estimate FRiP..."
                macs.sh -d $chdir/tmp $mapfile none ${prefix}_forFRiP $build sharp-nomodel
            fi
-           ex "parse2wig+.sh $parseparam -b $binsize -z $macspeak $mapfile $head $build $Ddir"
+           ex "parse2wig+.sh $parseparam -b $binsize -z $macspeak $mapfile $head $build $Ddir >& $logdir/$head.txt"
 #	   rm $chdir/tmp/${prefix}_forFRiP*
 #	   rm -rf $chdir/tmp
        fi
