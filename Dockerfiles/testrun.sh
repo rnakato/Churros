@@ -1,4 +1,4 @@
-version=1.0.0
+version=1.1.0
 for tool in sambamba fastq-dump bedtools samtools macs2 drompa+ ssp trim_galore genmap bismark bowtie bowtie2 chromap deeptools cutadapt epilogos cobind.py
 do
     echo $tool

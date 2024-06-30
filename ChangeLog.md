@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.0 (2024-6-30)
+- Fixed bug in `build-index.sh` that did not accept indexing for bismark.
+
 ## 1.0.0 (2024-5-19)
 - Added `churros_mapping_spikein` for spike-in normalization.
 - Changed Python environment from conda to micromamba (`/opt/micromamba`)
