@@ -42,6 +42,7 @@ RUN R -e "BiocManager::install(c('ATACseqQC', \
                                  'edgeR', \
                                  'Imetagene', \
                                  'metagene', \
+                                 'methylKit', \
                                  'motifbreakR', \
                                  'preprocessCore', \
                                  'rGREAT', \
