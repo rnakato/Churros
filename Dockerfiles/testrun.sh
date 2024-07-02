@@ -11,7 +11,7 @@ do
     docker run --rm -it rnakato/churros:$version $tool
 done
 
-for tool in edgeR DESeq2 ChIPseeker rGREAT clusterProfiler motifbreakR ATACseqQC TFBSTools
+for tool in edgeR DESeq2 ChIPseeker rGREAT clusterProfiler motifbreakR ATACseqQC TFBSTools methylKit
 do
     docker run -it --rm rnakato/churros:$version R -e "library("$tool")"
 done

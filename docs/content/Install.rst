@@ -67,12 +67,16 @@ The latest version of **Churros** uses the following tools internally.
    - `ATACseqQC <https://bioconductor.org/packages/release/bioc/html/ATACseqQC.html>`_ v1.26.0
    - `TOBIAS <https://github.com/loosolab/TOBIAS>`_ v0.16.1
    
-- Bisulfite sequencing (DNA methylation)
-   - `Bismark <https://github.com/FelixKrueger/Bismark>`_  v0.22.3
-
-- Peak analysis 
+- Peak analysis
    - `ChIPseeker <https://bioconductor.org/packages/release/bioc/html/ChIPseeker.html>`_ v1.36.0
    - `intervene <https://intervene.readthedocs.io/en/latest/install.html>`_ v0.6.5
+
+- DNA methylation analysis
+   - `Bismark <https://github.com/FelixKrueger/Bismark>`_  v0.22.3
+   - `methylKit <https://www.bioconductor.org/packages/release/bioc/html/methylKit.html>`_  v1.28.0
+   - `MEDIPS <https://www.bioconductor.org/packages/release/bioc/html/MEDIPS.html>`_ v1.54.0
+   - `abismal <https://github.com/smithlabcode/abismal>`_  v3.2.3
+   - `MethPipe <https://smithlabresearch.org/software/methpipe/>`_ v5.0.0
 
 - Differential analysis
    - `edgeR <https://bioconductor.org/packages/release/bioc/html/edgeR.html>`_ v3.42.4

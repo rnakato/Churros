@@ -1,7 +1,11 @@
 # Changelog
 
-## 1.1.0 (2024-6-30)
+## 1.1.0 (2024-7-02)
 - Fixed bug in `build-index.sh` that did not accept indexing for bismark.
+- Added [methylKit](https://www.bioconductor.org/packages/release/bioc/html/methylKit.html) for RRBS analysis.
+- Added [MEDIPS](https://www.bioconductor.org/packages/release/bioc/html/MEDIPS.html) for MeDIP-seq analysis.
+- Added [abismal](https://github.com/smithlabcode/abismal) for WGBS analysis.
+- Added [MethPipe](https://smithlabresearch.org/software/methpipe/) for WGBS analysis.
 
 ## 1.0.0 (2024-5-19)
 - Added `churros_mapping_spikein` for spike-in normalization.
@@ -31,10 +35,10 @@
 - Updated chromap from v0.2.5 to v0.2.6
 - Updated SSP and DROMPAplus to modify `parsestats4DROMPAplus.pl`
 - Fixed the warning of xargs in `churros_callpeak`
-- `download_genomedata.sh`: 
+- `download_genomedata.sh`:
     - Updated the version of Ensemble data from 106 to 111.
     - Added `Medaka` genome.
-- Changed `churros_visualize` to allow ChIP samples even without the input sample when the `-G` option is specified. 
+- Changed `churros_visualize` to allow ChIP samples even without the input sample when the `-G` option is specified.
 - Added the `-n: do not filter PCR duplicate` option to `churros_genPvalwig`.
 
 ## 0.12.2 (2024-3-5)
