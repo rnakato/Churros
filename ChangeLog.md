@@ -1,7 +1,10 @@
 # Changelog
 
+## 1.1.1 (2024-7-18)
+- Fixed a bug in `churros_compare` that had an error when comparing bigWig files.
+
 ## 1.1.0 (2024-7-02)
-- Fixed bug in `build-index.sh` that did not accept indexing for bismark.
+- Fixed a bug in `build-index.sh` that did not accept indexing for bismark.
 - Added [methylKit](https://www.bioconductor.org/packages/release/bioc/html/methylKit.html) for RRBS analysis.
 - Added [MEDIPS](https://www.bioconductor.org/packages/release/bioc/html/MEDIPS.html) for MeDIP-seq analysis.
 - Added [abismal](https://github.com/smithlabcode/abismal) for WGBS analysis.

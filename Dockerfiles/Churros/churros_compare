@@ -16,17 +16,17 @@ function usage()
 
 odir=comparison
 chdir="Churros_result"
-mp=1
+#mp=1
 post_predefined=""
 mdir=macs
 ncore=8
 
-while getopts o:d:nD:p:y: option
+while getopts o:d:D:p:y: option
 do
     case ${option} in
         o) odir=${OPTARG};;
         d) mdir=${OPTARG};;
-        n) mp=0;;
+#        n) mp=0;;
         D) chdir=${OPTARG};;
         p) ncore=${OPTARG}
            isnumber.sh $ncore "-p" || exit 1
@@ -69,11 +69,12 @@ mkdir -p $odir
 mdir=$chdir/`basename $mdir`
 
 if test "$post_predefined" = ""; then
-    if test $mp -eq 1; then
-        post=".mpbl"
-    else
-        post=""
-    fi
+#    if test $mp -eq 1; then
+#        post=".mpbl"
+#    else
+#        post=""
+#    fi
+    post=""
 else
     post=$post_predefined
 fi
