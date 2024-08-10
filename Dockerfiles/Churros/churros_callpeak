@@ -71,16 +71,15 @@ bamdir=$chdir/`basename $bamdir`
 mkdir -p $mdir
 newlist=$mdir/samplepairlist.txt
 rm -rf $newlist
-array=""
 
-while read LINE; do
-    array="$array $LINE"
+while IFS=',' read -r chip input label mode flen; do
+    chip=${chip:-""}
+    input=${input:-""}
+    label=${label:-""}
+    mode=${mode:-""}
+    flen=${flen:-""}
+    echo $chip, $input, $label, $flen, $mode
 
-    LINE=(${LINE//,/ })
-    chip=${LINE[0]:-""}
-    input=${LINE[1]:-""}
-    label=${LINE[2]:-""}
-    mode=${LINE[3]:-""}
     if test "$mode" = ""; then
        mode="sharp"
     fi
@@ -89,6 +88,7 @@ while read LINE; do
     else
        peak=$mdir_original/${label}_peaks.broadPeak
     fi
+    echo $chip, $input, $label, $mode, $flen, $peak
     echo "$chip,$input,$label,$mode,$peak" >> $newlist
 done < $samplepairlist
 
@@ -138,6 +138,12 @@ do_macs(){
     fi
 }
 export -f do_macs
+
+array=""
+
+while read LINE; do
+    array="$array $LINE"
+done < $samplepairlist
 
 echo ${array[@]} | tr ' ' '\n' | xargs -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval \"$force\" \"$post\""
 #  xargs -n1 -I

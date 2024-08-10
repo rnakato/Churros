@@ -1,0 +1,5 @@
+HepG2_H2A.Z,,HepG2_H2A.Z,sharp
+HepG2_H3K4me3,,HepG2_H3K4me3,sharp
+HepG2_H3K27ac,,HepG2_H3K27ac,sharp
+HepG2_H3K27me3,,HepG2_H3K27me3,broad
+HepG2_H3K36me3,,HepG2_H3K36me3,broad

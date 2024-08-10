@@ -1,10 +1,14 @@
-#sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.9.0.sif"
-sing="singularity exec churros.sif"
+sing="singularity exec --bind /work,/work2,/work3 /work3/SingularityImages/churros.1.1.1.sif"
+#sing="singularity exec churros.sif"
 
 build=hg38
 Ddir=Referencedata_$build
 
-$sing churros_visualize samplepairlist.txt drompa+ $build $Ddir
+#$sing churros_visualize samplepairlist.txt drompa+ $build $Ddir
+
+# test for no input control
+$sing churros_visualize --pdfdir pdf_noinpput samplepairlist.noinput.txt drompa+ $build $Ddir
+exit
 
 $sing churros_visualize Churros_result/$build/macs/samplepairlist.txt drompa+.macspeak $build $Ddir
 $sing churros_visualize -b 5000 -l 8000 -P "--scale_tag 100" samplepairlist.txt drompa+.bin5M $build $Ddir

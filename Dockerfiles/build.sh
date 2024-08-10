@@ -1,4 +1,4 @@
-tag=1.1.1
+tag=1.1.2
 docker build -f Dockerfile.$tag -t rnakato/churros:$tag . #--no-cache
 #docker save -o churros-$tag.tar rnakato/churros:$tag
 #singularity build -F /work3/SingularityImages/churros.$tag.sif docker-archive://churros-$tag.tar

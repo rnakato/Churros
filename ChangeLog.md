@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.2 (2024-8-10)
+- Fixed a bug in `churros_compare` that caused the sample labels in `drompa+.macspeak.PCSHARP.100.pdf` to be displayed incorrectly if the input samples were not specified in samplepairlist.txt.
+
 ## 1.1.1 (2024-7-18)
 - Fixed a bug in `churros_compare` that had an error when comparing bigWig files.
 
