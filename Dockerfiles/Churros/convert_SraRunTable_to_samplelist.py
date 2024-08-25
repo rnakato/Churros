@@ -1,4 +1,6 @@
 #!/bin/env python
+# Copyright(c) Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>
+# All rights reserved.
 
 import pandas as pd
 import sys

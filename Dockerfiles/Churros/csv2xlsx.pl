@@ -1,4 +1,6 @@
 #!/usr/bin/env perl
+# Copyright(c) Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>
+# All rights reserved.
 
 use strict;
 use warnings;

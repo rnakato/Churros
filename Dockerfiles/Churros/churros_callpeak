@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright(c) Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>
+# All rights reserved.
+
 cmdname=`basename $0`
 function usage()
 {

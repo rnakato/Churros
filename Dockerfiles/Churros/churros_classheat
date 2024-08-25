@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright(c) Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>
+# All rights reserved.
 
 # Set default values for optional arguments
 kcluster=3
