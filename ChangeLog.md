@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.0 (2024-8-25)
+- Fixed a bug in `SSP` and `DROMPAplus` that causes a momery error when the input file has long reads (>200 bp).
+
 ## 1.1.2 (2024-8-10)
 - Fixed a bug in `churros_compare` that caused the sample labels in `drompa+.macspeak.PCSHARP.100.pdf` to be displayed incorrectly if the input samples were not specified in samplepairlist.txt.
 
