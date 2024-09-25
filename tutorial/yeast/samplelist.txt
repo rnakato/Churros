@@ -1,8 +1,8 @@
-Scc1_DMSO	fastq/SRR13065962.fastq.gz
-Input_Scc1_DMSO	fastq/SRR13065963.fastq.gz
-Scc1_thiolutin	fastq/SRR13065966.fastq.gz
-Input_Scc1_thiolutin	fastq/SRR13065967.fastq.gz
-RPO21_DMSO	fastq/SRR13065972.fastq.gz
-Input_RPO21_DMSO	fastq/SRR13065973.fastq.gz
-RPO21_thiolutin	fastq/SRR13065974.fastq.gz
-InputRPO21_thiolutin	fastq/SRR13065975.fastq.gz
+Scc1_DMSO   fastq/SRR13065962.fastq.gz
+Input_Scc1_DMSO fastq/SRR13065963.fastq.gz
+Scc1_thiolutin  fastq/SRR13065966.fastq.gz
+Input_Scc1_thiolutin    fastq/SRR13065967.fastq.gz
+RPO21_DMSO  fastq/SRR13065972.fastq.gz
+Input_RPO21_DMSO    fastq/SRR13065973.fastq.gz
+RPO21_thiolutin fastq/SRR13065974.fastq.gz
+InputRPO21_thiolutin    fastq/SRR13065975.fastq.gz

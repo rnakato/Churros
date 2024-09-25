@@ -19,3 +19,9 @@ tutorial/yeast/fastq/
 tutorial/yeast/log/
 Dockerfiles/ROSE_old/
 tutorial/classheat/
+tutorial/DNAmethylation/Bismarkdir/
+tutorial/DNAmethylation/Referencedata_hg38/
+tutorial/DNAmethylation/abismal_index/
+tutorial/DNAmethylation/fastq/
+tutorial/DNAmethylation/log/
+tutorial/DNAmethylation/methylKit/

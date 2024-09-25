@@ -82,7 +82,7 @@ else
     post=$post_predefined
 fi
 
-while read LINE; do
+while read -r LINE || [ -n "$LINE" ]; do
     LINE=($LINE)
     prefix=${LINE[0]:-""}
     array="$array `ls $chdir/bigWig/TotalReadNormalized/$prefix$post.100.bw`"

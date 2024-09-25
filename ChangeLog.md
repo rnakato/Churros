@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 (2024-9-25)
+- Fixed a bug in `churros` where the last line of the samplelist was not read correctly if there was no newline character at the end.
+- Modified `churros` to allow space-separated samplelist.txt.
+- Fixed an issue where several R tools were unusable since `v1.2.0`.
+
 ## 1.2.0 (2024-8-25)
 - Fixed a bug in `SSP` and `DROMPAplus` that causes a memory error when the input file has long reads (>200 bp).
 

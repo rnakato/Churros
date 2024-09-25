@@ -103,7 +103,7 @@ chdir=$chdir/$build
 #post=`echo $bowtieparam | tr -d ' ' | sed -e 's/--/-/g'`
 
 if test $1 = "header"; then
-    while read LINE; do
+    while read -r LINE || [ -n "$LINE" ]; do
         LINE=($LINE)
         prefix=${LINE[0]}
         fq1=${LINE[1]}
@@ -190,7 +190,7 @@ func_map(){
 }
 
 if test $command = "map" -o $command = "exec"; then
-    while read LINE; do
+    while read -r LINE || [ -n "$LINE" ]; do
         LINE=($LINE)
         prefix=${LINE[0]}
         fq1=${LINE[1]}
@@ -260,7 +260,7 @@ func_postprocess(){
 }
 
 if test $command = "postprocess" -o $command = "exec"; then
-    while read LINE; do
+    while read -r LINE || [ -n "$LINE" ]; do
         LINE=($LINE)
         prefix=${LINE[0]}
         fq1=${LINE[1]}
@@ -305,7 +305,7 @@ func_stats(){
 }
 
 if test $command = "stats"; then
-    while read LINE; do
+    while read -r LINE || [ -n "$LINE" ]; do
         LINE=($LINE)
         prefix=${LINE[0]}
         fq1=${LINE[1]}

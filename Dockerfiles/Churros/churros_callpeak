@@ -144,7 +144,7 @@ export -f do_macs
 
 array=""
 
-while read LINE; do
+while read -r LINE || [ -n "$LINE" ]; do
     array="$array $LINE"
 done < $samplepairlist
 

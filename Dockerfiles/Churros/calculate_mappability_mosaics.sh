@@ -49,9 +49,9 @@ export -f ex
 read_genometable(){
     gt=$1
     local i=0
-    while read line; do
-	CHR[$i]=`echo $line | awk '{printf $1}'`
-	LEN[$i]=`echo $line | awk '{printf $2}'`
+    while read -r LINE || [ -n "$LINE" ]; do
+	CHR[$i]=`echo $LINE | awk '{printf $1}'`
+	LEN[$i]=`echo $LINE | awk '{printf $2}'`
 	i=`expr $i + 1`
     done < $gt
 }
