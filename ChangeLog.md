@@ -4,6 +4,7 @@
 - Fixed a bug in `churros` where the last line of the samplelist was not read correctly if there was no newline character at the end.
 - Modified `churros` to allow space-separated samplelist.txt.
 - Fixed an issue where several R tools were unusable since `v1.2.0`.
+- Added scripts for DNA methylation analysis in the `tutorial` directory.
 
 ## 1.2.0 (2024-8-25)
 - Fixed a bug in `SSP` and `DROMPAplus` that causes a memory error when the input file has long reads (>200 bp).
