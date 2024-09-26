@@ -117,12 +117,12 @@ From version ``v1.0.0``, ``churros`` has an option to apply spike-in normalizati
 
    build=hg38
    build_spikein=mm39
-   Ddir_ref=Referencedata_$build
-   Ddir_spikein=Referencedata_$build_spikein
+   Ddir_ref=Referencedata_${build}
+   Ddir_spikein=Referencedata_${build_spikein}
    ncore=48
 
    churros -p $ncore --spikein samplelist.txt samplepairlist.txt \
-         $build $Ddir_ref --build_spikein $build_spikein --Ddir_spikein $Ddir_spikein
+         $build ${Ddir_ref} --build_spikein ${build_spikein} --Ddir_spikein ${Ddir_spikein}
 
 The required options are ``--spikein``, ``build_spikein`` and ``--Ddir_spikein``. This command uses hg38 for the reference genome and mm39 for the spike-in genome.
 
