@@ -201,11 +201,6 @@ This is an example command. The reference genome is human and the spike-in genom
    Ddir_spikein=Referencedata_$build_spikein
    ncore=48
 
-   churros -p $ncore --spikein samplelist.txt samplepairlist.txt \
-         $build $Ddir_ref --build_spikein $build_spikein --Ddir_spikein $Ddir_spikein
-
-   or 
-
    churros_mapping_spikein exec samplelist.txt samplepairlist.txt $build $build_spikein \
          $Ddir_ref $Ddir_spikein -p $ncore
 
