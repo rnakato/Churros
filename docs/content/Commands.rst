@@ -107,6 +107,10 @@ churros
 
       - In version ``0.4.0``, ``scer`` (for `S. cerevisiae`) and ``T2T`` (for `T2T-CHM13`) are available. When applying ``chuross`` to `S. cerevisiae`, try ``--preset scer`` option.
 
+
+churros (spike-in mode)
+--------------------------------------------
+
 From version `v1.0.0`, `churros` has an option to apply spike-in normalization. The command is as follows:
 
 .. code-block:: bash
@@ -124,6 +128,7 @@ The required options are `--spikein`, `build_spikein` and `--Ddir_spikein`. This
 
 Churros will then create the `bigWig/Spikein/`, `pdf_spikein/`, and `spikein_scalingfactor`` directories, which contain the results of the spike-in analysis.
 
+See also: `churros-mapping-spikein <https://churros.readthedocs.io/en/latest/content/Commands.html#churros-mapping-spikein>`_
 
 churros_mapping
 --------------------------------------------
