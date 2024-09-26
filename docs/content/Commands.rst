@@ -130,6 +130,7 @@ Churros will then create the ``bigWig/Spikein/``, ``pdf_spikein/``, and ``spikei
 
 See also: `churros-mapping-spikein <https://churros.readthedocs.io/en/latest/content/Commands.html#id1>`_
 
+
 churros_mapping
 --------------------------------------------
 
@@ -191,18 +192,18 @@ churros_mapping_spikein
 
 By default, ``churros_mapping_spikein`` uses the Calibrating ChIP-seq normalization proposed by `Hu et al., NAR 2015 <https://academic.oup.com/nar/article/43/20/e132/1398246>`_, which requires the input sample obtained from WCE. If this is not available, use the ``--spikein_simple`` option, which applies a simpler normalization using only the ChIP samples proposed by `Orlando et al., Cell Rep, 2014 <https://www.cell.com/cell-reports/fulltext/S2211-1247(14)00872-9>`_. 
 
-This is an example command. The reference genome is human and the spike-in genome is mouse.
+The command below uses hg38 for the reference genome and mm39 for the spike-in genome.
 
 .. code-block:: bash
 
    build=hg38
    build_spikein=mm39
-   Ddir_ref=Referencedata_$build
-   Ddir_spikein=Referencedata_$build_spikein
+   Ddir_ref=Referencedata_${build}
+   Ddir_spikein=Referencedata_${build_spikein}
    ncore=48
 
-   churros_mapping_spikein exec samplelist.txt samplepairlist.txt $build $build_spikein \
-         $Ddir_ref $Ddir_spikein -p $ncore
+   churros_mapping_spikein exec samplelist.txt samplepairlist.txt ${build} ${build_spikein} \
+         ${Ddir_ref} ${Ddir_spikein} -p ${ncore}
 
 .. code-block:: bash
 
