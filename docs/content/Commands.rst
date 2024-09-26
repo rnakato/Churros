@@ -111,7 +111,7 @@ churros
 churros (spike-in mode)
 --------------------------------------------
 
-From version `v1.0.0`, `churros` has an option to apply spike-in normalization. The command is as follows:
+From version ``v1.0.0``, ``churros`` has an option to apply spike-in normalization. The command is as follows:
 
 .. code-block:: bash
 
@@ -124,11 +124,11 @@ From version `v1.0.0`, `churros` has an option to apply spike-in normalization. 
    churros -p $ncore --spikein samplelist.txt samplepairlist.txt \
          $build $Ddir_ref --build_spikein $build_spikein --Ddir_spikein $Ddir_spikein
 
-The required options are `--spikein`, `build_spikein` and `--Ddir_spikein`. This command uses hg38 for the reference genome and mm39 for the spike-in genome.
+The required options are ``--spikein``, ``build_spikein`` and ``--Ddir_spikein``. This command uses hg38 for the reference genome and mm39 for the spike-in genome.
 
-Churros will then create the `bigWig/Spikein/`, `pdf_spikein/`, and `spikein_scalingfactor`` directories, which contain the results of the spike-in analysis.
+Churros will then create the ``bigWig/Spikein/``, ``pdf_spikein/``, and ``spikein_scalingfactor`` directories, which contain the results of the spike-in analysis.
 
-See also: `churros-mapping-spikein <https://churros.readthedocs.io/en/latest/content/Commands.html#churros-mapping-spikein>`_
+See also: `churros-mapping-spikein <https://churros.readthedocs.io/en/latest/content/Commands.html#id1>`_
 
 churros_mapping
 --------------------------------------------
