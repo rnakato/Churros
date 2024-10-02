@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2 (2024-10-02)
+- Updated SAMtools from 1.19.2 to 1.21
+- Updated SRA Toolkit from 3.0.10 to v3.1.1
+- Added [parallel-fastq-dump](https://github.com/rvalieris/parallel-fastq-dump)
+- Added `Arabidopsis thaliana` genome (TAIR10) in `download_genomedata.sh`.
+
 ## 1.2.1 (2024-9-25)
 - Fixed a bug in `churros` where the last line of the samplelist was not read correctly if there was no newline character at the end.
 - Modified `churros` to allow space-separated samplelist.txt.
