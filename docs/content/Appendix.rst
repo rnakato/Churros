@@ -15,7 +15,6 @@ While ``download_genomedata.sh`` uses the `Ensembl <https://asia.ensembl.org/ind
    "**Species**", "**Ensembl**", "**UCSC**"
    "human", "GRCh38", "hg38"
    "human", "GRCh37", "hg19"
-   "human", "T2T",    "T2T"
    "mouse", "GRCm39", "mm39"
    "mouse", "GRCm38", "mm10"
    "rat",   "mRatBN7.2", "rn7"
@@ -24,6 +23,7 @@ While ``download_genomedata.sh`` uses the `Ensembl <https://asia.ensembl.org/ind
    "chicken", "GRCg6a", "galGal6"
    "C.elegans", "WBcel235", "ce11"
    "S.serevisiae", "R64-1-1", "sacCer3"
+   "African clawed frog", "Xenopus_tropicalis", "xenLae2"
 
 For example, to use human genome build GRCh38/hg38, specify GRCh38 or hg38 for ``download_genomedata.sh`` and hg38 for ``churros``.
 
@@ -34,6 +34,18 @@ For example, to use human genome build GRCh38/hg38, specify GRCh38 or hg38 for `
    # or
    download_genomedata.sh GRCh38 Ensembl-GRCh38/ 2>&1 | tee log/Ensembl-GRCh38
    churros -p 24 --mpbl samplelist.txt samplepairlist.txt hg38 Ensembl-GRCh38/
+
+Other species: 
+
+.. csv-table::
+   :class: align-center
+   
+   "**Species**", "**ID**"
+   "human", "T2T"
+   "S.pombe", "SPombe"
+   "A.thaliana", "TAIR10"
+   "Oryzias latipes", "Medaka"
+   "Hydra vulgaris AEP", "HVAEP"
 
 
 Make mappability files
