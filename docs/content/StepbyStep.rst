@@ -71,7 +71,7 @@ SAM (.sam), BAM (.bam) and CRAM (.cram) formats are acceptable. For paired-end m
 .. note::
 
    - Sample lists that contain both BAM and FASTQ files will not be accepted.
-   - BAM files are only accepted in normal mode. The spike-in mode ``--spikein'' does not allow BAM files as input.
+   - BAM files are only accepted in normal mode. The spike-in mode (``--spikein``) does not allow BAM files as input.
 
 Prepare sample pair list
 -------------------------------------
