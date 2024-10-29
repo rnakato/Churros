@@ -66,7 +66,7 @@ Starting with ``version 1.3.0``, **Churros** can allow BAM files as input in sam
     HepG2_H3K36me3  bam/HepG2_H3K36me3.sort.bam
     HepG2_Control   bam/HepG2_Control.sort.bam
 
-SAM (.sam), BAM (.bam) and CRAM (.cram) formats are acceptable. For paired-end map files, specify ``--pair`` option to ``churros``.
+SAM (.sam), BAM (.bam) and CRAM (.cram) formats are acceptable. For paired-end map files, specify the ``--pair`` option to ``churros``.
 
 .. note::
 
