@@ -52,6 +52,25 @@ When using paired-end fastqs, use the second and the third columns to specify th
     gen_samplelist.sh -p fastq/ > samplelist.txt
 
 
+Sample list with BAM files
++++++++++++++++++++++++++++++++++
+
+Starting with ``version 1.3.0``, **Churros** can allow BAM files as input in samplelist.txt instead of FASTQ files. Just replace the FASTQ entries with BAM files like this:
+
+.. code-block:: bash
+
+    HepG2_H2A.Z     bam/HepG2_H2A.Z.sort.bam
+    HepG2_H3K4me3   bam/HepG2_H3K4me3.sort.bam
+    HepG2_H3K27ac   bam/HepG2_H3K27ac.sort.bam
+    HepG2_H3K27me3  bam/HepG2_H3K27me3.sort.bam
+    HepG2_H3K36me3  bam/HepG2_H3K36me3.sort.bam
+    HepG2_Control   bam/HepG2_Control.sort.bam
+
+.. note::
+
+   Sample lists containing both BAM and FASTQ files are not accepted.
+
+
 Prepare sample pair list
 -------------------------------------
 

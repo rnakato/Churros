@@ -63,6 +63,13 @@ Multiple fastq files can be specified by separateing with ``,``.
     HepG2_H3K36me3  fastq/SRR227447.fastq.gz,fastq/SRR227448.fastq.gz
     HepG2_Control   fastq/SRR227552.fastq.gz,fastq/SRR227553.fastq.gz
 
+
+.. note::
+
+   Starting with ``version 1.3.0``, **Churros** can allow BAM files as input in samplelist.txt instead of FASTQ files. 
+   See `Prepare sample list <https://churros.readthedocs.io/en/latest/content/StepbyStep.html#id8>`_
+
+
 samplepairlist.txt
 ++++++++++++++++++++++++++
 

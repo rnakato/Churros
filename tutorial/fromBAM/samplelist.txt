@@ -1,0 +1,8 @@
+Scc1_DMSO   bam/Scc1_DMSO.sort.bam
+Input_Scc1_DMSO bam/Input_Scc1_DMSO.sort.bam
+Scc1_thiolutin  bam/Scc1_thiolutin.sort.bam
+Input_Scc1_thiolutin    bam/Input_Scc1_thiolutin.sort.bam
+RPO21_DMSO  bam/RPO21_DMSO.sort.bam
+Input_RPO21_DMSO    bam/Input_RPO21_DMSO.sort.bam
+RPO21_thiolutin bam/RPO21_thiolutin.sort.bam
+Input_RPO21_thiolutin    bam/Input_RPO21_thiolutin.sort.bam

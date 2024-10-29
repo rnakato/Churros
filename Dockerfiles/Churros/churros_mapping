@@ -31,6 +31,7 @@ function usage()
     echo '      -P "param": Additional parameter for bowtie|bowtie2 (shouled be quated)' 1>&2
     echo '      -Q "param": Additional parameter for parse2wig+ (shouled be quated)' 1>&2
     echo '      -p: Number of CPUs (default: 12)' 1>&2
+    echo '      -w: Specify paired-end mode (default: judged based on the samplelist)' 1>&2
     echo '      -D: directory for execution (defalt: "Churros_result")' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname exec chip.fastq.gz chip hg38 Referencedata_hg38" 1>&2
@@ -50,8 +51,9 @@ ncore=12
 csfasta=0
 nofilter=0
 chdir="Churros_result"
+pairedend=0
 
-while getopts cCb:z:nNa:k:f:P:Q:p:D: option
+while getopts cCb:z:nNa:k:f:wP:Q:p:D: option
 do
     case ${option} in
         c) format=CRAM
@@ -77,6 +79,7 @@ do
         f) of=${OPTARG}
            isnumber.sh $of "-f" || exit 1
            ;;
+        w) pairedend=1;;
         P) bowtieparam=${OPTARG};;
         Q) parse2wigparam=${OPTARG};;
         p) ncore=${OPTARG}
@@ -100,7 +103,22 @@ command=$1
 samplelist=$2
 build=$3
 chdir=$chdir/$build
-#post=`echo $bowtieparam | tr -d ' ' | sed -e 's/--/-/g'`
+
+if test $pairedend -eq 1; then
+    pair="-p"
+else
+    while read -r LINE || [ -n "$LINE" ]; do
+        LINE=($LINE)
+        prefix=${LINE[0]}
+        fq1=${LINE[1]}
+        fq2=${LINE[2]}
+        if test "$fq2" = ""; then
+            pair=""
+        else
+            pair="-p"
+        fi
+    done < $samplelist
+fi
 
 if test $1 = "header"; then
     while read -r LINE || [ -n "$LINE" ]; do
@@ -109,28 +127,32 @@ if test $1 = "header"; then
         fq1=${LINE[1]}
         fq2=${LINE[2]}
 
-        if test "$fq2" = ""; then
-            pair=""
+        if [[ "$fq1" =~ \.(bam|sam|cram)$ ]]; then
+            is_bam=1
         else
-            pair="-p"
+            is_bam=0
         fi
 
         logdir=$chdir/log
-        if test $csfasta -eq 1; then
-            a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | head -n1 | cut -f2-`
+        statsdir=$chdir/stats
+        if test $is_bam -eq 1; then
+            a=`cat $statsdir/$prefix.stats.singleline.GC.tsv | head -n1 | cut -f1,2`
         else
-            a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | head -n1 | cut -f2-`
+            if test $csfasta -eq 1; then
+                a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | head -n1 | cut -f2-`
+            else
+                a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | head -n1 | cut -f2-`
+            fi
         fi
 
-        statsdir=$chdir/stats
         if test $mp -eq 1; then
-            b=`cat $statsdir/$prefix$post.stats.singleline.GC.tsv | head -n1 | cut -f6,7,8,9,10,11,12,13,14`
+            b=`cat $statsdir/$prefix.stats.singleline.GC.tsv | head -n1 | cut -f6,7,8,9,10,11,12,13,14`
         else
-            b=`cat $statsdir/$prefix$post.stats.singleline.tsv | head -n1 | cut -f6,7,8,9,10,11,12,13`
+            b=`cat $statsdir/$prefix.stats.singleline.tsv | head -n1 | cut -f6,7,8,9,10,11,12,13`
         fi
 
         echo -en "$a\t$b\t"
-        echo -e "`head -n1 $chdir/sspout/$prefix$post.stats.txt | cut -f4,5,6,7,8,9,10,11,12,13,14`"
+        echo -e "`head -n1 $chdir/sspout/$prefix.stats.txt | cut -f4,5,6,7,8,9,10,11,12,13,14`"
         exit
     done < $samplelist
 fi
@@ -156,7 +178,7 @@ func_map(){
     prefix=$1
     fq1=$2
     fq2=$3
-    head=$prefix #$post
+    head=$prefix
 
     if test "$fq2" = ""; then
 	    fastq=$fq1
@@ -180,10 +202,8 @@ func_map(){
         fi
         if test "$bowtieparam" != ""; then
             p_param="-P \"$bowtieparam\""
-#            ex "bowtie2.sh -c -p $ncore -P \"$bowtieparam\" -D $chdir \"$fastq\" $prefix $Ddir"
         else
             p_param=""
- #           ex "bowtie2.sh    -p $ncore -P \"$bowtieparam\" -D $chdir \"$fastq\" $prefix $Ddir"
         fi
         ex "bowtie2.sh $cramparam -p $ncore $p_param -D $chdir \"$fastq\" $prefix $Ddir"
     fi
@@ -200,16 +220,10 @@ if test $command = "map" -o $command = "exec"; then
 fi
 
 func_postprocess(){
-    prefix=$1
+    head=$1
     fq1=$2
     fq2=$3
-    head=$prefix #$post
-
-    if test "$fq2" = ""; then
-        pair=""
-    else
-        pair="-p"
-    fi
+    mapfile=$4
 
     parseparam="-a -D $chdir -s stats -o bigWig -t $ncore $pair -f $of"
     if test $mp -eq 1; then
@@ -217,11 +231,6 @@ func_postprocess(){
     fi
     if test "$nofilter" -eq 1; then
         parseparam="$parseparam -n"
-    fi
-    if test $format = "CRAM"; then
-        mapfile=$chdir/$bamdir/$head.sort.cram
-    else
-        mapfile=$chdir/$bamdir/$head.sort.bam
     fi
 
     echo -e "churros_mapping: quality check by SSP..."
@@ -245,15 +254,13 @@ func_postprocess(){
        if test "$peak" != ""; then
            ex "parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir >& $logdir/$head.txt"
        else
-	   mkdir -p $chdir/tmp
+	       mkdir -p $chdir/tmp
            macspeak="$chdir/tmp/${prefix}_forFRiP_peaks.narrowPeak"
            if test ! -e $macspeak; then
                echo "execute MACS2 without Input to estimate FRiP..."
                macs.sh -d $chdir/tmp $mapfile none ${prefix}_forFRiP $build sharp-nomodel
            fi
            ex "parse2wig+.sh $parseparam -b $binsize -z $macspeak $mapfile $head $build $Ddir >& $logdir/$head.txt"
-#	   rm $chdir/tmp/${prefix}_forFRiP*
-#	   rm -rf $chdir/tmp
        fi
     fi
     echo "done."
@@ -265,28 +272,50 @@ if test $command = "postprocess" -o $command = "exec"; then
         prefix=${LINE[0]}
         fq1=${LINE[1]}
         fq2=${LINE[2]}
-        func_postprocess $prefix "$fq1" "$fq2"
+
+        if [[ "$fq1" =~ \.(bam|sam|cram)$ ]]; then
+	        mkdir -p $chdir/$bamdir
+
+            # fq1 が絶対パスか相対パスかを判定して、絶対パスを mapfile に設定
+            if [[ "$fq1" = /* ]]; then
+                mapfile=$fq1  # 絶対パスならそのまま
+            else
+                mapfile=$(pwd)/$fq1  # 相対パスなら絶対パスに変換
+            fi
+
+            ln -sf $mapfile $chdir/$bamdir/$prefix.sort.bam
+        elif test $format = "CRAM"; then
+            mapfile=$chdir/$bamdir/$head.sort.cram
+        else
+            mapfile=$chdir/$bamdir/$head.sort.bam
+        fi
+
+        func_postprocess $prefix "$fq1" "$fq2" $mapfile
     done < $samplelist
 fi
 
 func_stats(){
-    prefix=$1
+    head=$1
     fq1=$2
     fq2=$3
-    head=$prefix$post
 
-    if test "$fq2" = ""; then
-        pair=""
+    if [[ "$fq1" =~ \.(bam|sam|cram)$ ]]; then
+        is_bam=1
     else
-        pair="-p"
+        is_bam=0
     fi
 
     logdir=$chdir/log
     statsdir=$chdir/stats
-    if test $csfasta -eq 1; then
-        a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | grep -v Sample | cut -f2-`
+    if test $is_bam -eq 1; then
+        echo -en "$head\t"
+        a=`cat $statsdir/$head.stats.singleline.GC.tsv | grep -v Sample | cut -f2`
     else
-        a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | grep -v Sample | cut -f2-`
+        if test $csfasta -eq 1; then
+            a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | grep -v Sample | cut -f2-`
+        else
+            a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | grep -v Sample | cut -f2-`
+        fi
     fi
 
     if test $mp -eq 1; then

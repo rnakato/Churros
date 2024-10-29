@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0 (2024-10-29)
+- Starting with this version, **Churros** can accept BAM files as input in samplelist.txt instead of FASTQ files.
+- Modified ``churros`` to abort when an error occurs in ``fastqc`` to detect cases where there are problems with the FASTQ file.
+
 ## 1.2.2 (2024-10-02)
 - Updated SAMtools from 1.19.2 to 1.21
 - Updated SRA Toolkit from 3.0.10 to v3.1.1

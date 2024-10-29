@@ -9,12 +9,21 @@ import argparse
 import pathlib
 import pandas as pd
 import re
+import subprocess
 
-__version__ = '1.2.1'
+__version__ = '1.3.0'
 
 def print_and_exec_shell(command):
     print (command)
-    os.system(command)
+#    os.system(command)
+    # stderrとstdoutの出力をキャプチャ
+    result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    # 標準エラー出力を確認して、エラー内容を表示
+    if result.returncode != 0 or result.stderr:
+        sys.exit(result.returncode)
+        print("\nError: Command failed with error message:", result.stderr, file=sys.stderr)
+        print("\nCheck your files and parameters.", result.stderr, file=sys.stderr)
 
 def check_file(file):
     if os.path.isfile(file):
@@ -188,8 +197,7 @@ def do_mapping_spikein(args, samplelist, samplepairlist, build, chdir):
     os.system(f'csv2xlsx.pl -i {qcstatsfile} -o {chdir}/{build}/churros.QCstats.xlsx')
 
 
-def do_mapping(args, samplelist, build, chdir):
-    
+def do_mapping(args, samplelist, build, chdir, is_bam):
     print ("Mapping with the normal mode.")
 
     if args.mapparam != "":
@@ -204,20 +212,33 @@ def do_mapping(args, samplelist, build, chdir):
         param_filter = "-N"
     else:
         param_filter = ""
+    if args.pair:
+        param_pair = "-w"
+    else:
+        param_pair = ""
 
     if args.nompbl:
-        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} {mapparam} {param_filter} {parse2wigparam} -n"
+        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} {mapparam} {param_filter} {param_pair} {parse2wigparam} -n"
     else:
-        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} {mapparam} {param_filter} {parse2wigparam}"
+        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} {mapparam} {param_filter} {param_pair} {parse2wigparam}"
 
-    print_and_exec_shell(f'churros_mapping {param_churros_mapping} exec {samplelist} {build} {args.Ddir}')
-
-    # stats
-    qcstatsfile = f'{chdir}/{build}/churros.QCstats.tsv'
-    os.system(f'churros_mapping {param_churros_mapping} header {samplelist} {build} {args.Ddir} > {qcstatsfile}')
-    os.system(f'churros_mapping {param_churros_mapping} stats {samplelist} {build} {args.Ddir} >> {qcstatsfile}')
-    # convert to xlsx
-    os.system(f'csv2xlsx.pl -i {qcstatsfile} -o {chdir}/{build}/churros.QCstats.xlsx')
+    if is_bam:
+        print ("BAM files detected. Execute churros_mapping postprocess.")
+        print_and_exec_shell(f'churros_mapping {param_churros_mapping} postprocess {samplelist} {build} {args.Ddir}')
+        # stats
+        qcstatsfile = f'{chdir}/{build}/churros.QCstats.tsv'
+        os.system(f'churros_mapping {param_churros_mapping} header {samplelist} {build} {args.Ddir} > {qcstatsfile}')
+        os.system(f'churros_mapping {param_churros_mapping} stats {samplelist} {build} {args.Ddir} >> {qcstatsfile}')
+        # convert to xlsx
+        os.system(f'csv2xlsx.pl -i {qcstatsfile} -o {chdir}/{build}/churros.QCstats.xlsx')
+    else:
+        print_and_exec_shell(f'churros_mapping {param_churros_mapping} exec {samplelist} {build} {args.Ddir}')
+        # stats
+        qcstatsfile = f'{chdir}/{build}/churros.QCstats.tsv'
+        os.system(f'churros_mapping {param_churros_mapping} header {samplelist} {build} {args.Ddir} > {qcstatsfile}')
+        os.system(f'churros_mapping {param_churros_mapping} stats {samplelist} {build} {args.Ddir} >> {qcstatsfile}')
+        # convert to xlsx
+        os.system(f'csv2xlsx.pl -i {qcstatsfile} -o {chdir}/{build}/churros.QCstats.xlsx')
 
 
 def make_trimmedsamplelist(chdir, samplelist):
@@ -341,6 +362,19 @@ def check_labels(samplelist, samplepairlist):
     if iserror:
         exit()
 
+
+def is_inputfile_BAM(samplelist):
+    df = pd.read_csv(samplelist, sep=r'\s+',  header=None)
+    df.fillna("", inplace=True)
+    is_bam = False
+    for index, row in df.iterrows():
+        f = row[1]
+        if f.endswith(".bam") or f.endswith(".sam") or f.endswith(".cram"):
+            is_bam = True
+            break
+
+    return is_bam
+
 def exec_churros(args):
     samplelist = args.samplelist
     samplepairlist = args.samplepairlist
@@ -370,11 +404,14 @@ def exec_churros(args):
 
     os.makedirs(chdir, exist_ok=True)
 
-    ### FASTQC
-    if args.noqc == False:
+    ### in the case of BAM format for input files
+    is_bam = is_inputfile_BAM(samplelist)
+
+    ### FASTQC/FASTP
+    if args.noqc == False and is_bam == False:
         do_readQC(chdir, build, samplelist, args.fastqtrimming, args.threads)
 
-    if args.fastqtrimming:
+    if args.fastqtrimming and is_bam == False:
         samplelist_trimmed = make_trimmedsamplelist(chdir, samplelist)
 
     ## churros_mapping
@@ -382,30 +419,28 @@ def exec_churros(args):
         if args.spikein:
             do_mapping_spikein(args, samplelist_trimmed, samplepairlist, build, chdir)
         else:
-            do_mapping(args, samplelist_trimmed, build, chdir)
+            do_mapping(args, samplelist_trimmed, build, chdir, is_bam)
     else:
         if args.spikein:
             do_mapping_spikein(args, samplelist, samplepairlist, build, chdir)
         else:
-            do_mapping(args, samplelist, build, chdir)
+            do_mapping(args, samplelist, build, chdir, is_bam)
 
     ## make samplepairlist_withflen
     samplepairlist_withflen = make_samplepairlist_withflen(samplepairlist, build, chdir_build)
 
     ## churros_callpeak
     param_macs = f' -b bam -p {args.threads} -q {args.qval} -d {args.macsdir} -D {chdir}'
-#    if args.mapparam != "":
-#        bowtiepost = get_mapfile_postfix(args.mapparam)
-#        param_macs += f' -s {bowtiepost}'
 
     if os.path.isfile(samplepairlist_withflen):
-            print_and_exec_shell(f'churros_callpeak {param_macs} {samplepairlist_withflen} {build}')
+        print_and_exec_shell(f'churros_callpeak {param_macs} {samplepairlist_withflen} {build}')
     else:
         print_and_exec_shell(f'churros_callpeak {param_macs} {samplepairlist} {build}')
 
     ## QC check
-    print ("\nCheck the quality of ChIP-seq samples...\n")
-    print_and_exec_shell(f'checkQC.py {chdir}/{build}/churros.QCstats.tsv {samplepairlist} | tee {chdir}/{build}/QCcheck.log')
+    if is_bam == False:
+        print ("\nCheck the quality of ChIP-seq samples...\n")
+        print_and_exec_shell(f'checkQC.py {chdir}/{build}/churros.QCstats.tsv {samplepairlist} | tee {chdir}/{build}/QCcheck.log')
 
     ### MultiQC
     print ("\n")
@@ -494,12 +529,13 @@ if(__name__ == '__main__'):
     parser.add_argument("--spikein_simple", help="Spikein: Use ChIP samples only", action="store_true")
     parser.add_argument("--spikein_constant", help="Scaling Constant for the number of reads after normalization (default: 100)", type=int, default=100)
     parser.add_argument("-p", "--threads", help="Number of CPUs (default: 12)", type=int, default=12)
+    parser.add_argument("--pair", help="(If inputs are BAM files) Specify if it is paired end", action="store_true")
     parser.add_argument("--threads_comparative", help="Number of CPUs for --comparative option (default: 8)", type=int, default=8)
     parser.add_argument("--outputpvalue", help="Output ChIP/Input -log(p) distribution as a begraph format", action="store_true")
     parser.add_argument("--comparative", help="Compare bigWigs and peaks among samples by churros_compare", action="store_true")
     parser.add_argument("-D", "--outputdir", help="Output directory (default: 'Churros_result')", type=str, default="Churros_result")
     parser.add_argument("--preset", help="Preset parameters for mapping reads ([scer|T2T])", type=str, default="")
-    parser.add_argument("-v", "--version", help="Print version information and quit", action='version', version=__version__)
+    parser.add_argument("-v", "--version", help="Print version information and quit", action='version', version="churros version " + __version__)
 
     args = parser.parse_args()
     #    print(args)
