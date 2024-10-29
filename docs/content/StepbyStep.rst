@@ -66,10 +66,12 @@ Starting with ``version 1.3.0``, **Churros** can allow BAM files as input in sam
     HepG2_H3K36me3  bam/HepG2_H3K36me3.sort.bam
     HepG2_Control   bam/HepG2_Control.sort.bam
 
+SAM (.sam), BAM (.bam) and CRAM (.cram) formats are acceptable. For paired-end map files, specify ``--pair`` option to ``churros``.
+
 .. note::
 
-   Sample lists containing both BAM and FASTQ files are not accepted.
-
+   - Sample lists that contain both BAM and FASTQ files will not be accepted.
+   - BAM files are only accepted in normal mode. The spike-in mode ``--spikein'' does not allow BAM files as input.
 
 Prepare sample pair list
 -------------------------------------
