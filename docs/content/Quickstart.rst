@@ -67,7 +67,7 @@ Multiple fastq files can be specified by separateing with ``,``.
 .. note::
 
    Starting with ``version 1.3.0``, **Churros** can allow BAM files as input in samplelist.txt instead of FASTQ files. 
-   See `Prepare sample list <https://churros.readthedocs.io/en/latest/content/StepbyStep.html#id8>`_
+   See `Prepare sample list <https://churros.readthedocs.io/en/latest/content/StepbyStep.html#prepare-sample-list>`_
 
 
 samplepairlist.txt
