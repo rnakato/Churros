@@ -16,11 +16,9 @@ __version__ = '1.3.0'
 def print_and_exec_shell(command):
     print (command)
 #    os.system(command)
-    # stderrとstdoutの出力をキャプチャ
     result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-    # 標準エラー出力を確認して、エラー内容を表示
-    if result.returncode != 0 or result.stderr:
+    if result.returncode != 0 or re.search(r'error', result.stderr, re.IGNORECASE):
         sys.exit(result.returncode)
         print("\nError: Command failed with error message:", result.stderr, file=sys.stderr)
         print("\nCheck your files and parameters.", result.stderr, file=sys.stderr)
