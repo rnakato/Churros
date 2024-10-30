@@ -18,10 +18,14 @@ def print_and_exec_shell(command):
 #    os.system(command)
     result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-    if result.returncode != 0 or re.search(r'error', result.stderr, re.IGNORECASE):
+    if result.stdout:
+        print(result.stdout)
+    if result.stderr:
+        print(result.stderr, file=sys.stderr)
+
+    if result.returncode != 0 or re.search(r'failed', result.stderr, re.IGNORECASE) or re.search(r'error', result.stderr, re.IGNORECASE):
+        print("Error: Command failed with error. Check your files and parameters.", result.returncode, file=sys.stderr)
         sys.exit(result.returncode)
-        print("\nError: Command failed with error message:", result.stderr, file=sys.stderr)
-        print("\nCheck your files and parameters.", result.stderr, file=sys.stderr)
 
 def check_file(file):
     if os.path.isfile(file):
