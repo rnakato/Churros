@@ -11,6 +11,7 @@ function usage()
     echo '   Options:' 1>&2
     echo '      -f <int>: predefined fragment length (defalt: estimated in MACS2)' 1>&2
     echo '      -d <str>: output directory (defalt: "macs")' 1>&2
+    echo '      -p: paired-end mode ("-f BAMPE")' 1>&2
     echo '      -B: save extended fragment pileup, and local lambda tracks (two files) at every bp into a bedGraph file' 1>&2
     echo '      -F: overwrite files if exist (defalt: skip)' 1>&2
 }
@@ -20,8 +21,9 @@ qval=0.05
 mdir=macs
 force=0
 param_bdg=""
+fileformat="BAM"
 
-while getopts f:q:d:BF option
+while getopts f:q:d:pBF option
 do
     case ${option} in
         f) flen=${OPTARG}
@@ -29,6 +31,7 @@ do
            ;;
         q) qval=${OPTARG};;
         d) mdir=${OPTARG};;
+        p) fileformat="BAMPE";;
         B) param_bdg="-B";;
         F) force=1;;
         *)
@@ -74,9 +77,9 @@ else
 fi
 
 if test $Input = "none"; then
-    macs="macs2 callpeak -t $IP -g $sp -f BAM -q $qval $param_bdg $param_yeast"
+    macs="macs2 callpeak -t $IP -g $sp -f $fileformat -q $qval $param_bdg $param_yeast"
 else
-    macs="macs2 callpeak -t $IP -c $Input -g $sp -f BAM $param_bdg $param_yeast"
+    macs="macs2 callpeak -t $IP -c $Input -g $sp -f $fileformat $param_bdg $param_yeast"
     if test -e $Input && test -s $Input; then
         n=1 # dummy
     else

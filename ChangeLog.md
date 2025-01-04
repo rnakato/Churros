@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0 (2025-1-04)
+- Fixed a bug in ``churros_callpeak`` that did not use the ``-f BEDPE`` option in MACS2 when paired end samples are supplied.
+- Fixed an installation of ``fgsea`` required by ``ChIPseeker`` and ``clusterProfiler``. 
+
 ## 1.3.0 (2024-10-29)
 - Starting with this version, **Churros** can accept BAM files as input in samplelist.txt instead of FASTQ files.
 - Modified ``churros`` to abort when an error occurs in ``fastqc`` to detect cases where there are problems with the FASTQ file.

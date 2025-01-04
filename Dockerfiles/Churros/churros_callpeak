@@ -13,8 +13,9 @@ function usage()
     echo '      -d : directory for peaks (defalt: "macs")' 1>&2
     echo '      -q : threshould of MACS2 (defalt: 0.05)' 1>&2
     echo '      -b : bam direcoty (defalt: "bam")' 1>&2
-    echo '      -F : overwrite MACS2 resilts if exist (defalt: skip)' 1>&2
-    echo '      -p : number of CPUs (defalt: 4)' 1>&2
+    echo '      -F : overwrite MACS2 results if exist (defalt: skip)' 1>&2
+    echo '      -t : number of CPUs (defalt: 4)' 1>&2
+    echo '      -p : Paired-end mode' 1>&2
     echo '      -s : postfix of the mapfile ($prefix$post.sort.bam, default: "")' 1>&2
 }
 
@@ -25,18 +26,20 @@ ncore=4
 chdir="Churros_result"
 force=""
 post=""
+pair=""
 
-while getopts D:b:q:d:p:Fs: option
+while getopts D:b:q:d:t:Fps: option
 do
     case ${option} in
 	D) chdir=${OPTARG};;
 	b) bamdir=${OPTARG};;
 	q) qval=${OPTARG};;
 	d) mdir=${OPTARG};;
-	p) ncore=${OPTARG}
-           isnumber.sh $ncore "-p" || exit 1
+	t) ncore=${OPTARG}
+           isnumber.sh $ncore "-t" || exit 1
 	   ;;
 	F) force="-F";;
+	p) pair="-p";;
 	s) post=${OPTARG};;
         *)
 	    usage
@@ -51,6 +54,7 @@ if [ $# -ne 2 ]; then
   usage
   exit 1
 fi
+
 
 samplepairlist=$1
 build=$2
@@ -104,6 +108,7 @@ do_macs(){
     qval=$6
     force=$7
     post=$8
+    pair=$9
 
     IFS=, read -ra LINE <<< $LINE
     chip=${LINE[0]:-""}
@@ -133,11 +138,9 @@ do_macs(){
         fi
     fi
     if test "$input" = ""; then
-#        echo "1 macs.sh $force -q $qval -d $mdir $flen $IPbam none $label $build $mode"
-        macs.sh $force -q $qval -d $mdir $flen $IPbam none $label $build $mode
+        macs.sh $force $pair -q $qval -d $mdir $flen $IPbam none $label $build $mode
     else
-#        echo "2 macs.sh $force -q $qval -d $mdir $flen $IPbam $Inputbam $label $build $mode"
-        macs.sh $force -q $qval -d $mdir $flen $IPbam $Inputbam $label $build $mode
+        macs.sh $force $pair -q $qval -d $mdir $flen $IPbam $Inputbam $label $build $mode
     fi
 }
 export -f do_macs
@@ -148,6 +151,8 @@ while read -r LINE || [ -n "$LINE" ]; do
     array="$array $LINE"
 done < $samplepairlist
 
-echo ${array[@]} | tr ' ' '\n' | xargs -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval \"$force\" \"$post\""
+echo ${array[@]} | tr ' ' '\n' \
+    | xargs -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval \"$force\" \"$post\" \"$pair\""
+
 #  xargs -n1 -I
 echo "churros_callpeak done."

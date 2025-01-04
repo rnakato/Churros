@@ -25,3 +25,5 @@ tutorial/DNAmethylation/abismal_index/
 tutorial/DNAmethylation/fastq/
 tutorial/DNAmethylation/log/
 tutorial/DNAmethylation/methylKit/
+tutorial/fromBAM/Churros_result/
+tutorial/fromBAM/bam/

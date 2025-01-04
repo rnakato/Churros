@@ -35,8 +35,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/list
 
 # R packages
+# Use install_github to install fgsea due to the failure of BiocManager::install('fgsea')
 ENV Ncpus=16
-RUN R -e "BiocManager::install(c('ATACseqQC', \
+RUN R -e "install.packages('devtools')" \
+    && R -e "devtools::install_github('ctlab/fgsea')" \
+    && R -e "BiocManager::install(c('ATACseqQC', \
                                  'ChIPseeker', \
                                  'clusterProfiler', \
                                  'DESeq2', \
