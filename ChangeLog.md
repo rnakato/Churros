@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.1 (2025-2-05)
+- Fixed a bug in `churros_genPvalwig` that required old names of bigWig files.
+- Fixed bugs in the scripts in the ``tutorial`` directory.
+- Corrected several mistakes in the manual.
+
 ## 1.4.0 (2025-1-04)
 - Fixed a bug in ``churros_callpeak`` that did not use the ``-f BEDPE`` option in MACS2 when paired end samples are supplied.
 - Fixed an installation of ``fgsea`` required by ``ChIPseeker`` and ``clusterProfiler``. 

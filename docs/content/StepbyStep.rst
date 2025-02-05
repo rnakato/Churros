@@ -129,7 +129,7 @@ The mapped reads are then quality-checked and converted to BigWig files.
     $sing churros_mapping -p 12 exec samplelist.txt $build $Ddir
 
     # output QC stats
-    $sing churros_mapping header > churros.QCstats.tsv
+    $sing churros_mapping header samplelist.txt $build $Ddir > churros.QCstats.tsv
     $sing churros_mapping stats samplelist.txt $build $Ddir >> churros.QCstats.tsv
 
 - Output
@@ -160,9 +160,15 @@ churros_callpeak: call peaks by MACS2
 ``churros_callpeak`` calls peaks of the samples specified in ``samplepairlist.txt`` using `MACS2 <https://github.com/macs3-project/MACS>`_.
 If input samples are omitted, peaks are called using ChIP samples only.
 
+By default, the ``churros`` command does not include this step. Add the ``--callpeak`` option to include this step in ``churros``.
+
+.. note::
+
+   Starting with version 1.4.0, the option of ``churros_callpeak`` to specify the number of CPUs has been changed from ``-p`` to ``-t`` to add a new parameter ``-p (paired-end mode)``.
+
 .. code-block:: bash
 
-    churros_callpeak -p 8 samplepairlist.txt hg38
+    churros_callpeak -t 8 samplepairlist.txt hg38
 
 ``churros_callpeak`` also outputs the correlation scores (Simpson index) and heatmaps.
 

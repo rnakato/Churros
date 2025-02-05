@@ -1,4 +1,4 @@
-#sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.9.0.sif"
+#sing="singularity exec --bind /work,/work2,/work3 /work3/SingularityImages/churros.1.4.0.sif"
 sing="singularity exec churros.sif"
 
 mkdir -p fastq

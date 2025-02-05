@@ -1,4 +1,4 @@
-sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.9.0.sif"
+sing="singularity exec --bind /work,/work2,/work3 /work3/SingularityImages/churros.1.4.0.sif"
 #sing="singularity exec churros.sif"
 
 build=sacCer3
@@ -8,5 +8,5 @@ Ddir=Referencedata_$build
 $sing churros_mapping exec samplelist.txt $build $Ddir
 
 # output QC stats
-$sing churros_mapping header > churros.QCstats.tsv
+$sing churros_mapping header samplelist.txt $build $Ddir > churros.QCstats.tsv
 $sing churros_mapping stats samplelist.txt $build $Ddir >> churros.QCstats.tsv

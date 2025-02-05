@@ -388,6 +388,8 @@ def do_peakcall(args, samplelist, samplepairlist, build, chdir, chdir_build):
 
     if args.pair:
         param_pair = "-p"
+    else:
+        param_pair = ""
 
     df = pd.read_csv(samplelist, sep=r'\s+',  header=None)
     df.fillna("", inplace=True)

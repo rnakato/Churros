@@ -34,6 +34,7 @@ post_predefined=""
 chdir="Churros_result"
 bigwig=0
 outputvalue=2
+post=""
 
 while getopts b:d:e:nmy:D:x option
 do
@@ -94,11 +95,11 @@ fi
 
 echo "output directory: $odir"
 if test "$post_predefined" = ""; then
-    if test $mp -eq 1; then
-        post=.mpbl
-    else
-        post=""
-    fi
+#    if test $mp -eq 1; then
+#        post=.mpbl
+#    else
+#        post=""
+#    fi
     if test $nofilter -eq 1; then
         post=$post-nofilter
     fi

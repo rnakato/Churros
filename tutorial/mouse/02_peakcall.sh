@@ -1,9 +1,9 @@
-#sing="singularity exec --bind /work,/work2 /work/SingularityImages/churros.0.9.0.sif"
-sing="singularity exec churros.sif"
+sing="singularity exec --bind /work,/work2,/work3 /work3/SingularityImages/churros.1.4.0.sif"
+#sing="singularity exec churros.sif"
 
 build=mm10
 
-$sing churros_callpeak -p 10 samplepairlist.txt $build
+$sing churros_callpeak -t 10 samplepairlist.txt $build
 
 # overwrite existing MACS results
-$sing churros_callpeak -F -p 10 samplepairlist.txt $build
+$sing churros_callpeak -F -t 10 samplepairlist.txt $build
