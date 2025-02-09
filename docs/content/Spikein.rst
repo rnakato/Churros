@@ -1,4 +1,4 @@
-Spike-in analysis (ChIP-seq, human)
+Spike-in analysis (human)
 =================================================
 
 Here we show the Spike-in analysis using **Churros**.
