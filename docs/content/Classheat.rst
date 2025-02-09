@@ -1,4 +1,4 @@
-Large-scale profile analysis
+Classheat: Large-scale profile analysis
 =================================================
 
 **Churros** provides a ``classheat`` function for clustering and visualizing large-scale epigenomic profiles.

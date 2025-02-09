@@ -104,9 +104,10 @@ In spike-in mode, in addition to the normal arguments, the genome build and the 
 
 The output directory contains several new subdirectories:
 
+- ``dm6/``: Map files mapped to the spike-in genome. The directory name depends on the genome build. In this case it is ``dm6/``.
+- ``bigWig/Spikein/``: bigWig files that have been spike-in normalized. Use these files for downstream analysis.
+- ``pdf_spikein/``: Visualization files that have been spike-in normalized. The ``pdf/`` directory contains visualization files with total read normalization as usual.
 - ``spikein_scalingfactor/``: A scaling factor calculated from the number of reads in the spike-in genome. Reads are normalized to this value.
-- ``bigWig/Spikein/``: bigWig files that have been spike-in normalized.
-- ``pdf_spikein/``: Visualization files that have been spike-in normalized. The ``pdf/`` directory contains visualization files using total read normalization.
 
 .. note::
 
@@ -135,6 +136,7 @@ In the spike-in normalization, we can see the decreased enrichment of H3K79me2, 
 Generate a read distribution profile
 +++++++++++++++++++++++++++++++++++++++++
 
+With the generated bigWig files, you can perform downstream analysis such as plotting the averaged profile.
 Churros uses `DROMPAplus <https://drompaplus.readthedocs.io/>`_ internally, which has a command to generate a read distribution profile in the PDF format.
 You can use it to see the averaged read distribution for spike-in normalization.
 
