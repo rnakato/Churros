@@ -194,9 +194,9 @@ If you want to run only the mapping step for spike-in normalization, use the ``c
     Ddir_spikein=Referencedata_${build_spikein}
     ncore=48
 
-    churros_mapping_spikein exec samplelist.txt samplepairlist.txt ${build} ${build_spikein} \
-        ${Ddir_ref} ${Ddir_spikein} -p ${ncore}
-
+    churros_mapping_spikein exec samplelist.txt samplepairlist.txt -p ${ncore} \
+        ${build} ${build_spikein} \
+        ${Ddir_ref} ${Ddir_spikein}
 
 churros_visualize
 +++++++++++++++++++++++++++++++++++++
@@ -209,6 +209,7 @@ If you want to generate PDF files for spike-in normalization, supply the options
     build=hg38
     Ddir=Referencedata_$build
     # Spike-in normalization (in the pdf_spikein directory)
-    churros_visualize --pdfdir pdf_spikein --chipdirectory Spikein --inputdirectory TotalReadNormalized \
-                        samplepairlist.txt drompa+ $build $Ddir
+    churros_visualize --pdfdir pdf_spikein \
+                      --chipdirectory Spikein --inputdirectory TotalReadNormalized \
+                      samplepairlist.txt drompa+ $build $Ddir
 
