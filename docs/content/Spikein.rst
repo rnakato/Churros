@@ -46,8 +46,8 @@ Here we specify ``hg38`` and ``dm6`` for genome build.
     for build in hg38 dm6
     do
         Ddir=Referencedata_$build
-        $sing download_genomedata.sh $build $Ddir 2>&1 | tee log/$Ddir
-        $sing build-index.sh -p $ncore bowtie2 $Ddir
+        download_genomedata.sh $build $Ddir 2>&1 | tee log/$Ddir
+        build-index.sh -p $ncore bowtie2 $Ddir
     done
 
 Prepare sample list
@@ -111,6 +111,25 @@ The output directory contains several new subdirectories:
 .. note::
 
    Currently, spike-in normalization is not applied to peak calling with MACS2.
+
+Let's look at the read distribution with total read normalization (in the ``pdf/`` directory) and spike-in normalization (in the ``pdf_spikein/`` directory). The first page of chromosome 10 (``drompa+.bin5M.PCSHARP.5000_chr10.pdf``) looks like this.
+
+
+.. figure:: img/Visualize_totalread.jpg
+   :width: 700px
+   :align: center
+   :alt: Alternate
+
+   Total read normalization
+
+.. figure:: img/Visualize_spikein.jpg
+   :width: 700px
+   :align: center
+   :alt: Alternate
+
+   Spike-in normalization
+
+In the spike-in normalization, we can see the decreased enrichment of H3K79me2, while the total read normalization does not successfully show it.
 
 
 churros_mapping_spikein: mapping reads for spike-in normalization
