@@ -171,7 +171,7 @@ See the `DROMPAplus manual <https://drompaplus.readthedocs.io/en/latest/content/
 The results are in the ``profile/`` directory.
 
 .. figure:: img/Profile_spikein.jpg
-   :width: 400px
+   :width: 700px
    :align: center
    :alt: Alternate
 
