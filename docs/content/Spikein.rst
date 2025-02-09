@@ -179,7 +179,7 @@ The results are in the ``profile/`` directory.
 
             Total read normalization
 
-    *   - .. figure:: img/Profile_spikein.jpg
+        - .. figure:: img/Profile_spikein.jpg
             :width: 700px
             :align: center
             :alt: Alternate
