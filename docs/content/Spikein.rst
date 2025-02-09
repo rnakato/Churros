@@ -186,7 +186,7 @@ Execute a single step
 churros_mapping_spikein
 +++++++++++++++++++++++++++++++++++++
 
-If you want to run only the mapping step for spike-in normalization, use the ``churros_mapping_spikein`` command.
+If you just want to do the mapping and generate bigWig files for spike-in normalization, use the ``churros_mapping_spikein`` command.
 
 .. code-block:: bash
 
