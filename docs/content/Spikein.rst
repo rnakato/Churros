@@ -1,14 +1,14 @@
 Spike-in analysis (human)
 =================================================
 
-Here we show the Spike-in analysis using **Churros**.
-The spike-in analysis is a method to normalize the ChIP-seq data by adding a known amount of external DNA as an internal control.
-This method allows us the absolute-level comparison between ChIP-seq samples.
+Here we show the spike-in analysis using **Churros**.
+Spike-in analysis is a method to normalize the ChIP-seq data by adding a known amount of external DNA as an internal control.
+This method allows us to compare ChIP-seq samples at an absolute level.
 
-Here we use the part of the ChIP-seq data from `Orlando et al. 2014 <https://www.cell.com/cell-reports/fulltext/S2211-1247(14)00872-9>`_: H3K79me2 histone modification data for Jurkat cells.
+In this tutorial, we will use the ChIP-seq data of H3K79me2 histone modification data for Jurkat cells from `Orlando et al., Cell Reports, 2014 <https://www.cell.com/cell-reports/fulltext/S2211-1247(14)00872-9>`_.
 
 H3K79me2 modification is lost from chromatin by treatment with the DOT1L inhibitor EPZ5676.
-In this experiment, EPZ5676-treated cells (low H3K79me2 levels) were mixed with DMSO-treated cells (high H3K79me2 levels) in ratios ranging 0%, 25%, 50%, 75%, and 100%. Therefore, in the ChIP-seq data, the higher the proportion of EPZ5676-treated cells, the lower the enrichment of H3K79me2 peaks should be.
+In this experiment, EPZ5676-treated cells (low H3K79me2 levels) were mixed with DMSO-treated cells (high H3K79me2 levels) at ratios of 0%, 25%, 50%, 75%, and 100%. Therefore, in the ChIP-seq data, the higher the proportion of EPZ5676-treated cells, the lower the enrichment of H3K79me2 peaks should be.
 
 The reference genome is human genome build hg38, while the spike-in DNA is the D. melanogaster genome (dm6).
 
