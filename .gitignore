@@ -27,3 +27,11 @@ tutorial/DNAmethylation/log/
 tutorial/DNAmethylation/methylKit/
 tutorial/fromBAM/Churros_result/
 tutorial/fromBAM/bam/
+tutorial/fromBAM_human/
+tutorial/Spikein/Churros_result/
+tutorial/Spikein/Churros_result_Quickstart/
+tutorial/Spikein/Referencedata_dm6/
+tutorial/Spikein/Referencedata_hg38/
+tutorial/Spikein/fastq/
+tutorial/Spikein/log/
+tutorial/Spikein/profile/

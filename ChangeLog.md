@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.2 (2025-2-09)
+- Added the tutorial and sample scripts for spike-in analysis.
+
 ## 1.4.1 (2025-2-05)
 - Fixed a bug in `churros_genPvalwig` that required old names of bigWig files.
 - Fixed bugs in the scripts in the ``tutorial`` directory.

@@ -4,7 +4,7 @@ Quick start (ChIP-seq, human)
 This page describes the tutorial on how to get the results from FASTQ files by **Churros**.
 There are only two pieces of data you need to prepare: FASTQ files and sample metadata.
 
-While this tutorial uses human data, the sample scripts for human, mouse and `S. cerevisiae` are also available at `Chrros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial>`_.
+While this tutorial uses human data, the sample scripts for human, mouse and `S. cerevisiae` are also available at `Churros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial>`_.
 
 .. note::
 

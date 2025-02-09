@@ -2,7 +2,7 @@ Tutorial (ChIP-seq, *S. serevisiae*)
 =======================================
 
 This tutorial is for the analysis of `S. cerevisiae`. For human analysis, see :doc:`Tutorial`.
-The sample scripts are also available at `Chrros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial/yeast>`_.
+The sample scripts are also available at `Churros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial/yeast>`_.
 
 .. note::
 
@@ -16,7 +16,7 @@ The sample scripts are also available at `Chrros GitHub site <https://github.com
 Get data
 ------------------------
 
-Here we use Scc1 and RPO21 ChIP-seq data from `Jeppsson et al., Sci Adv, 2022 <https://www.science.org/doi/10.1126/sciadv.abn7063>`_.
+Here we use Scc1 and RPO21 ChIP-seq data from `Jeppsson et al., Science Advance, 2022 <https://www.science.org/doi/10.1126/sciadv.abn7063>`_.
 
 .. code-block:: bash
 
@@ -26,7 +26,7 @@ Here we use Scc1 and RPO21 ChIP-seq data from `Jeppsson et al., Sci Adv, 2022 <h
         fastq-dump --gzip $id -O fastq
     done
 
-| Then download and generate the reference dataset including genome, gene annotation and index files. **Chuross** contains scripts for that: ``download_genomedata.sh`` and ``build-index.sh``.
+| Then download and generate the reference dataset including genome, gene annotation and index files. **Churos** contains scripts for that: ``download_genomedata.sh`` and ``build-index.sh``.
 | Here we specify ``sacCer3`` for genome build. See :doc:`Appendix` for the detail of genome build.
 
 .. code-block:: bash
@@ -68,7 +68,7 @@ Multiple fastq files can be specified by separateing with ``,``.
 samplepairlist.txt
 ++++++++++++++++++++++++++
 
-``samplelist.txt`` is a **comma-delimited** file (CSV) that describes the ChIP/Input pairs as follows:
+``samplepairlist.txt`` is a **comma-delimited** file (CSV) that describes the ChIP/Input pairs as follows:
 
 - ChIP-sample label
 - Input-sample label
@@ -96,7 +96,7 @@ Running Churros
 
 ``churros`` command executes all steps from mapping reads to visualization.
 
-Here we use ``--preset scer`` option to adjust the parameter setting to S. serevisiae.
+Here we use ``--preset scer`` option to adjust the parameter setting to `S. serevisiae`.
 
 .. code-block:: bash
 

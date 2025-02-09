@@ -1,0 +1,5 @@
+H3K79me2_0_rep1,WCE_0_rep1,H3K79me2_0_rep1,sharp
+H3K79me2_25_rep1,WCE_25_rep1,H3K79me2_25_rep1,sharp
+H3K79me2_50_rep1,WCE_50_rep1,H3K79me2_50_rep1,sharp
+H3K79me2_75_rep1,WCE_75_rep1,H3K79me2_75_rep1,sharp
+H3K79me2_100_rep1,WCE_100_rep1,H3K79me2_100_rep1,sharp

@@ -1,0 +1,10 @@
+H3K79me2_0_rep1	fastq/SRR1536557.fastq.gz
+H3K79me2_25_rep1	fastq/SRR1536558.fastq.gz
+H3K79me2_50_rep1	fastq/SRR1536559.fastq.gz
+H3K79me2_75_rep1	fastq/SRR1536560.fastq.gz
+H3K79me2_100_rep1	fastq/SRR1536561.fastq.gz
+WCE_0_rep1	fastq/SRR1584489.fastq.gz
+WCE_25_rep1	fastq/SRR1584490.fastq.gz
+WCE_50_rep1	fastq/SRR1584491.fastq.gz
+WCE_75_rep1	fastq/SRR1584492.fastq.gz
+WCE_100_rep1	fastq/SRR1584493.fastq.gz
