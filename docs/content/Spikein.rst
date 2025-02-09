@@ -34,9 +34,10 @@ Here we use `parallel-fastq-dump <https://github.com/rvalieris/parallel-fastq-du
         parallel-fastq-dump --sra-id $id --threads 4 --outdir fastq/ --gzip
     done
 
-| Then download and generate the reference dataset including genome, gene annotation and index files.
-| The reference genome is human, while the spike-in DNA is the D. melanogaster.
-| Here we specify ``hg38`` and ``dm6`` for genome build.
+Then download and generate the reference dataset including genome, gene annotation and index files.
+
+The reference genome is human, while the spike-in DNA is the D. melanogaster.
+Here we specify ``hg38`` and ``dm6`` for genome build.
 
 .. code-block:: bash
 
@@ -44,7 +45,6 @@ Here we use `parallel-fastq-dump <https://github.com/rvalieris/parallel-fastq-du
     ncore=24
     for build in hg38 dm6
     do
-        ncore=24
         Ddir=Referencedata_$build
         $sing download_genomedata.sh $build $Ddir 2>&1 | tee log/$Ddir
         $sing build-index.sh -p $ncore bowtie2 $Ddir
