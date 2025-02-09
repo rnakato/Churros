@@ -36,7 +36,7 @@ Here we use `parallel-fastq-dump <https://github.com/rvalieris/parallel-fastq-du
 
 Then download and generate the reference dataset including genome, gene annotation and index files.
 
-The reference genome is human, while the spike-in DNA is the D. melanogaster.
+The reference genome is human, while the spike-in DNA is the `D. melanogaster`.
 Here we specify ``hg38`` and ``dm6`` for genome build.
 
 .. code-block:: bash
