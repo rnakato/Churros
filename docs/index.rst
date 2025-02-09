@@ -23,6 +23,7 @@ Contents:
    content/Quickstart
    content/StepbyStep
    content/Classheat
+   content/Tutorial.Spikein
    content/Tutorial.scer
    content/Tutorial.Bisulfite
    content/Commands
