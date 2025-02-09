@@ -138,7 +138,7 @@ Generate a read distribution profile
 Churros uses `DROMPAplus <https://drompaplus.readthedocs.io/>`_ internally, which has a command to generate a read distribution profile in the PDF format.
 You can use it to see the averaged read distribution for spike-in normalization.
 
-See the `DROMPAplus manual <https://drompaplus.readthedocs.io/en/latest/content/drompa/Profile.html>`_ for details.
+The command for DROMPAplus is as follows. See the `DROMPAplus manual <https://drompaplus.readthedocs.io/en/latest/content/drompa/Profile.html>`_ for details.
 
 .. code-block:: bash
 
