@@ -170,21 +170,13 @@ See the `DROMPAplus manual <https://drompaplus.readthedocs.io/en/latest/content/
 
 The results are in the ``profile/`` directory.
 
-.. list-table::
+.. figure:: img/Profile_spikein.jpg
+   :width: 400px
+   :align: center
+   :alt: Alternate
 
-        - .. figure:: img/Profile_totalread.jpg
-            :width: 700px
-            :align: center
-            :alt: Alternate
+   Averaged read distribution around TSSs of all protein-coding genes
 
-            Total read normalization
-
-        - .. figure:: img/Profile_spikein.jpg
-            :width: 700px
-            :align: center
-            :alt: Alternate
-
-            Spike-in normalization
 
 Execute a single step
 ------------------------------------
