@@ -6,6 +6,10 @@
 
 See [Changelog](https://github.com/rnakato/Churros/blob/main/ChangeLog.md)
 
+**[Important]** 
+There was a bug in ``v1.3.0`` ~ ``v1.4.2`` that affected the order of samples and labels in samplelist.txt. Please do not use those versions. This problem has been fixed in ``v1.5.0``.
+If you've already generated data with them, please regenerate the results with Churros ``v.1.5.0``. 
+
 ## 1. Installation
 
 Docker image is available at [DockerHub](https://hub.docker.com/r/rnakato/churros).
