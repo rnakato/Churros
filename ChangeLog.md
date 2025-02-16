@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.5.0 (2025-2-16)
-- **[Important]** A bug affecting the order of samples and labels in samplelist.txt was present in versions v1.3.0 ~ v1.4.2. Please do not use these versions. This problem is fixed in v1.5.0.
+- **[Important]** There was a bug in v1.3.0 ~ v1.4.2 that affected the order of samples and labels in samplelist.txt. Please do not use those versions. This problem has been fixed in v1.5.0.
 
 ## 1.4.2 (2025-2-09)
 - Added the tutorial and sample scripts for spike-in analysis.
