@@ -285,9 +285,9 @@ if test $command = "postprocess" -o $command = "exec"; then
 
             ln -sf $mapfile $chdir/$bamdir/$prefix.sort.bam
         elif test $format = "CRAM"; then
-            mapfile=$chdir/$bamdir/$head.sort.cram
+            mapfile=$chdir/$bamdir/$prefix.sort.cram
         else
-            mapfile=$chdir/$bamdir/$head.sort.bam
+            mapfile=$chdir/$bamdir/$prefix.sort.bam
         fi
 
         func_postprocess $prefix "$fq1" "$fq2" $mapfile
