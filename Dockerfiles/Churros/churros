@@ -11,7 +11,7 @@ import pandas as pd
 import re
 import subprocess
 
-__version__ = '1.4.2'
+__version__ = '1.5.1'
 
 def print_and_exec_shell(command):
     print (command)
@@ -291,13 +291,24 @@ def make_samplepairlist_withflen(samplepairlist, build, chdir):
     if(os.path.isfile(samplepairlist_withflen)):
         os.remove(samplepairlist_withflen)
 
-    df = pd.read_csv(samplepairlist, sep=",", header=None)
+    df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True)
     df.fillna("", inplace=True)
     for index, row in df.iterrows():
+        if all(str(cell).strip() == "" for cell in row):
+            continue
+
+        if len(row) < 4:
+            print(f"Warning: Row {index + 1} has fewer than 4 non-empty columns. Skipping.")
+            continue
+
         chip  = row[0]
         input = row[1]
         label = row[2]
         mode  = row[3]
+
+        if chip == "":
+            print(f"Warning: Skipping empty chip label in row {index + 1} of {samplepairlist}.")
+            continue
 
         sspstats = pd.read_csv(chdir + '/sspout/' + chip + '.stats.txt', sep="\t", header=0)
         flen = int(sspstats["fragment length"])
@@ -350,12 +361,14 @@ def is_exist_input(samplepairlist):
 def check_labels(samplelist, samplepairlist):
     with open(samplelist, 'r') as f:
         labels = set(re.split(r'\s+', line.strip())[0] for line in f)
-#        labels = set(line.strip().split('\t')[0] for line in f)
     
     iserror = False
     with open(samplepairlist, 'r') as f:
         for line_number, line in enumerate(f, 1):
             row = line.strip().split(',')
+            if (len(row)<2):
+                print (f"Warning: Line {line_number} in {samplepairlist} is empty or has fewer than 2 columns. Skipping.")
+                continue
             if row[0] != "" and row[0] not in labels:
                 print (f"Error: Label '{row[0]}' in {samplepairlist} not found in {samplelist}.")
                 iserror = True

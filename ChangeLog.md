@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.1 (2025-6-30)
+- Fixed the error that occurred when a line in samplepairlist.txt had fewer columns.
+
 ## 1.5.0 (2025-2-16)
 - **[Important]** There was a bug in v1.3.0 ~ v1.4.2 that affected the order of samples and labels in samplelist.txt. Please do not use those versions. This problem has been fixed in v1.5.0.
 

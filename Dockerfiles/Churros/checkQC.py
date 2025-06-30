@@ -20,10 +20,13 @@ data_dict = {}
 with open(samplepairlist, 'r') as file:
     for line in file:
         columns = line.strip().split(',')
+        if (len(columns)<4):
+#            print (f"Warning: Line {line} in {samplepairlist} is empty or has fewer than 2 columns. Skipping.")
+            continue
+
         key = columns[0]
         value = columns[3]
         data_dict[key] = value
-
 
 column_name = data.columns.get_loc("Sample")
 column_maprate = data.columns.get_loc("Mapped 1 time") + 1
@@ -38,41 +41,41 @@ column_nsc = data.columns.get_loc("NSC")
 column_bu = data.columns.get_loc("Background uniformity")
 
 for index, row in data.iterrows():
-    label = row[column_name]
+    label = row.iloc[column_name]
 
     # mapping rate
-    mapratio = row[column_maprate]
+    mapratio = row.iloc[column_maprate]
     if mapratio < 60.0:
         print(f"Warning: {label} has a unique mapping rate {mapratio}%, which is less than 60.0%")
 
-    match = re.search(r'(\d+)', str(row[column_uniquereads]))
+    match = re.search(r'(\d+)', str(row.iloc[column_uniquereads]))
     if match:
         uniquereads = int(match.group(1))
         if uniquereads < 10000000:
             print(f"Warning: {label} has {uniquereads} nonredundant reads, which is less than 10,000,000")
 
-    complexity = row[column_complexity]
+    complexity = row.iloc[column_complexity]
     if isinstance(complexity, str):
         print(f"Warning: {label} has too few mapped reads to compute a library complexity: {complexity}")
     elif complexity < 0.8 and complexity > 0:
         print(f"Warning: {label} has a complexity {complexity}, which is less than 0.8")
 
-    genomecov = row[column_genomecov]
+    genomecov = row.iloc[column_genomecov]
     if genomecov < 0.6:
         print(f"Warning: {label} has a genome coverage {genomecov}, which is less than 0.6")
 
     if "GC summit" in data.columns:
-        gc = row[column_GC]
+        gc = row.iloc[column_GC]
         if gc > 60:
             print(f"Warning: {label} has a {gc}% GC content, which is more than 60%")
 
-    nsc = row[column_nsc]
+    nsc = row.iloc[column_nsc]
     if label in data_dict:
         if "sharp" in data_dict[label] and nsc < 3.0:
            print(f"Warning: {label} has SSP-NSC < {nsc}, which is less than 3.0 (threshold for sharp peaks)")
         elif "broad" in data_dict[label] and nsc < 1.5:
            print(f"Warning: {label} has SSP-NSC < {nsc}, which is less than 1.5 (threshold for broad peaks)")
 
-    backcomp = row[column_bu]
+    backcomp = row.iloc[column_bu]
     if backcomp < 0.8:
         print(f"Warning: {label} has a background complexity {backcomp}, which is less than 0.8")
