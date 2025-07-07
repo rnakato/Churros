@@ -253,6 +253,7 @@ def visualize_PCSHARP(args, param, samplepairlist, chipdir, inputdir, pdfdir, lo
     logfile = logdir + head + ".PCSHARP." + str(args.binsize) + ".log"
 
     command = "drompa+ PC_SHARP " + param + " " + s + " -o " + outputprefix + " > " + logfile
+    print (command)
     echo_and_print_and_exec_shell(command, logfile)
 
     if args.preset != "scer":

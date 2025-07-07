@@ -1,5 +1,5 @@
 ### Churros: Docker image for ChIP-seq analysis
-FROM rnakato/mapping:2024.10 AS base
+FROM rnakato/mapping:2025.07 AS base
 LABEL maintainer="Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>"
 
 WORKDIR /opt
@@ -132,7 +132,7 @@ RUN make -C /opt/Churros/MOSAiCS_mappability/
 
 COPY rose /opt/ROSE
 
-FROM rnakato/mapping:2024.10
+FROM rnakato/mapping:2025.07
 COPY --from=base / /
 COPY --from=rnakato/homer:20.04 /opt/HOMER /opt/HOMER
 LABEL maintainer="Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>"

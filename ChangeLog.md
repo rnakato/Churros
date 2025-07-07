@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.2 (2025-7-7)
+- `download_genomedata.sh`: Added `T2T-mhaESC` genome (T2T for mouse)
+- Added minimap2 v2.30-r1287
+- Update ChIPseqTools (DROMPAplus v.1.20.1)
+- Updated bowtie2 from 2.5.3 to 2.5.4
+
 ## 1.5.1 (2025-6-30)
 - Fixed the error that occurred when a line in samplepairlist.txt had fewer columns.
 
