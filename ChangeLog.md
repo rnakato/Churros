@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.0 (2026-3-13)
+  - Updated chromap from v0.3.0 to v0.3.2
+  - Added `download_RPE1.sh` to download the RPE1 genome data.
+  - Added [pfastq-dump](https://github.com/inutano/pfastq-dump) (a bash implementation of parallel-fastq-dump)  and removed parallel-fastq-dump
+  - Bug fix: lost path to sratoolkit 3.2.1 in PATH
+
 ## 1.5.2 (2025-7-7)
 - `download_genomedata.sh`: Added `T2T-mhaESC` genome (T2T for mouse)
 - Added minimap2 v2.30-r1287
