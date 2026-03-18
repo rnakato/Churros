@@ -1,7 +1,7 @@
 #!/bin/bash
 build=$1
 
-if test "$build" = "hg38" -o "$build" = "hg19" -o "$build" = "T2T"; then
+if test "$build" = "hg38" -o "$build" = "hg19" -o "$build" = "T2T" -o "$build" = "hap1" -o "$build" = "hap2"; then
     echo "Human genome build $build"
 elif test "$build" = "mm39" -o "$build" = "mm10"; then
     echo "Mouse genome build $build"
