@@ -66,10 +66,8 @@ def func_map(args, odir_ref, odir_spikein, prefix, fq1, fq2):
     outputdir = args.outputdir
 
     print(f"mapping by bowtie2: {fastq}...")
-#    cmd = f"~/DockerFiles/Churros/Dockerfiles/Churros/bowtie2.sh {cramparam} -p {ncore} {bowtieparam} -D {odir_ref} \"{fastq}\" {prefix} {Ddir_ref}"
     cmd = f"bowtie2.sh {cramparam} -p {ncore} {bowtieparam} -D {odir_ref} \"{fastq}\" {prefix} {Ddir_ref}"
     exec_shell(cmd)
-#    cmd = f"~/DockerFiles/Churros/Dockerfiles/Churros/bowtie2.sh {cramparam} -p {ncore} {bowtieparam} -D {odir_spikein} \"{fastq}\" {prefix} {Ddir_spikein}"
     cmd = f"bowtie2.sh {cramparam} -p {ncore} {bowtieparam} -D {odir_spikein} \"{fastq}\" {prefix} {Ddir_spikein}"
     exec_shell(cmd)
 
@@ -89,7 +87,6 @@ def func_postprocess(args, odir_ref, odir_spikein, prefix, fq1, fq2):
     mapfile = f'{odir_ref}/bam/{prefix}.sort.cram' if args.cram else f'{odir_ref}/bam/{prefix}.sort.bam'
 
     print ("churros_mapping: quality check by SSP...")
-#    cmd = f"~/DockerFiles/Churros/Dockerfiles/Churros/ssp.sh -t {ncore} {pair} -D {odir_ref} {mapfile} {prefix} {build} {gt} {mptable}"
     cmd = f"ssp.sh -t {ncore} {pair} -D {odir_ref} {mapfile} {prefix} {build} {gt} {mptable}"
     print_and_exec_shell(cmd)
 
@@ -115,7 +112,6 @@ def func_postprocess(args, odir_ref, odir_spikein, prefix, fq1, fq2):
        parseparam += f' -P \"{args.param_parse2wig}\"'
 
     os.makedirs(f"{odir_ref}/log/parse2wig+", exist_ok=True)
-#    cmd = f"~/DockerFiles/Churros/Dockerfiles/Churros/parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref}"
     cmd = f"parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref} > {odir_ref}/log/parse2wig+/{prefix}.log 2>&1"
     print_and_exec_shell(cmd)
 
@@ -220,7 +216,6 @@ def create_spikein_bw(args, odir_ref, chip, nNormed):
        parseparam += f' -P \"{args.param_parse2wig}\"'
 
     os.makedirs(f"{odir_ref}/log/parse2wig+", exist_ok=True)
-#    cmd = f"~/DockerFiles/Churros/Dockerfiles/Churros/parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref}"
     cmd = f"parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref} > {odir_ref}/log/parse2wig+/{prefix}.spikein.log 2>&1"
     print_and_exec_shell(cmd)
 
