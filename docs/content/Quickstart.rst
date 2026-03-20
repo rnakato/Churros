@@ -1,18 +1,42 @@
 Quick start (ChIP-seq, human)
 ===================================
 
-This page describes the tutorial on how to get the results from FASTQ files by **Churros**.
-There are only two pieces of data you need to prepare: FASTQ files and sample metadata.
+This page describes a tutorial on how to obtain results from FASTQ files using **Churros**.
+There are only two pieces of data that need to be prepared: FASTQ files and sample metadata.
 
-While this tutorial uses human data, the sample scripts for human, mouse and `S. cerevisiae` are also available at `Churros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial>`_.
+While this tutorial uses human data, the sample scripts for human, mouse and `S. cerevisiae` are also available at `Churros Tutorial on GitHub <https://github.com/rnakato/Churros/tree/main/tutorial>`_.
 
 .. note::
 
-   | This tutorial assumes using the **Churros** singularity image (``churros.sif``). Please add ``singularity exec churros.sif`` before each command below.
-   | Example: ``singularity exec churros.sif download_genomedata.sh``
+   | This tutorial assumes using the **Churros** singularity image (``churros.sif``).
+   | Example: ``apptainer exec churros.sif download_genomedata.sh``
 
-.. contents:: 
+.. contents::
    :depth: 3
+
+Churros using Docker or Apptainer
+---------------------------------------------
+
+Since Churros is provided as a Docker image, you need to use ``docker`` or ``apptainer`` commands. We recommended to use Apptainer.
+
+The command below is a general example of how to run Churros using Docker or Apptainer.
+It will mount the ``/work`` directory of the host machine to the ``/work`` directory of the container.
+
+.. code-block:: bash
+
+    # For docker
+    $ docker run --rm -it -v /work:/work rnakato/churros <command>
+    ## Example
+    $ docker run --rm -it -v /work:/work rnakato/churros \
+        churros -p $ncore --mpbl samplelist.txt samplepairlist.txt $build $Ddir
+
+    # For Apptainer
+    $ apptainer exec --bind /work churros.sif <command>
+    ## Example
+    $ apptainer exec --bind /work churros.sif \
+        churros -p $ncore --mpbl samplelist.txt samplepairlist.txt $build $Ddir
+
+See also the sample scripts in the `Churros Tutorial <https://github.com/rnakato/Churros/tree/main/tutorial>`_ on GitHub.
 
 Get data
 ------------------------
@@ -27,7 +51,7 @@ Here we use five histone modification data of HepG2 cells from `ENCODE Project <
         fastq-dump --gzip $id -O fastq
     done
 
-| Then download and generate the reference dataset including genome, gene annotation and index files. **Chuross** contains scripts for that: ``download_genomedata.sh`` and ``build-index.sh``.
+| Then download and generate the reference dataset including genome, gene annotation and index files. **Churros** contains scripts for that: ``download_genomedata.sh`` and ``build-index.sh``.
 | Here we specify ``hg38`` for genome build. See :doc:`Appendix` for the detail of genome build.
 
 .. code-block:: bash

@@ -27,7 +27,7 @@ Contents:
    content/Tutorial.scer
    content/Tutorial.Bisulfite
    content/Commands
-   content/Appendix
+..   content/Appendix
 
 
 Citation:
