@@ -19,29 +19,29 @@ To use the docker command, type:
    docker run -it --rm rnakato/churros <command>
 
 
-Singularity
+Apptainer
 +++++++++++++++++++++++
 
-Singularity is the alternative way to use the docker image.
+Apptainer is the alternative way to use the docker image.
 With this command you can build the singularity file (.sif) of Churros:
 
 .. code-block:: bash
 
-   singularity build churros.sif docker://rnakato/churros
+   apptainer build churros.sif docker://rnakato/churros
 
-Instead, you can download the Churros singularity image from our `Dropbox <https://www.dropbox.com/scl/fo/lptb68dirr9wcncy77wsv/h?rlkey=whhcaxuvxd1cz4fqoeyzy63bf&dl=0>`_ (We use singularity version 3.8.5).
+Instead, you can download the Churros image from our `Dropbox <https://www.dropbox.com/scl/fo/lptb68dirr9wcncy77wsv/h?rlkey=whhcaxuvxd1cz4fqoeyzy63bf&dl=0>`_ (We use apptainer version 1.4.1).
 
 Then you can run Churros with the command:
 
 .. code-block:: bash
 
-   singularity exec churros.sif <command>
+   apptainer exec churros.sif <command>
 
-Singularity will automatically mount the current directory. If you want to access the files in the other directory, use the ``--bind`` option, for instance:
+Apptainer will automatically mount the current directory. If you want to access the files in the other directory, use the ``--bind`` option, for instance:
 
 .. code-block:: bash
 
-   singularity exec --bind /work churros.sif <command>
+   apptainer exec --bind /work churros.sif <command>
 
 This command mounts the ``/work`` directory.
 
