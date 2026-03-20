@@ -1,4 +1,4 @@
-sing="singularity exec --bind /work,/work2,/work3 /work3/SingularityImages/churros.1.4.1.sif"
+sing="singularity exec --bind /work,/work2,/work3 /work3/SingularityImages/churros.1.6.0.sif"
 #sing="singularity exec churros.sif"
 
 build=mm10

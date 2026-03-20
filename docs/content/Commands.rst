@@ -651,14 +651,23 @@ Bismark.sh: Bisulfite sequencing analysis
 
 The results are output in ``Bismarkdir/``. If you want to specify the name of output directory, use ``-d`` option.
 
-Utility tools
+
+Utility scripts in Churros
 +++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 gen_samplelist.sh: create samplelist.txt
 --------------------------------------------------
 
+``gen_samplelist.sh`` is a script that takes the FASTQ files directory as input and creates a draft ``samplelist.txt`` file. 
+The first column is the sample name, and the second column is the path of the FASTQ file(s).
+Please modify the sample name as needed.
+
+.. code-block:: bash
+   $ ls fastq
    SRR227447.fastq.gz  SRR227552.fastq.gz  SRR227563.fastq.gz  SRR227575.fastq.gz  SRR227598.fastq.gz  SRR227639.fastq.gz
    SRR227448.fastq.gz  SRR227553.fastq.gz  SRR227564.fastq.gz  SRR227576.fastq.gz  SRR227599.fastq.gz  SRR227640.fastq.gz
+   
    $ gen_samplelist.sh fastq > samplelist.txt
    $ cat samplelist.txt
    SRR227447      fastq/SRR227447.fastq.gz
@@ -674,13 +683,14 @@ gen_samplelist.sh: create samplelist.txt
    SRR227639      fastq/SRR227639.fastq.gz
    SRR227640      fastq/SRR227640.fastq.gz
 
-Supply ``-p`` option when using paired-end fastqs.
+If you have paired-end FASTQ files, Supply ``-p`` option.
 
 .. code-block:: bash
 
    $ gen_samplelist.sh -p fastq > samplelist.txt
 
-By default, ``gen_samplelist.sh`` assumes that the postfix of paired fastq files is "_1" and "_2". If it is "_R1" and "_R2", specify ``-r`` option.
+By default, ``gen_samplelist.sh`` assumes that the postfix of paired fastq files is "_1.fastq.gz" and "_2.fastq.gz". 
+If it is "_R1.fastq.gz" and "_R2.fastq.gz", specify ``-r`` option.
 
 .. code-block:: bash
 
@@ -690,16 +700,18 @@ By default, ``gen_samplelist.sh`` assumes that the postfix of paired fastq files
 generate_samplelist_from_SRA
 --------------------------------------------------
 
-``generate_samplelist_from_SRA`` is a script that get the labels of each SRA ids from ``SraExperimentPackage.xml`` and ``SraRunTable.txt`` to make the sample list.
+``generate_samplelist_from_SRA`` is a script that takes SRA metadata files as input and creates a draft ``samplelist.txt`` file. 
+This script is useful when you download the FASTQ files as well as the metadata files named ``SraExperimentPackage.xml`` and ``SraRunTable.txt`` from SRA.
 
 .. code-block:: bash
 
    generate_samplelist_from_SRA SraExperimentPackage.xml SraRunTable.txt samplelist.txt
 
+
 gen_samplepairlist.sh: create samplepairlist.txt
 --------------------------------------------------
 
-``gen_samplepairlist.sh`` takes ``samplelist.txt`` as input and "roughly" outputs ``samplepairlist.txt``.
+``gen_samplepairlist.sh`` is a script that takes ``samplelist.txt`` as input and creats a draft ``samplepairlist.txt``.
 
 .. code-block:: bash
 
@@ -711,7 +723,8 @@ gen_samplepairlist.sh: create samplepairlist.txt
    HepG2_H3K36me3  fastq/SRR227447.fastq.gz,fastq/SRR227448.fastq.gz
    HepG2_Control   fastq/SRR227552.fastq.gz,fastq/SRR227553.fastq.gz
 
-   $ gen_samplepairlist.sh samplelist.txt
+   $ gen_samplepairlist.sh samplelist.txt > samplepairlist.txt
+   $ cat samplepairlist.txt
    HepG2_H2A.Z,,HepG2_H2A.Z,sharp
    HepG2_H3K4me3,,HepG2_H3K4me3,sharp
    HepG2_H3K27ac,,HepG2_H3K27ac,sharp
@@ -719,10 +732,24 @@ gen_samplepairlist.sh: create samplepairlist.txt
    HepG2_H3K36me3,,HepG2_H3K36me3,sharp
    HepG2_Control,,HepG2_Control,sharp
 
-Please fill the label of Input samples.
+This script fills the first and third columns of ``samplepairlist.txt`` with the sample names in ``samplelist.txt``. 
+The second column (for the control samples) is left blank, so please fill it as needed. For example, if you want to use "HepG2_Control" as the control sample for "HepG2_H3K27ac", fill the second column of the first row with "HepG2_Control".
 
-- Specify ``-n`` option when omitting input samples (outputs "none").
-- Specify ``-b`` option when the peak mode is "broad".
+The fourth column is for the peak mode, which is "sharp" or "broad". The default value is "sharp", so please change it to "broad" if the target is broad peaks (e.g., H3K27me3 and H3K36me3).
+
+.. code-block:: bash
+
+   # Example of filling the control sample name
+   $ cat samplepairlist.modified.txt
+   HepG2_H2A.Z,HepG2_Control,HepG2_H2A.Z,sharp
+   HepG2_H3K4me3,HepG2_Control,HepG2_H3K4me3,sharp
+   HepG2_H3K27ac,HepG2_Control,HepG2_H3K27ac,sharp
+   HepG2_H3K27me3,HepG2_Control,HepG2_H3K27me3,broad
+   HepG2_H3K36me3,HepG2_Control,HepG2_H3K36me3,broad
+
+
+- Specify ``-n`` option when you do not have matching input samples (outputs "none" in the second column).
+- Specify ``-b`` option to specify the peak mode "broad" for all samples (default: "sharp").
 
 
 checkQC.py: check the quality of the input ChIP-seq samples
@@ -757,3 +784,33 @@ checkQC.py: check the quality of the input ChIP-seq samples
    - This value decreases when the sample has high copy number regions in the genome, such as MCF-7 cells. In such cases, a value > 0.6 is considered acceptable.
 
 See `Nakato et al., Brief Bioinform. 2017 <https://academic.oup.com/bib/article/18/2/279/2453282>`_ and `Nakato et al., Bioinformatics 2018 <https://academic.oup.com/bioinformatics/article/34/14/2356/4924717>`_ for the detailed criteria.
+
+
+Create mappability files
+--------------------------------------------------
+
+If you want to create the mappability files yourself, you can use ``calculate_mappability_mosaics.sh``.
+
+.. code-block:: bash
+
+    calculate_mappability_mosaics.sh [Options] <Ddir>
+       <Ddir>: directory of the genome
+       Options:
+          -f <int>: fragment length (default: 150)
+          -b <array <int>>: binsizes (default: "10000 25000 50000 500000 1000000")
+          -r <array <int>>: read length (default: "36 50")
+          -p <int>: number of CPUs (default: 12)
+       Example:
+          calculate_mappability_mosaics.sh Ensembl-GRCh38
+
+For example, if you want to make the mappability files for genome build hg38 with the read length 75 and 100, type:  
+
+.. code-block:: bash
+
+    calculate_mappability_mosaics.sh -r "75 100" UCSC-hg38
+
+Then the data is created in ``UCSC-hg38/mappability_Mosaics_75mer`` and ``UCSC-hg38/mappability_Mosaics_100mer``.
+
+.. note::
+
+   This command takes long time for computation. Set large number for ``-p`` (e.g., 64).
