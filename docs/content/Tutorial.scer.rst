@@ -1,7 +1,7 @@
-Tutorial (ChIP-seq, *S. serevisiae*)
+Quick start (ChIP-seq, *S. cerevisiae*)
 =======================================
 
-This tutorial is for the analysis of `S. cerevisiae`. For human analysis, see :doc:`Tutorial`.
+This tutorial is for the analysis of `S. cerevisiae`. For human analysis, see :doc:`Quickstart`.
 The sample scripts are also available at `Churros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial/yeast>`_.
 
 .. note::
@@ -27,7 +27,7 @@ Here we use Scc1 and RPO21 ChIP-seq data from `Jeppsson et al., Science Advance,
     done
 
 | Then download and generate the reference dataset including genome, gene annotation and index files. **Churos** contains scripts for that: ``download_genomedata.sh`` and ``build-index.sh``.
-| Here we specify ``sacCer3`` for genome build. See :doc:`Appendix` for the detail of genome build.
+| Here we specify ``sacCer3`` for genome build. See `Reference Data Preparation <https://churros.readthedocs.io/en/latest/content/Commands.html#reference-data-preparation>`_ for the detail of genome build.
 
 .. code-block:: bash
 

@@ -21,10 +21,10 @@ Contents:
 
    content/Install
    content/Quickstart
+   content/Tutorial.scer
    content/StepbyStep
    content/Classheat
    content/Spikein
-   content/Tutorial.scer
    content/Tutorial.Bisulfite
    content/Commands
 ..   content/Appendix
