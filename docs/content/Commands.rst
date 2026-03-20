@@ -664,10 +664,12 @@ The first column is the sample name, and the second column is the path of the FA
 Please modify the sample name as needed.
 
 .. code-block:: bash
-   
+
    $ ls fastq
-   SRR227447.fastq.gz  SRR227552.fastq.gz  SRR227563.fastq.gz  SRR227575.fastq.gz  SRR227598.fastq.gz  SRR227639.fastq.gz
-   SRR227448.fastq.gz  SRR227553.fastq.gz  SRR227564.fastq.gz  SRR227576.fastq.gz  SRR227599.fastq.gz  SRR227640.fastq.gz
+   SRR227447.fastq.gz  SRR227552.fastq.gz  SRR227563.fastq.gz
+   SRR227575.fastq.gz  SRR227598.fastq.gz  SRR227639.fastq.gz
+   SRR227448.fastq.gz  SRR227553.fastq.gz  SRR227564.fastq.gz
+   SRR227576.fastq.gz  SRR227599.fastq.gz  SRR227640.fastq.gz
    
    $ gen_samplelist.sh fastq > samplelist.txt
    $ cat samplelist.txt
