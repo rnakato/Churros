@@ -47,7 +47,7 @@ Here we use five histone modification data of HepG2 cells from `ENCODE Project <
     done
 
 | Then download and generate the reference dataset including genome, gene annotation and index files. **Churros** contains scripts for that: ``download_genomedata.sh`` and ``build-index.sh``.
-| Here we specify ``hg38`` for genome build. See :doc:`Appendix` for the detail of genome build.
+| Here we specify ``hg38`` for genome build. See `Reference Data Preparation <https://churros.readthedocs.io/en/latest/content/Commands.html#reference-data-preparation>`_ for the detail of genome build.
 
 .. code-block:: bash
 
