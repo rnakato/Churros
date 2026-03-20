@@ -52,9 +52,9 @@ The latest version of **Churros** uses the following tools internally.
 
 - Mapping
    - `Bowtie <https://bowtie-bio.sourceforge.net/manual.shtml>`_ v1.3.1
-   - `Bowtie2 <https://bowtie-bio.sourceforge.net/bowtie2/index.shtml>`_ v2.5.3
+   - `Bowtie2 <https://bowtie-bio.sourceforge.net/bowtie2/index.shtml>`_ v2.5.4
    - `BWA <https://bio-bwa.sourceforge.net/>`_ v0.7.17
-   - `chromap <https://github.com/haowenz/chromap>`_ v0.2.5
+   - `chromap <https://github.com/haowenz/chromap>`_ v0.3.2
 
 - ChIP-seq analysis
    - `MACS2 <https://github.com/macs3-project/MACS>`_ v2.2.9.1
@@ -103,7 +103,7 @@ The latest version of **Churros** uses the following tools internally.
    - `SSP <https://github.com/rnakato/SSP>`_ v1.4.0
 
 - File processing
-   - `SAMtools <http://www.htslib.org/>`_ v1.19.2
+   - `SAMtools <http://www.htslib.org/>`_ v1.21
    - `sambamba <https://github.com/biod/sambamba>`_ v0.6.6
    - `BEDtools <https://bedtools.readthedocs.io/en/latest/>`_ v2.31.0
    - `deepTools <https://deeptools.readthedocs.io/>`_  v3.5.5
@@ -117,4 +117,4 @@ The latest version of **Churros** uses the following tools internally.
    - `GenMap <https://github.com/cpockrandt/genmap>`_ v1.2.0
 
 - Utility tools
-   - `SRAtoolkit <https://github.com/ncbi/sra-tools>`_ v3.0.10
+   - `SRAtoolkit <https://github.com/ncbi/sra-tools>`_ v3.2.1
