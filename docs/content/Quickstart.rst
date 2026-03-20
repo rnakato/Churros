@@ -6,11 +6,6 @@ There are only two pieces of data that need to be prepared: FASTQ files and samp
 
 While this tutorial uses human data, the sample scripts for human, mouse and `S. cerevisiae` are also available at `Churros Tutorial on GitHub <https://github.com/rnakato/Churros/tree/main/tutorial>`_.
 
-.. note::
-
-   | This tutorial assumes using the **Churros** singularity image (``churros.sif``).
-   | Example: ``apptainer exec churros.sif download_genomedata.sh``
-
 .. contents::
    :depth: 3
 
