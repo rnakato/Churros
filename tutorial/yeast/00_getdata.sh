@@ -1,5 +1,5 @@
-#sing="singularity exec --bind /work,/work2,/work3 /work3/SingularityImages/churros.1.4.0.sif"
-sing="singularity exec churros.sif"
+#sing="apptainer exec --bind /work,/work2,/work3 /work3/SingularityImages/churros.1.6.0.sif"
+sing="apptainer exec churros.sif"
 
 mkdir -p fastq
 for id in SRR13065962 SRR13065963 SRR13065966 SRR13065967 SRR13065972 SRR13065973 SRR13065974 SRR13065975
