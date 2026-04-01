@@ -55,7 +55,7 @@ mode=$5
 
 ex(){ echo $1; eval $1; }
 
-if test $build = "hg19" -o $build = "hg38" -o $build = "T2T"; then
+if test $build = "hg19" -o $build = "hg38" -o $build = "T2T" -o $build = "hap1" -o $build = "hap2" -o $build = "RPE1_hap1" -o $build = "RPE1_hap2"; then
     sp="hs"
 elif test $build = "mm9" -o $build = "mm10" -o $build = "mm39"; then
     sp="mm"
