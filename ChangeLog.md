@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.6.1 (2026.4.1)
+  - Bug fix: Added `RPE1` build names in ``churros_callpeak->macs.sh``
+
 ## 1.6.0 (2026-3-13)
   - Updated chromap from v0.3.0 to v0.3.2
   - Added `download_RPE1.sh` to download the RPE1 genome data.
