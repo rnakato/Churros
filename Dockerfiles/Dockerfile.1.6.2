@@ -1,5 +1,5 @@
 ### Churros: Docker image for ChIP-seq analysis
-FROM rnakato/mapping:2026.03 AS base
+FROM rnakato/mapping:2026.04 AS base
 LABEL maintainer="Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>"
 
 WORKDIR /opt
@@ -56,8 +56,8 @@ RUN R -e "install.packages('devtools')" \
                                  'TFBSTools', \
                                  'TxDb.Hsapiens.UCSC.hg19.knownGene', \
                                  'TxDb.Hsapiens.UCSC.hg38.knownGene', \
-                                 'TxDb.Hsapiens.UCSC.mm10.knownGene', \
-                                 'TxDb.Hsapiens.UCSC.mm39.knownGene'))" \
+                                 'TxDb.Mmusculus.UCSC.mm10.knownGene', \
+                                 'TxDb.Mmusculus.UCSC.mm39.knownGene'))" \
     && R -e "install.packages(c('snow', 'snowfall', 'bitops', 'caTools', 'VennDiagram'))"
 
 # ChromHMM & ChromImpute
@@ -132,7 +132,7 @@ RUN make -C /opt/Churros/MOSAiCS_mappability/
 
 COPY rose /opt/ROSE
 
-FROM rnakato/mapping:2026.03
+FROM rnakato/mapping:2026.04
 COPY --from=base / /
 COPY --from=rnakato/homer:20.04 /opt/HOMER /opt/HOMER
 LABEL maintainer="Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>"
