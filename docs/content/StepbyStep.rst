@@ -16,7 +16,12 @@ Here we show the step-by-step ChIP-seq analysis using **Churros**. See also the 
 Prepare sample list
 -------------------------------------
 
-``samplelist.txt`` is a **tab-delimited** file (TSV) that describes the sample labels and the path to the corresponding fastq files.
+``samplelist.txt`` is a **tab-delimited** file (TSV) that describes the sample labels and the path to the corresponding FASTQ files.
+
+Single-end fastq files
++++++++++++++++++++++++++++++++++
+
+The sample labels and the path to the corresponding single-end FASTQ files are separated by tabs.
 
 .. code-block:: bash
 
@@ -33,8 +38,24 @@ Prepare sample list
 
     gen_samplelist.sh fastq/ > samplelist.txt
 
+Single-end, multiple fastq files
++++++++++++++++++++++++++++++++++
 
-When using paired-end fastqs, use the second and the third columns to specify the R1 (F3) and R2 (F5) fastqs like this: 
+If samples have multiple FASTQ files, specify the path to all FASTQ files connected with comma in the second column:
+
+.. code-block:: bash
+
+    HepG2_H2A.Z     fastq/SRR227639_rep1.fastq.gz,fastq/SRR227639_rep2.fastq.gz
+    HepG2_H3K4me3   fastq/SRR227563_rep1.fastq.gz,fastq/SRR227563_rep2.fastq.gz
+    HepG2_H3K27ac   fastq/SRR227575_rep1.fastq.gz,fastq/SRR227575_rep2.fastq.gz
+    HepG2_H3K27me3  fastq/SRR227598_rep1.fastq.gz,fastq/SRR227598_rep2.fastq.gz
+    HepG2_H3K36me3  fastq/SRR227447_rep1.fastq.gz,fastq/SRR227447_rep2.fastq.gz
+    HepG2_Control   fastq/SRR227552_rep1.fastq.gz,fastq/SRR227552_rep2.fastq.gz
+
+Paired-end fastq files
++++++++++++++++++++++++++++++++++
+
+When using paired-end fastqs, use the second and the third columns to specify the R1 (F3) and R2 (F5) FASTQs:
 
 .. code-block:: bash
 
@@ -51,6 +72,19 @@ When using paired-end fastqs, use the second and the third columns to specify th
 
     gen_samplelist.sh -p fastq/ > samplelist.txt
 
+Paired-end, multiple fastq files
++++++++++++++++++++++++++++++++++
+
+If samples have multiple FASTQ files, specify the path to all FASTQ files connected with comma in the second and the third columns for R1 and R2, respectively:
+
+.. code-block:: bash
+
+    HepG2_H2A.Z     fastq/SRR227639_rep1_1.fastq.gz,fastq/SRR227639_rep2_1.fastq.gz  fastq/SRR227639_rep1_2.fastq.gz,fastq/SRR227639_rep2_2.fastq.gz
+    HepG2_H3K4me3   fastq/SRR227563_rep1_1.fastq.gz,fastq/SRR227563_rep2_1.fastq.gz  fastq/SRR227563_rep1_2.fastq.gz,fastq/SRR227563_rep2_2.fastq.gz
+    HepG2_H3K27ac   fastq/SRR227575_rep1_1.fastq.gz,fastq/SRR227575_rep2_1.fastq.gz  fastq/SRR227575_rep1_2.fastq.gz,fastq/SRR227575_rep2_2.fastq.gz
+    HepG2_H3K27me3  fastq/SRR227598_rep1_1.fastq.gz,fastq/SRR227598_rep2_1.fastq.gz  fastq/SRR227598_rep1_2.fastq.gz,fastq/SRR227598_rep2_2.fastq.gz
+    HepG2_H3K36me3  fastq/SRR227447_rep1_1.fastq.gz,fastq/SRR227447_rep2_1.fastq.gz  fastq/SRR227447_rep1_2.fastq.gz,fastq/SRR227447_rep2_2.fastq.gz
+    HepG2_Control   fastq/SRR227552_rep1_1.fastq.gz,fastq/SRR227552_rep2_1.fastq.gz  fastq/SRR227552_rep1_2.fastq.gz,fastq/SRR227552_rep2_2.fastq.gz
 
 Sample list with BAM files
 +++++++++++++++++++++++++++++++++
