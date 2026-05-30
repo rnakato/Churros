@@ -1,7 +1,7 @@
 reponame=churros
-tag=1.6.2
-docker build -f Dockerfile.$tag -t rnakato/$reponame:$tag . #--no-cache
-apptainer build -F /work3/SingularityImages/$reponame.$tag.sif docker-daemon://rnakato/$reponame:$tag
+tag=1.6.3
+#docker build -f Dockerfile.$tag -t rnakato/$reponame:$tag . #--no-cache
+#apptainer build -F /work3/SingularityImages/$reponame.$tag.sif docker-daemon://rnakato/$reponame:$tag
 #exit
 docker push rnakato/$reponame:$tag
 docker tag rnakato/$reponame:$tag rnakato/$reponame:latest

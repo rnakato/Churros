@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.6.3 (2026.5.30)
+  - Bug fix in ``churros_mapping`` where the sample names did not appear in the stats file (``churros.QCstats.[xlsx|tsv]``) in some cases.
+
 ## 1.6.1 (2026.4.1)
   - Bug fix: Added `RPE1` build names in ``churros_callpeak->macs.sh``
 

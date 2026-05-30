@@ -312,9 +312,13 @@ func_stats(){
         a=`cat $statsdir/$head.stats.singleline.GC.tsv | grep -v Sample | cut -f2`
     else
         if test $csfasta -eq 1; then
-            a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | grep -v Sample | cut -f2-`
+#            a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | grep -v Sample | cut -f2-`
+            echo -en "$head\t"
+            a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | grep -v Sample | cut -f3-`
         else
-            a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | grep -v Sample | cut -f2-`
+#            a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | grep -v Sample | cut -f2-`
+            echo -en "$head\t"
+            a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | grep -v Sample | cut -f3-`
         fi
     fi
 
@@ -339,6 +343,6 @@ if test $command = "stats"; then
         prefix=${LINE[0]}
         fq1=${LINE[1]}
         fq2=${LINE[2]}
-        func_stats $prefix "$fq1" "$fq2"
+        func_stats "$prefix" "$fq1" "$fq2"
     done < $samplelist
 fi
