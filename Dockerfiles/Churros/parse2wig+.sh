@@ -125,7 +125,6 @@ mpbinary=$Ddir/mappability_Mosaics_${k}mer
 
 if test "$mp" -eq 1; then
     echo "consider mappability: $mptable"
-#    mppost=".mpbl"
     mppost=""
     mpbin="--mpdir $mpbinary"
 else
@@ -154,7 +153,7 @@ func(){
         mkdir -p $rdir
         for b in $bins; do
             file=$rdir/$prefix$mppost.$b.bw
-            if test -e "$file" -a 1000 -lt `wc -c < $file` -a $force -eq 0 ; then
+            if [ -e "$file" ] && [ "$(wc -c < "$file")" -ge 1000 ] && [ "$force" -eq 0 ]; then
                 echo "$file already exists. skipping"
             else
                 ex "parse2wig+ --odir $rdir $parse2wigparam -o $prefix$mppost$filterpost --binsize $b"
@@ -167,7 +166,7 @@ func(){
         mkdir -p $sdir
         for b in $bins; do
             file="$sdir/$prefix$mppost$filterpost.$b.bw"
-            if test -e "$file" -a 1000 -lt `wc -c < $file` -a $force -eq 0 ; then
+            if [ -e "$file" ] && [ "$(wc -c < "$file")" -ge 1000 ] && [ "$force" -eq 0 ]; then
                 echo "$file already exists. skipping"
             else
                 ex "parse2wig+ --odir $sdir $parse2wigparam -o $prefix$mppost$filterpost -n GR --nrpm $nNorm --binsize $b"
@@ -178,25 +177,27 @@ func(){
         mkdir -p $tdir
         for b in $bins; do
             file=$tdir/$prefix$mppost$filterpost.$b.bw
-            if test -e "$file" -a 1000 -lt `wc -c < $file` -a $force -eq 0 ; then
+            if [ -e "$file" ] && [ "$(wc -c < "$file")" -ge 1000 ] && [ "$force" -eq 0 ]; then
                 echo "$file already exists. skipping"
-            else
+            else 
                 ex "parse2wig+ --odir $tdir $parse2wigparam -o $prefix$mppost$filterpost -n GR --binsize $b"
                 parsestats4DROMPAplus.pl $tdir/$prefix$mppost$filterpost.$b.tsv >& $statsdir/$prefix.stats.singleline.tsv
             fi
         done
         if test "$mp" -eq 1; then
             file=$tdir/$prefix$mppost$filterpost.GCnormed.100000.bw
-            if test -e "$file" -a 1000 -lt `wc -c < $file` -a $force -eq 0 ; then
+            if [ -e "$file" ] && [ "$(wc -c < "$file")" -ge 1000 ] && [ "$force" -eq 0 ]; then
                 echo "$file already exists. skipping."
             else
                 ex "parse2wig+ --odir $tdir $parse2wigparam -o $prefix$mppost$filterpost.GCnormed -n GR --chrdir $chrpath $mpbin --binsize 100000 --gcdepthoff"
             fi
             parsestats4DROMPAplus.pl $tdir/$prefix$mppost$filterpost.GCnormed.100000.tsv >& $statsdir/$prefix.stats.singleline.GC.tsv
-            mv $tdir/$prefix$mppost$filterpost.GCnormed.GCdist.tsv $statsdir/$prefix.GCdistribution.tsv
+            cp $tdir/$prefix$mppost$filterpost.GCnormed.GCdist.tsv $statsdir/$prefix.GCdistribution.tsv
 
             # remove normal stats files if GC stats are available
-            rm $statsdir/$prefix.stats.singleline.tsv
+            if [ -e "$statsdir/$prefix.stats.singleline.tsv" ]; then
+                rm $statsdir/$prefix.stats.singleline.tsv
+            fi
         fi
     fi
 }

@@ -15,8 +15,8 @@ function usage()
     echo '      -t: number of CPUs (default: 4)' 1>&2
     echo '      -D outputdir: output dir (defalt: ./)' 1>&2
     echo "   Example:" 1>&2
-    echo "      For single-end: $cmdname chip.sort.bam chip hg38 genometable.hg38.txt" 1>&2
-    echo "      For single-end: $cmdname -p chip.sort.bam chip hg38 genometable.hg38.txt" 1>&2
+    echo "      For single-end: $cmdname    chip.sort.bam chip hg38 genometable.hg38.txt" 1>&2
+    echo "      For paired-end: $cmdname -p chip.sort.bam chip hg38 genometable.hg38.txt" 1>&2
 }
 
 k=50

@@ -1,0 +1,6 @@
+K562_K27me3_nf,,K562_K27me3_nf,sharp
+K562_K27me3_XLink,,K562_K27me3_XLink,sharp
+K562_K4me3_nf,,K562_K4me3_nf,sharp
+K562_K4me3_XLink,,K562_K4me3_XLink,sharp
+K562_IgG_Xlink,,K562_IgG_Xlink,sharp
+K562_IgG_ABIN101961,,K562_IgG_ABIN101961,sharp

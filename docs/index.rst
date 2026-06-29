@@ -23,7 +23,7 @@ Contents:
    content/Quickstart
    content/Tutorial.scer
    content/StepbyStep
-   content/Classheat
+   content/Peakheatmap
    content/Spikein
    content/Tutorial.Bisulfite
    content/Commands

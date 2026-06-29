@@ -11,20 +11,64 @@ import pandas as pd
 import re
 import subprocess
 
-__version__ = '1.6.2'
+__version__ = '2.0.0'
 
 def print_and_exec_shell(command):
     print (command)
-    result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-    if result.stdout:
-        print(result.stdout)
-    if result.stderr:
-        print(result.stderr, file=sys.stderr)
+    proc = subprocess.Popen(
+        command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1
+    )
 
-    if result.returncode != 0 or re.search(r'Failed to process file', result.stderr, re.IGNORECASE) or re.search(r'error', result.stderr, re.IGNORECASE):
-        print("Error: Command failed with error. Check your files and parameters.", file=sys.stderr)
-        sys.exit(result.returncode)
+    error_patterns = [
+        r"Failed to process file",
+        r"SequenceFormatException",
+        r"\bException\b",
+        r"\bTraceback\b"
+    ]
+
+    error_detected = False
+
+    for line in proc.stdout:
+        print(line, end="")
+
+        if any(re.search(p, line, re.IGNORECASE) for p in error_patterns):
+            error_detected = True
+
+    proc.wait()
+
+    if proc.returncode != 0 or error_detected:
+        print("Error: Command failed or output indicates failure.", file=sys.stderr)
+        sys.exit(proc.returncode if proc.returncode != 0 else 1)
+
+#    result = subprocess.run(command, shell=True)
+
+#    if result.returncode != 0:
+#        print(
+#            f"Error: Command failed with exit code {result.returncode}.",
+#            file=sys.stderr
+#        )
+#        sys.exit(result.returncode)
+
+#    stderr_for_error_check = "\n".join(
+#        line for line in result.stderr.splitlines()
+#        if "warning" not in line.lower()
+#    )
+
+#    failed = (
+#        result.returncode != 0
+#        or re.search(r'Failed to process file', stderr_for_error_check, re.IGNORECASE)
+#        or re.search(r'\b(error|exception|traceback)\b', stderr_for_error_check, re.IGNORECASE)
+#    )
+
+#    if failed:
+#        print("Error: Command failed with error. Check your files and parameters.", file=sys.stderr)
+#        sys.exit(result.returncode if result.returncode != 0 else 1)
 
 def check_file(file):
     if os.path.isfile(file):
@@ -41,8 +85,8 @@ def check_dir(dir):
         exit()
 
 def check_fastq_in_samplelist(samplelist):
-    df = pd.read_csv(samplelist, sep=r'\s+',  header=None)
-    df.fillna("", inplace=True)
+    df = pd.read_csv(samplelist, sep=r'\s+', header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
+
     for index, row in df.iterrows():
         if (len(row)<2 or row[1] == ""):
             print (f"Error: Specify fastq file (or add line break at end) in {samplelist}.")
@@ -106,14 +150,14 @@ def do_fastp(fq1, fq2, fastpdir, fastqtrimming, ncore):
             if os.path.isfile(fastp_output):
                 print (fastp_output + " already created. skipping.")
             else:
-                print_and_exec_shell(f'fastp {fastp_param} -i {fq1} -I {fq2} -h {fastpdir}/{prefix}.fastp.html -j {fastpdir}/{prefix}.fastp.json -o {fastp_output} -O {fastp_output2}')
+                print_and_exec_shell(f'fastp {fastp_param} --detect_adapter_for_pe -i {fq1} -I {fq2} -h {fastpdir}/{prefix}.fastp.html -j {fastpdir}/{prefix}.fastp.json -o {fastp_output} -O {fastp_output2}')
 
         else:
             fastp_output = f"{fastpdir}/{prefix}.fastp.json"
             if os.path.isfile(fastp_output):
                 print (fastp_output + " already created. skipping.")
             else:
-                print_and_exec_shell(f'fastp {fastp_param} -i {fq1} -I {fq2} -h {fastpdir}/{prefix}.fastp.html -j {fastpdir}/{prefix}.fastp.json ')
+                print_and_exec_shell(f'fastp {fastp_param} --detect_adapter_for_pe -i {fq1} -I {fq2} -h {fastpdir}/{prefix}.fastp.html -j {fastpdir}/{prefix}.fastp.json ')
 
 
 def do_readQC(chdir, build, samplelist, fastqtrimming, ncore):
@@ -122,8 +166,8 @@ def do_readQC(chdir, build, samplelist, fastqtrimming, ncore):
     os.makedirs(fastqcdir, exist_ok=True)
     os.makedirs(fastpdir, exist_ok=True)
 
-    df = pd.read_csv(samplelist, sep=r'\s+',  header=None)
-    df.fillna("", inplace=True)
+    df = pd.read_csv(samplelist, sep=r'\s+', header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
+
     for index, row in df.iterrows():
         if (len(row)<2 or row[1] == ""):
             print (f"Error: Specify fastq file (or add line break at end) in {samplelist}.")
@@ -217,11 +261,15 @@ def do_mapping(args, samplelist, build, chdir, is_bam):
         param_pair = "-w"
     else:
         param_pair = ""
+    if args.csfastq:
+        param_csfastq = "-C"
+    else:
+        param_csfastq = ""
 
     if args.nompbl:
-        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} {mapparam} {param_filter} {param_pair} {parse2wigparam} -n"
+        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} {mapparam} {param_filter} {param_pair} {param_csfastq} {parse2wigparam} -n"
     else:
-        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} {mapparam} {param_filter} {param_pair} {parse2wigparam}"
+        param_churros_mapping = f"-D {chdir} -k {args.k} -p {args.threads} {mapparam} {param_filter} {param_pair} {param_csfastq} {parse2wigparam}"
 
     if is_bam:
         print ("BAM files detected. Execute churros_mapping postprocess.")
@@ -242,14 +290,12 @@ def do_mapping(args, samplelist, build, chdir, is_bam):
         os.system(f'csv2xlsx.pl -i {qcstatsfile} -o {chdir}/{build}/churros.QCstats.xlsx')
 
 
-
 def make_trimmedsamplelist(chdir, samplelist):
     samplelist_trimmed = chdir + "/samplelist.trimmed.txt"
     if(os.path.isfile(samplelist_trimmed)):
         os.remove(samplelist_trimmed)
 
-    df = pd.read_csv(samplelist, sep=r'\s+',  header=None)
-    df.fillna("", inplace=True)
+    df = pd.read_csv(samplelist, sep=r'\s+', header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
 
     fastpdir =  chdir + "/fastp/"
     for index, row in df.iterrows():
@@ -290,8 +336,8 @@ def make_samplepairlist_withflen(samplepairlist, build, chdir):
     if(os.path.isfile(samplepairlist_withflen)):
         os.remove(samplepairlist_withflen)
 
-    df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True)
-    df.fillna("", inplace=True)
+    df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
+
     for index, row in df.iterrows():
         if all(str(cell).strip() == "" for cell in row):
             continue
@@ -340,8 +386,7 @@ def ask_to_proceed_with_overwrite(filepath):
 
 
 def is_exist_input(samplepairlist):
-    df = pd.read_csv(samplepairlist, sep=",", header=None)
-    df.fillna("", inplace=True)
+    df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
 
     nInput = 0
     for index, row in df.iterrows():
@@ -360,7 +405,7 @@ def is_exist_input(samplepairlist):
 def check_labels(samplelist, samplepairlist):
     with open(samplelist, 'r') as f:
         labels = set(re.split(r'\s+', line.strip())[0] for line in f)
-    
+
     iserror = False
     with open(samplepairlist, 'r') as f:
         for line_number, line in enumerate(f, 1):
@@ -379,8 +424,8 @@ def check_labels(samplelist, samplepairlist):
 
 
 def is_inputfile_BAM(samplelist):
-    df = pd.read_csv(samplelist, sep=r'\s+',  header=None)
-    df.fillna("", inplace=True)
+    df = pd.read_csv(samplelist, sep=r'\s+', header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
+
     is_bam = False
     for index, row in df.iterrows():
         f = row[1]
@@ -392,27 +437,33 @@ def is_inputfile_BAM(samplelist):
 
 
 def do_peakcall(args, samplelist, samplepairlist, build, chdir, chdir_build):
-    ## make samplepairlist_withflen
-    samplepairlist_withflen = make_samplepairlist_withflen(samplepairlist, build, chdir_build)
-
-    ## churros_callpeak
-    param_macs = f' -b bam -t {args.threads} -q {args.qval} -d {args.macsdir} -D {chdir}'
-
     if args.pair:
         param_pair = "-p"
     else:
         param_pair = ""
 
-    df = pd.read_csv(samplelist, sep=r'\s+',  header=None)
-    df.fillna("", inplace=True)
+    df = pd.read_csv(samplelist, sep=r'\s+', header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
+
     for index, row in df.iterrows():
         if (len(row)>2): # for paired-end
             param_pair = "-p"
 
-    if os.path.isfile(samplepairlist_withflen):
-        print_and_exec_shell(f'churros_callpeak {param_macs} {param_pair} {samplepairlist_withflen} {build}')
+    ## churros_callpeak
+    param_macs = f' -b bam -t {args.threads} -q {args.qval} -d {args.macsdir} -D {chdir}'
+    if args.atac:
+        param_macs += " -A"
+
+    if args.keepdup:
+        param_macs += " -a"
+
+    os.makedirs(chdir + "/log", exist_ok=True)
+
+    if param_pair == "":
+        ## make samplepairlist_withflen
+        samplepairlist_withflen = make_samplepairlist_withflen(samplepairlist, build, chdir_build)
+        print_and_exec_shell(f'churros_callpeak {param_macs} {param_pair} {samplepairlist_withflen} {build} | tee {chdir}/log/churros_callpeak.log')
     else:
-        print_and_exec_shell(f'churros_callpeak {param_macs} {param_pair} {samplepairlist} {build}')
+        print_and_exec_shell(f'churros_callpeak {param_macs} {param_pair} {samplepairlist} {build} | tee {chdir}/log/churros_callpeak.log')
 
 
 def exec_churros(args):
@@ -525,8 +576,7 @@ def do_visualize(args, chdir, build, samplepairlist, Ddir, is_spikein):
         print_and_exec_shell(f'churros_visualize {param_churros_visualize} --preset scer --enrich {samplepairlist} drompa+.macspeak {build} {Ddir}')
         print_and_exec_shell(f'churros_visualize {param_churros_visualize} --preset scer --enrich --logratio {samplepairlist} drompa+.macspeak {build} {Ddir}')
     else:
-        df = pd.read_csv(samplepairlist, sep=",", header=None)
-        df.fillna("", inplace=True)
+        df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
 
         if is_exist_input(samplepairlist):
             print_and_exec_shell(f'churros_visualize {param_churros_visualize} -b 5000 -l 8000 --pvalue -P "--pthre_enrich 3 --scale_pvalue 3" {samplepairlist} drompa+.pval.bin5M {build} {Ddir}')
@@ -550,8 +600,8 @@ if(__name__ == '__main__'):
     parser.add_argument("--nofilter", help="Do not filter PCR duplicate", action="store_true")
     parser.add_argument("--noqc", help="Omit FASTQC and fastp", action="store_true")
     parser.add_argument("--fastqtrimming", help="Apply adapter trimming with fastp before mapping (omitted if '--noqc' is specified)", action="store_true")
-    parser.add_argument("-q", "--qval", help="Threshould of MACS2 (default: 0.05)", type=float, default=0.05)
-    parser.add_argument("--macsdir", help="Output direcoty of macs2 (default: 'macs2')", type=str, default="macs")
+    parser.add_argument("-q", "--qval", help="Threshould of MACS3 (default: 0.05)", type=float, default=0.05)
+    parser.add_argument("--macsdir", help="Output directory of MACS3 (default: 'macs')", type=str, default="macs")
     parser.add_argument("--mapparam", help="Additional parameter for bowtie|bowtie2 (shouled be quated)", type=str, default="")
     parser.add_argument("--parse2wigparam", help="Additional parameter for parse2wig+ (shouled be quated)", type=str, default="")
     parser.add_argument("--spikein", help="Spike-in mode", action="store_true")
@@ -561,11 +611,14 @@ if(__name__ == '__main__'):
     parser.add_argument("--spikein_constant", help="Scaling Constant for the number of reads after normalization (default: 100)", type=int, default=100)
     parser.add_argument("-p", "--threads", help="Number of CPUs (default: 12)", type=int, default=12)
     parser.add_argument("--pair", help="(If inputs are BAM files) Specify if it is paired end", action="store_true")
+    parser.add_argument("--keepdup", help="Do not remove PCD duplicates in peak calling by MACS3", action="store_true")
     parser.add_argument("--threads_comparative", help="Number of CPUs for --comparative option (default: 8)", type=int, default=8)
     parser.add_argument("--outputpvalue", help="Output ChIP/Input -log(p) distribution as a begraph format", action="store_true")
     parser.add_argument("--comparative", help="Compare bigWigs and peaks among samples by churros_compare", action="store_true")
     parser.add_argument("-D", "--outputdir", help="Output directory (default: 'Churros_result')", type=str, default="Churros_result")
     parser.add_argument("--preset", help="Preset parameters for mapping reads ([scer|T2T])", type=str, default="")
+    parser.add_argument("--csfastq", help="For csfastq files", action="store_true")
+    parser.add_argument("--atac", help="ATAC-seq mode", action="store_true")
     parser.add_argument("-v", "--version", help="Print version information and quit", action='version', version="churros version " + __version__)
 
     args = parser.parse_args()

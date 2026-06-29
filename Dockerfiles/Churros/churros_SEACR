@@ -1,0 +1,82 @@
+#!/bin/bash
+cmdname=`basename $0`
+function usage()
+{
+    echo "$cmdname [Options] <samplelist> <samplepairlist> <Churrosdir> <genometable>" 1>&2
+    echo '   <samplelist>: List of samples' 1>&2
+    echo '   <samplepairlist>: List of sample pairs' 1>&2
+    echo '   <Churrosdir>: Churros output directory' 1>&2
+    echo '   <genometable>: Path to genome table file' 1>&2
+    echo '   Options:' 1>&2
+    echo '      -p <int>: Number of threads (default: 4)' 1>&2
+}
+
+ncore=4
+while getopts p: option
+do
+    case ${option} in
+        p) ncore=${OPTARG};;
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+if test $# -ne 4; then
+    usage
+    exit 0
+fi
+
+samplelist=$1
+samplepairlist=$2
+chdir=$3
+gt=$4
+
+SEACRdir=$chdir/SEACR
+
+bamdir=$SEACRdir/bam
+bedgraphdir=$SEACRdir/bedGraph
+peakdir=$SEACRdir/peak
+
+ex(){ echo $1; eval $1; }
+
+mkdir -p $bamdir $bedgraphdir $peakdir
+
+while read -r LINE || [ -n "$LINE" ]; do
+    LINE=($LINE)
+    id=${LINE[0]}
+
+    ex "samtools sort -n -@ $ncore -o $bamdir/$id.qname.bam $chdir/bam/$id.sort.bam"
+    ex "plot_fragmentlength.sh $chdir/bam/$id.sort.bam $SEACRdir/fragmentlength $id"
+
+    # Do not remove duplicates for CUT&Tag data, as recommended by the SEACR authors
+    echo -n "Generate bedgraph for $id..."
+    bedtools bamtobed -bedpe -i $bamdir/$id.qname.bam \
+        | awk 'BEGIN{OFS="\t"} $1==$4 && $6>$2 && $6-$2 < 1000 {print $1, $2, $6}' \
+        | sort -k1,1 -k2,2n \
+        | bedtools genomecov -bg -i - -g $gt \
+        > $bedgraphdir/$id.fragments.bedgraph
+    echo "done."
+done < $samplelist
+
+while IFS=',' read -r chip input label mode flen; do
+    chip=${chip:-""}
+    input=${input:-""}
+    label=${label:-""}
+
+    if test "$input" = ""; then
+        ex "bash /opt/SEACR/SEACR_1.3.sh \
+            $bedgraphdir/$chip.fragments.bedgraph \
+            0.01 non stringent $peakdir/${label}"
+    else
+        for ty in stringent relaxed
+        do
+            ex "bash /opt/SEACR/SEACR_1.3.sh \
+                $bedgraphdir/$chip.fragments.bedgraph \
+                $bedgraphdir/$input.fragments.bedgraph \
+                norm $ty $peakdir/${label}"
+        done
+    fi
+done < $samplepairlist

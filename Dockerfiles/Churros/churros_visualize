@@ -107,8 +107,7 @@ def do_churros_visualize(args):
 
 
 def is_exist_input(samplepairlist):
-    df = pd.read_csv(samplepairlist, sep=",", header=None)
-    df.fillna("", inplace=True)
+    df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
 
     nInput = 0
     for index, row in df.iterrows():
@@ -146,8 +145,7 @@ def visualize_GV(args, samplepairlist, chipdir, inputdir, pdfdir, logdir, fileex
     else:
         print (GD + " does not exist. skipping.")
 
-    df = pd.read_csv(samplepairlist, sep=",", header=None)
-    df.fillna("", inplace=True)
+    df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
 
 #    if not is_exist_input(samplepairlist):
 #        print ("No ChIP sample with the input sample. Skipped.")
@@ -183,8 +181,7 @@ def visualize_PCENRICH(args, param, samplepairlist, chipdir, inputdir, pdfdir, l
     if args.preset != "scer":
         param += " --showchr "
 
-    df = pd.read_csv(samplepairlist, sep=",", header=None)
-    df.fillna("", inplace=True)
+    df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
 
     if not is_exist_input(samplepairlist):
         print ("No ChIP sample with the input sample. Skipped.")
@@ -224,8 +221,8 @@ def visualize_PCSHARP(args, param, samplepairlist, chipdir, inputdir, pdfdir, lo
     if args.preset != "scer":
         param += " --showchr "
 
-    df = pd.read_csv(samplepairlist, sep=",", header=None)
-    df.fillna("", inplace=True)
+    df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
+
     s = ""
     for index, row in df.iterrows():
         chip  = row[0]

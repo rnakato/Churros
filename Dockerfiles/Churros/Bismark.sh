@@ -44,7 +44,7 @@ prefix=$(basename $fastq .fastq.gz)
 logfile=log/Bismark_$prefix.log
 rm -rf $logfile
 
-ex(){ echo $1 | tee $logfile; eval $1; }
+ex(){ echo $1; eval $1; }
 
 if test $mode = "directional"; then
     bismarkparam=""
@@ -64,12 +64,12 @@ else
     exit
 fi
 
-ex "bismark --genome $index -o $odir --temp_dir $odir/tmp -p $ncore $bismarkparam $fastq"
+ex "bismark --genome $index -o $odir --temp_dir $odir/tmp -p $ncore $bismarkparam $fastq 2>&1 | tee $logfile"
 rm -rf $odir/tmp
 
 outputbam=$odir/${prefix}_trimmed_bismark_bt2.bam #`ls $odir/*_bismark_bt2*.bam | grep -v deduplicated`
 if test $mode = "rrbs"; then
-    echo "Because this is RRBS mode, the deduplication step is skipped." | tee $logfile
+    echo "Because this is RRBS mode, the deduplication step is skipped." 2>&1 | tee -a $logfile
     sortedbam=$odir/${prefix}_trimmed_bismark_bt2.sorted.bam
 else
     ex "deduplicate_bismark --bam $outputbam --output_dir $odir"
@@ -77,13 +77,13 @@ else
     outputbam=$odir/${prefix}_trimmed_bismark_bt2.deduplicated.bam
     sortedbam=$odir/${prefix}_trimmed_bismark_bt2.deduplicated.sorted.bam
 fi
-ex "bismark_methylation_extractor $bismarkextractparam --gzip --bedGraph $outputbam -o $odir"
-ex "bam2nuc --dir $odir --genome_folder $index $outputbam"
+ex "bismark_methylation_extractor $bismarkextractparam --gzip --bedGraph $outputbam -o $odir 2>&1 | tee -a $logfile"
+ex "bam2nuc --dir $odir --genome_folder $index $outputbam 2>&1 | tee -a $logfile"
 ex "samtools sort $outputbam > $sortedbam"
 rm $outputbam
 
-cd $odir
-ex "bismark2report"
-ex "bismark2summary"
-ex "multiqc --pdf --force ."
-cd ..
+
+ex "bismark2report --dir $odir --alignment_report $odir/${prefix}_trimmed_bismark_bt2_SE_report.txt 2>&1 | tee -a $logfile"
+ex "ln -s ${prefix}_trimmed_bismark_bt2_SE_report.txt $odir/${prefix}_trimmed_bismark_bt2.sorted_SE_report.txt"
+ex "bismark2summary $odir/${prefix}_trimmed_bismark_bt2.sorted.bam 2>&1 | tee -a $logfile"
+ex "multiqc --force ."

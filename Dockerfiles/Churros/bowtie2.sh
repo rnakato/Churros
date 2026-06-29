@@ -92,16 +92,11 @@ ex_hiseq(){
     fi
 }
 
-#if test -e "$file" && test 1000 -lt `wc -c < $file` ; then
-#    echo "$file already exist. skipping"
-#    exit 0
-#fi
-
 logfile=$logdir/$prefix.txt
 #if test -e $logfile; then
 #    echo "$logfile already exist. skipping"
 
-if test -e "$file" && test 1000 -lt `wc -c < $file` ; then
+if [ -e "$file" ] && [ "$(wc -c < "$file")" -ge 1000 ]; then
     echo "$file already exist. skipping"
 else
     ex_hiseq >& $logfile

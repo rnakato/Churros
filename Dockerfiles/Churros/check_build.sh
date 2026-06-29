@@ -21,6 +21,8 @@ elif test "$build" = "sacCer3"; then
     echo "S. cerevisiae genome build $build"
 elif test "$build" = "SPombe"; then
     echo "S. pombe genome build $build"
+elif test "$build" = "Medaka"; then
+    echo "Medaka genome"
 else
     echo "Error: invalid genome build: $build"
     exit 1

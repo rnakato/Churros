@@ -1,8 +1,0 @@
-sing="apptainer exec --bind /work,/work2,/work3 /work3/SingularityImages/churros.1.6.0.sif"
-#sing="apptainer exec churros.sif"
-
-build=sacCer3
-Ddir=Referencedata_$build
-ncore=24
-
-$sing churros --noqc --preset scer -p $ncore --outputpvalue --comparative samplelist.txt samplepairlist.txt $build $Ddir

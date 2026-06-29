@@ -1,0 +1,3 @@
+CB550-Empty_Vector	fastq/SRR2453157_1.fastq.gz	fastq/SRR2453157_2.fastq.gz
+CB550-RAD21_Mutant_1	fastq/SRR2453159_1.fastq.gz	fastq/SRR2453159_2.fastq.gz
+CB550-RAD21_WT_1	fastq/SRR2453158_1.fastq.gz	fastq/SRR2453158_2.fastq.gz

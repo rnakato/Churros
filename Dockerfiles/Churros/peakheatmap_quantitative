@@ -1,0 +1,98 @@
+#!/bin/bash
+# Copyright(c) Ryuichiro Nakato <rnakato@iqb.u-tokyo.ac.jp>
+# All rights reserved.
+
+cmdname=`basename $0`
+function usage()
+{
+    echo "$cmdname [Options] <genometable> <region> <bigwigs>" 1>&2
+    echo '   <genometable>: genome table file (e.g., genometable.txt)' 1>&2
+    echo '   <region>: BED file of regions to analyze' 1>&2
+    echo '   <bigwigs>: bigWig files for comparison (should be quoted)' 1>&2
+    echo '   Options:' 1>&2
+    echo '      -k <int>: number of clusters (default: 3)' 1>&2
+    echo '      -b <int>: bin size (default: 1000)' 1>&2
+    echo '      -s <str>: sort name (default: "defaultUseFirstColumn")' 1>&2
+    echo '      -n <str>: normalization type (default: "zscore")' 1>&2
+    echo '      -l <str>: sample label TSV file' 1>&2
+    echo '      -m <str>: clustering method (default: "minikmeans")' 1>&2
+    echo '      -o <str>: output directory (default: "output_quantitative/")' 1>&2
+    echo '   Example:' 1>&2
+    echo '      $cmdname -b 5000 genometable.txt refregion.bed "sample1.bw sample2.bw"' 1>&2
+}
+
+# Set default values for optional arguments
+kcluster=3
+sortname="defaultUseFirstColumn"
+outdir="output_quantitative/"
+binsize=1000 # must when using quantitative
+normalize="zscore"
+clustermethod="minikmeans"
+
+# Parse command line arguments
+while getopts "k:s:o:b:l:n:m:" opt; do
+  case ${opt} in
+    k) kcluster=${OPTARG};;
+    s) sortname=${OPTARG};;
+    o) outdir=${OPTARG};;
+    b) binsize=${OPTARG};;
+    l) samplelabel=${OPTARG};;
+    n) normalize=${OPTARG};;
+    m) clustermethod=${OPTARG};;
+    \?)
+      echo "Invalid option: -${OPTARG}" >&2
+	    usage
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+if [ $# -ne 3 ]; then
+  usage
+  exit 1
+fi
+
+ex(){ echo $1; eval $1; }
+
+# Assign values to required positional arguments
+gt=$1
+region=$2
+bws=$3
+
+# Check if required arguments are provided
+if [[ -z $region ]]; then
+  echo "Error: Missing required arguments: region" 1>&2
+  usage
+  exit 1
+fi
+if [[ -z $gt ]]; then
+  echo "Error: Missing required arguments: genome table" 1>&2
+  usage
+  exit 1
+fi
+
+
+ex(){ echo $1; eval $1; }
+
+export OPENBLAS_NUM_THREADS=1
+export GOTO_NUM_THREADS=1
+export OMP_NUM_THREADS=1
+
+#do something after confirming the code
+mkdir -p $outdir
+
+echo "Quantitative clustering for $region. Bin size: $binsize. Normalization: $normalize. Clustering method: $clustermethod."
+
+drompacode=$(for i in $bws; do prefix=`basename "$i" | sed -E 's/\.(bw|bigwig|bigWig)$//'`; echo -i $i,,$prefix,,$binsize; done | tr '\n' '\t')
+
+ex "drompa+ MULTICI --gt $gt --bed $region -o $outdir/tmp $drompacode"
+mv $outdir/tmp.MULTICI.averaged.ChIPread.tsv $outdir/Output1_raw_matrix.tsv
+
+if [ ! -z "$samplelabel" ]; then
+  param="--samplelabeltsv $samplelabel"
+fi
+
+peakheatmap.py quantitative $outdir/Output1_raw_matrix.tsv \
+  --sortname $sortname --kcluster $kcluster --outdir $outdir \
+  $param --normalize $normalize --clustermethod $clustermethod

@@ -3,17 +3,19 @@ cmdname=`basename $0`
 function usage()
 {
     echo "$cmdname [Options] <IP bam> <Input bam> <prefix> <build> <mode>" 1>&2
-    echo '   <IP bam>: BAM for for ChIP (treat) sample' 1>&2
-    echo '   <Input bam>: BAM for for Input (control) sample: specify "none" if unavailable' 1>&2
-    echo '   <prefix>: prefix of output file' 1>&2
-    echo '   <build>: genome build (e.g., hg38)' 1>&2
-    echo '   <mode>: peak mode ([sharp|broad|sharp-nomodel|broad-nomodel])' 1>&2
+    echo '   <IP bam>: BAM of the ChIP (treat) sample' 1>&2
+    echo '   <Input bam>: BAM of the Input (control) sample: specify "none" if unavailable' 1>&2
+    echo '   <prefix>: Prefix of output file' 1>&2
+    echo '   <build>: Genome build (e.g., hg38)' 1>&2
+    echo '   <mode>: Peak mode ([sharp|broad|sharp-nomodel|broad-nomodel])' 1>&2
     echo '   Options:' 1>&2
-    echo '      -f <int>: predefined fragment length (defalt: estimated in MACS2)' 1>&2
-    echo '      -d <str>: output directory (defalt: "macs")' 1>&2
-    echo '      -p: paired-end mode ("-f BAMPE")' 1>&2
-    echo '      -B: save extended fragment pileup, and local lambda tracks (two files) at every bp into a bedGraph file' 1>&2
-    echo '      -F: overwrite files if exist (defalt: skip)' 1>&2
+    echo '      -f <int>: Predefined fragment length (default: estimated in MACS3)' 1>&2
+    echo '      -d <str>: Output directory (default: "macs")' 1>&2
+    echo '      -p: Paired-end mode ("-f BAMPE")' 1>&2
+    echo '      -a: Do not remove PCD duplicates ("--keep-dup all"; default: "--keep-dup 1" except for yeast)' 1>&2
+    echo '      -B: Save extended fragment pileup, and local lambda tracks (two files) at every bp into a bedGraph file' 1>&2
+    echo '      -F: Overwrite files if exist (default: skip)' 1>&2
+    echo '      -O: Use macs2 instead of macs3' 1>&2
 }
 
 flen=294
@@ -22,8 +24,10 @@ mdir=macs
 force=0
 param_bdg=""
 fileformat="BAM"
+keepdup=1
+macs="macs3"
 
-while getopts f:q:d:pBF option
+while getopts f:q:d:pBFaO option
 do
     case ${option} in
         f) flen=${OPTARG}
@@ -34,6 +38,8 @@ do
         p) fileformat="BAMPE";;
         B) param_bdg="-B";;
         F) force=1;;
+        a) keepdup="all";;
+        O) macs="macs2";;
         *)
             usage
             exit 1
@@ -65,7 +71,9 @@ elif test $build = "dm3" -o $build = "dm6" -o $build = "dm7"; then
     sp="dm"
 elif test $build = "sacCer3" -o $build = "Spom"; then
     sp="13e6"
-    param_yeast="--keep-dup all"
+    keepdup="all"
+elif test $build = "Medaka"; then
+    sp="734057086"
 else
     sp="1e8"
 fi
@@ -77,9 +85,9 @@ else
 fi
 
 if test $Input = "none"; then
-    macs="macs2 callpeak -t $IP -g $sp -f $fileformat -q $qval $param_bdg $param_yeast"
+    macs="$macs callpeak -t $IP -g $sp -f $fileformat -q $qval $param_bdg --keep-dup $keepdup"
 else
-    macs="macs2 callpeak -t $IP -c $Input -g $sp -f $fileformat $param_bdg $param_yeast"
+    macs="$macs callpeak -t $IP -c $Input -g $sp -f $fileformat $param_bdg --keep-dup $keepdup"
     if test -e $Input && test -s $Input; then
         n=1 # dummy
     else

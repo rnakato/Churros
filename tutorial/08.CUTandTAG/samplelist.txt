@@ -1,0 +1,6 @@
+K562_K27me3_nf	fastq/SRR12246717_1.fastq.gz	fastq/SRR12246717_2.fastq.gz
+K562_K27me3_XLink	fastq/SRR11074240_1.fastq.gz	fastq/SRR11074240_2.fastq.gz
+K562_K4me3_nf	fastq/SRR11074254_1.fastq.gz	fastq/SRR11074254_2.fastq.gz
+K562_K4me3_XLink	fastq/SRR11074258_1.fastq.gz	fastq/SRR11074258_2.fastq.gz
+K562_IgG_Xlink	fastq/SRR11923224_1.fastq.gz	fastq/SRR11923224_2.fastq.gz
+K562_IgG_ABIN101961	fastq/SRR8754611_1.fastq.gz	fastq/SRR8754611_2.fastq.gz

@@ -58,6 +58,7 @@ The latest version of **Churros** uses the following tools internally.
 
 - ChIP-seq analysis
    - `MACS2 <https://github.com/macs3-project/MACS>`_ v2.2.9.1
+   - `MACS3 <https://github.com/macs3-project/MACS>`_ v3.0.4
    - `DROMPA+ <https://drompaplus.readthedocs.io/en/latest/>`_ v1.20.0
    - `ROSE <http://younglab.wi.mit.edu/super_enhancer_code.html>`_ v0.1
    - `STARE <https://stare.readthedocs.io/en/latest/index.html>`_ v1.0.4

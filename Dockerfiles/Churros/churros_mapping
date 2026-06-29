@@ -34,8 +34,7 @@ function usage()
     echo '      -w: Specify paired-end mode (default: judged based on the samplelist)' 1>&2
     echo '      -D: directory for execution (defalt: "Churros_result")' 1>&2
     echo "   Example:" 1>&2
-    echo "      For single-end: $cmdname exec chip.fastq.gz chip hg38 Referencedata_hg38" 1>&2
-    echo "      For paired-end: $cmdname exec \"-1 chip_1.fastq.gz -2 chip_2.fastq.gz\" chip hg38 Referencedata_hg38" 1>&2
+    echo "      $cmdname exec samplelist.txt hg38 Referencedata_hg38" 1>&2
 }
 
 bowtieparam=""
@@ -120,6 +119,52 @@ else
     done < $samplelist
 fi
 
+
+
+func_stats(){
+    head=$1
+    fq1=$2
+    fq2=$3
+
+    if [[ "$fq1" =~ \.(bam|sam|cram)$ ]]; then
+        is_bam=1
+    else
+        is_bam=0
+    fi
+
+    logdir=$chdir/log
+    statsdir=$chdir/stats
+    if test $is_bam -eq 1; then
+        echo -en "$head\t"
+        a=`cat $statsdir/$head.stats.singleline.GC.tsv | grep -v Sample | cut -f2`
+    else
+        if test $csfasta -eq 1; then
+#            a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | grep -v Sample | cut -f2-`
+            echo -en "$head\t"
+            a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | grep -v Sample | cut -f3-`
+        else
+#            a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | grep -v Sample | cut -f2-`
+            echo -en "$head\t"
+            a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | grep -v Sample | cut -f3-`
+        fi
+    fi
+
+    if test $mp -eq 1; then
+        b=`cat $statsdir/$head.stats.singleline.GC.tsv    | grep -v Sample | cut -f6,7,8,9`
+        gcov=`cat $statsdir/$head.stats.singleline.GC.tsv | grep -v Sample | cut -f10`
+        b2=`cat $statsdir/$head.stats.singleline.GC.tsv | grep -v Sample | cut -f11,12,13,14`
+    else
+        b=`cat $statsdir/$head.stats.singleline.tsv    | grep -v Sample | cut -f6,7,8,9`
+        gcov=`cat $statsdir/$head.stats.singleline.tsv | grep -v Sample | cut -f10`
+        b2=`cat $statsdir/$head.stats.singleline.tsv | grep -v Sample | cut -f11,12,13`
+    fi
+
+    echo -en "$a\t$b\t$gcov\t$b2\t"
+    echo -en "`tail -n1 $chdir/sspout/$head.stats.txt | cut -f4,5,6,7,8,9,10,11,12,13,14`"
+    echo ""
+}
+
+
 if test $1 = "header"; then
     while read -r LINE || [ -n "$LINE" ]; do
         LINE=($LINE)
@@ -155,6 +200,18 @@ if test $1 = "header"; then
         echo -e "`head -n1 $chdir/sspout/$prefix.stats.txt | cut -f4,5,6,7,8,9,10,11,12,13,14`"
         exit
     done < $samplelist
+    exit 0
+fi
+
+if test $command = "stats"; then
+    while read -r LINE || [ -n "$LINE" ]; do
+        LINE=($LINE)
+        prefix=${LINE[0]}
+        fq1=${LINE[1]}
+        fq2=${LINE[2]}
+        func_stats "$prefix" "$fq1" "$fq2"
+    done < $samplelist
+    exit 0
 fi
 
 if [ $# -ne 4 ]; then
@@ -234,7 +291,7 @@ func_postprocess(){
     fi
 
     echo -e "churros_mapping: quality check by SSP..."
-    ssp.sh -t $ncore $pair -D $chdir $mapfile $head $build $gt $mptable
+    ex "ssp.sh -t $ncore $pair -D $chdir $mapfile $head $build $gt $mptable"
     if ! test -e $chdir/sspout/$head.stats.txt; then
         echo "Error: $chdir/sspout/$head.stats.txt was not created correctly."
         exit 1
@@ -249,10 +306,10 @@ func_postprocess(){
     logdir=$chdir/log/parse2wig+
     mkdir -p $logdir
     if test $format = "CRAM"; then
-       ex "parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir >& $logdir/$head.txt"
+       ex "parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir 2>&1 | tee $logdir/$head.txt"
     else
        if test "$peak" != ""; then
-           ex "parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir >& $logdir/$head.txt"
+           ex "parse2wig+.sh $parseparam -b $binsize $peak $mapfile $head $build $Ddir 2>&1 | tee $logdir/$head.txt"
        else
 	       mkdir -p $chdir/tmp
            macspeak="$chdir/tmp/${prefix}_forFRiP_peaks.narrowPeak"
@@ -260,7 +317,7 @@ func_postprocess(){
                echo "execute MACS2 without Input to estimate FRiP..."
                macs.sh -d $chdir/tmp $mapfile none ${prefix}_forFRiP $build sharp-nomodel
            fi
-           ex "parse2wig+.sh $parseparam -b $binsize -z $macspeak $mapfile $head $build $Ddir >& $logdir/$head.txt"
+           ex "parse2wig+.sh $parseparam -b $binsize -z $macspeak $mapfile $head $build $Ddir 2>&1 | tee $logdir/$head.txt"
        fi
     fi
     echo "done."
@@ -291,58 +348,5 @@ if test $command = "postprocess" -o $command = "exec"; then
         fi
 
         func_postprocess $prefix "$fq1" "$fq2" $mapfile
-    done < $samplelist
-fi
-
-func_stats(){
-    head=$1
-    fq1=$2
-    fq2=$3
-
-    if [[ "$fq1" =~ \.(bam|sam|cram)$ ]]; then
-        is_bam=1
-    else
-        is_bam=0
-    fi
-
-    logdir=$chdir/log
-    statsdir=$chdir/stats
-    if test $is_bam -eq 1; then
-        echo -en "$head\t"
-        a=`cat $statsdir/$head.stats.singleline.GC.tsv | grep -v Sample | cut -f2`
-    else
-        if test $csfasta -eq 1; then
-#            a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | grep -v Sample | cut -f2-`
-            echo -en "$head\t"
-            a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | grep -v Sample | cut -f3-`
-        else
-#            a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | grep -v Sample | cut -f2-`
-            echo -en "$head\t"
-            a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | grep -v Sample | cut -f3-`
-        fi
-    fi
-
-    if test $mp -eq 1; then
-        b=`cat $statsdir/$head.stats.singleline.GC.tsv    | grep -v Sample | cut -f6,7,8,9`
-        gcov=`cat $statsdir/$head.stats.singleline.GC.tsv | grep -v Sample | cut -f10`
-        b2=`cat $statsdir/$head.stats.singleline.GC.tsv | grep -v Sample | cut -f11,12,13,14`
-    else
-        b=`cat $statsdir/$head.stats.singleline.tsv    | grep -v Sample | cut -f6,7,8,9`
-        gcov=`cat $statsdir/$head.stats.singleline.tsv | grep -v Sample | cut -f10`
-        b2=`cat $statsdir/$head.stats.singleline.tsv | grep -v Sample | cut -f11,12,13`
-    fi
-
-    echo -en "$a\t$b\t$gcov\t$b2\t"
-    echo -en "`tail -n1 $chdir/sspout/$head.stats.txt | cut -f4,5,6,7,8,9,10,11,12,13,14`"
-    echo ""
-}
-
-if test $command = "stats"; then
-    while read -r LINE || [ -n "$LINE" ]; do
-        LINE=($LINE)
-        prefix=${LINE[0]}
-        fq1=${LINE[1]}
-        fq2=${LINE[2]}
-        func_stats "$prefix" "$fq1" "$fq2"
     done < $samplelist
 fi

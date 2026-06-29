@@ -112,7 +112,7 @@ def func_postprocess(args, odir_ref, odir_spikein, prefix, fq1, fq2):
        parseparam += f' -P \"{args.param_parse2wig}\"'
 
     os.makedirs(f"{odir_ref}/log/parse2wig+", exist_ok=True)
-    cmd = f"parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref} > {odir_ref}/log/parse2wig+/{prefix}.log 2>&1"
+    cmd = f"parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref} 2>&1 | tee {odir_ref}/log/parse2wig+/{prefix}.log"
     print_and_exec_shell(cmd)
 
     path=f"{odir_spikein}/parse2wigdir+/{prefix}.100000.tsv"
@@ -120,7 +120,7 @@ def func_postprocess(args, odir_ref, odir_spikein, prefix, fq1, fq2):
         print(f"{path} already exists. skipping.")
     else:
         os.makedirs(f"{odir_spikein}/log/parse2wig+", exist_ok=True)
-        cmd = f"parse2wig+ -b 100000 -i {odir_spikein}/bam/{prefix}.sort.bam --gt {Ddir_spikein}/genometable.txt -p {ncore} -o {prefix} --odir {odir_spikein}/parse2wigdir+ > {odir_spikein}/log/parse2wig+/{prefix}.spikein.log"
+        cmd = f"parse2wig+ -b 100000 -i {odir_spikein}/bam/{prefix}.sort.bam --gt {Ddir_spikein}/genometable.txt -p {ncore} -o {prefix} --odir {odir_spikein}/parse2wigdir+ 2>&1 | tee {odir_spikein}/log/parse2wig+/{prefix}.spikein.log"
         print_and_exec_shell(cmd)
 
 
@@ -216,7 +216,7 @@ def create_spikein_bw(args, odir_ref, chip, nNormed):
        parseparam += f' -P \"{args.param_parse2wig}\"'
 
     os.makedirs(f"{odir_ref}/log/parse2wig+", exist_ok=True)
-    cmd = f"parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref} > {odir_ref}/log/parse2wig+/{prefix}.spikein.log 2>&1"
+    cmd = f"parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref} 2>&1 | tee {odir_ref}/log/parse2wig+/{prefix}.spikein.log"
     print_and_exec_shell(cmd)
 
 

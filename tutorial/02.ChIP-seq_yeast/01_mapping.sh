@@ -1,0 +1,11 @@
+sing="apptainer exec --bind /work,/work2,/work3 /work3/SingularityImages/churros.2.0.0.sif"
+
+build=sacCer3
+Ddir=Referencedata_$build
+
+# mapping, QC and generate wig files
+$sing churros_mapping exec samplelist.txt $build $Ddir
+
+# output QC stats
+$sing churros_mapping header samplelist.txt $build $Ddir > Churros_result/$build/churros.QCstats.tsv
+$sing churros_mapping stats samplelist.txt $build $Ddir >> Churros_result/$build/churros.QCstats.tsv

@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.0.0 (2026.6.XX): Major update
+  - **Important**: Updated **Churros** to use MACS3 insated of MACS2 for peak calling.
+      - Added [MACS3](https://macs3-project.github.io/MACS/index.html).
+      - Added ``macs3.sh`` to excuse macs3 instead of macs2 in ``macs.sh``.
+  - Added a new genome build ``Medaka``.
+  - Added ``--keepdup`` option to ``churros`` and ``-a`` option to ``churros_callpeak`` to specify whether to remove PCR duplicates in MACS3 peak calling. By default, PCR duplicates are removed (``--keep-dup 1``) except for yeast samples, but with the `-a` option, all duplicates will be kept (``--keep-dup all``).
+  - Added ``--atac`` option to ``churros`` and ``-A`` option to ``churros_callpeak`` for ATAC-seq analysis. This option enables the use of HMMRATAC for peak calling in ATAC-seq data.
+  - Updated ``churros`` and ``churros_visualize`` to address FutureWarnings.
+  - Added ``--detect_adapter_for_pe`` option to `fastp` in `churros` for paired-end samples. This option allows `fastp` to automatically detect the adapter sequences for paired-end data, which can improve the accuracy of adapter trimming.
+  - Updated Bioconductor 3.22 to 3.23
+  - Added ``tobias.sh`` to run TOBIAS for footprinting analysis.
+  - Added [SEACR](https://github.com/FredHutch/SEACR) for peak calling of CUT&RUN/CUT&Tag data.
+  - Added ``plot_fragmentlength.sh`` to plot the fragment length distribution of the mapped reads.
+  - Added [ENCODE_Blacklist_v2](https://github.com/Boyle-Lab/Blacklist) in the ``/opt`` directory.
+  - Added JASPER motif files 2026 in the ``/opt`` directory.
+  - Added directories and scripts for ATAC-seq and CUT&Tag analyses in the ``tutorial/`` directory.
+  - Moved ``epilogos`` to a separated virtual environment ``epilogos``.
+  - Added ``download_Ecoli.sh`` and ``download_Lambdaphage.sh``.
+  - Added ``isnumber.sh``
+  - Bug fix in ``Bismark.sh`` that did not output the log file correctly.
+
 ## 1.6.3 (2026.5.30)
   - Bug fix in ``churros_mapping`` where the sample names did not appear in the stats file (``churros.QCstats.[xlsx|tsv]``) in some cases.
 
@@ -34,7 +55,7 @@
 
 ## 1.4.0 (2025-1-04)
 - Fixed a bug in ``churros_callpeak`` that did not use the ``-f BEDPE`` option in MACS2 when paired end samples are supplied.
-- Fixed an installation of ``fgsea`` required by ``ChIPseeker`` and ``clusterProfiler``. 
+- Fixed an installation of ``fgsea`` required by ``ChIPseeker`` and ``clusterProfiler``.
 
 ## 1.3.0 (2024-10-29)
 - Starting with this version, **Churros** can accept BAM files as input in samplelist.txt instead of FASTQ files.

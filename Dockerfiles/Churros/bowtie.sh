@@ -69,7 +69,7 @@ else
     file=$bamdir/$prefix$post.sort.cram
 fi
 
-if test -e $file && test 1000 -lt `wc -c < $file` ; then
+if [ -e "$file" ] && [ "$(wc -c < "$file")" -ge 1000 ]; then
     echo "$file already exist. quit"
     exit 0
 fi

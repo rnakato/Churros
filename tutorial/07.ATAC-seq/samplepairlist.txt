@@ -1,0 +1,3 @@
+CB550-Empty_Vector,,CB550-Empty_Vector,sharp
+CB550-RAD21_Mutant_1,,CB550-RAD21_Mutant_1,sharp
+CB550-RAD21_WT_1,,CB550-RAD21_WT_1,sharp

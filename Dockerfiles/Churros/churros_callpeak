@@ -16,7 +16,11 @@ function usage()
     echo '      -F : overwrite MACS2 results if exist (defalt: skip)' 1>&2
     echo '      -t : number of CPUs (defalt: 4)' 1>&2
     echo '      -p : Paired-end mode' 1>&2
+    echo '      -a : Do not remove PCD duplicates ("--keep-dup all"; default: "--keep-dup 1" except for yeast)' 1>&2
     echo '      -s : postfix of the mapfile ($prefix$post.sort.bam, default: "")' 1>&2
+    echo '      -A : ATAC-seq mode' 1>&2
+#    echo '      -C : CUT&Tag (CUT&RUN) mode' 1>&2
+    echo '      -g : Genome table file (for the -C option)' 1>&2
 }
 
 qval=0.05
@@ -27,8 +31,13 @@ chdir="Churros_result"
 force=""
 post=""
 pair=""
+atac="no"
+#cuttag=""
+fileformat="BAM"
+keepdup=""
+gt=""
 
-while getopts D:b:q:d:t:Fps: option
+while getopts D:b:q:d:t:Fps:Aag: option
 do
     case ${option} in
 	D) chdir=${OPTARG};;
@@ -39,9 +48,15 @@ do
            isnumber.sh $ncore "-t" || exit 1
 	   ;;
 	F) force="-F";;
-	p) pair="-p";;
+	p) pair="-p"
+       fileformat="BAMPE" 
+       ;;
+    a) keepdup="-a";;
 	s) post=${OPTARG};;
+    A) atac="yes";;
+#    C) cuttag="-C";;
         *)
+        echo "Invalid option: -${OPTARG}" >&2
 	    usage
 	    exit 1
 	    ;;
@@ -55,7 +70,6 @@ if [ $# -ne 2 ]; then
   exit 1
 fi
 
-
 samplepairlist=$1
 build=$2
 
@@ -68,6 +82,7 @@ fi
 chdir=$chdir/$build
 
 ex(){ echo $1; eval $1; }
+export -f ex
 
 echo "Churros callpeak: $samplepairlist"
 
@@ -85,7 +100,7 @@ while IFS=',' read -r chip input label mode flen; do
     label=${label:-""}
     mode=${mode:-""}
     flen=${flen:-""}
-    echo $chip, $input, $label, $flen, $mode
+#    echo $chip, $input, $label, $flen, $mode
 
     if test "$mode" = ""; then
        mode="sharp"
@@ -104,11 +119,15 @@ do_macs(){
     build=$2
     bamdir=$3
     mdir=$4
-    newlist=$5
+    chdir=$5
     qval=$6
     force=$7
     post=$8
     pair=$9
+    atac=${10}
+    fileformat=${11}
+
+#    echo "$build, $bamdir, $mdir, $chdir, $qval, $force, $post, $pair, $atac"
 
     IFS=, read -ra LINE <<< $LINE
     chip=${LINE[0]:-""}
@@ -119,11 +138,7 @@ do_macs(){
     IPbam=$bamdir/$chip$post.sort.bam
     Inputbam=$bamdir/$input$post.sort.bam
 
-#    echo $chip
-#    echo $input
-#    echo $label
-#    echo $mode
-#    echo $flen
+    mkdir -p $chdir/log/macs
 
     if test "$mode" = ""; then mode="sharp"; fi
     if test $mode = "sharp" -o $mode = "sharp-nomodel"; then
@@ -138,9 +153,15 @@ do_macs(){
         fi
     fi
     if test "$input" = ""; then
-        macs.sh $force $pair -q $qval -d $mdir $flen $IPbam none $label $build $mode
+        macs.sh $force $pair $keepdup -q $qval -d $mdir $flen $IPbam none $label $build $mode | tee $chdir/log/macs/$label.log
     else
-        macs.sh $force $pair -q $qval -d $mdir $flen $IPbam $Inputbam $label $build $mode
+        macs.sh $force $pair $keepdup -q $qval -d $mdir $flen $IPbam $Inputbam $label $build $mode | tee $chdir/log/macs/$label.log
+    fi
+
+    if test "$atac" = "yes"; then
+        echo "MACS3 HMMRATAC for ATAC-seq"
+        ex "mkdir -p $chdir/log/hmmratac"
+        ex "macs3 hmmratac -i $IPbam -f $fileformat -n $label --outdir $chdir/hmmratac/ 2>&1 | tee $chdir/log/hmmratac/$label.log"
     fi
 }
 export -f do_macs
@@ -152,7 +173,7 @@ while read -r LINE || [ -n "$LINE" ]; do
 done < $samplepairlist
 
 echo ${array[@]} | tr ' ' '\n' \
-    | xargs -I {} -P $ncore bash -c "do_macs {} $build $bamdir $mdir $newlist $qval \"$force\" \"$post\" \"$pair\""
+    | xargs -I {} -P $ncore bash -c "do_macs {} \"$build\" \"$bamdir\" \"$mdir\" \"$chdir\" \"$qval\" \"$force\" \"$post\" \"$pair\" \"$atac\" \"$fileformat\""
 
 #  xargs -n1 -I
 echo "churros_callpeak done."
