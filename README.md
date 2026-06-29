@@ -2,6 +2,8 @@
 
 <img src = "image/Churros.jpg" width = 700ptx>
 
+## Major release: v2.0.0!
+
 ## 0. Changelog
 
 See [Changelog](https://github.com/rnakato/Churros/blob/main/ChangeLog.md)
