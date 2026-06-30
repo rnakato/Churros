@@ -14,7 +14,7 @@ The sample scripts are also available at `Churros GitHub site <https://github.co
 Get data
 ------------------------
 
-Here we use two human Bisulfite-Seq data.
+Here we use two human RRBS data.
 
 .. code-block:: bash
 
@@ -30,11 +30,11 @@ Here we use two human Bisulfite-Seq data.
 .. code-block:: bash
 
     mkdir -p log
-    build=mm39      # genome build
+    build=hg38      # genome build
     Ddir=Referencedata_$build   # output directory
     ncore=12    # number of CPUs
     # download the genome
-    download_genomedata.sh $build $Ddir 2>&1 | tee log/$Ddir
+    download_genomedata.sh -s $build $Ddir
     # make Bismark index
     build-index.sh -p $ncore bismark $Ddir
 
@@ -53,13 +53,15 @@ Running Bismark
 In addition, **Bismark.sh** executes `MultiQC <https://multiqc.info/>`_ to make a summary of quality statistics.
 
 Supply ``-m`` option to specify the mode of Bisulfite sequencing (``[directional|non_directional|pbat|rrbs]``).
-Because here we use a PBAT sample, ``-m pbat`` option is supplied.
-Paired-end fastq files should be quated, and supplied by ``-1`` and ``-2``.
+Because here we use a RRBS sample, ``-m rrbs`` option is supplied.
 
 .. code-block:: bash
 
-    index=Referencedata_mm39/bismark-indexes_genome
-    Bismark.sh -m pbat $index "-1 SRR19268567_1.fastq.gz -2 SRR19268567_2.fastq.gz"
+    index=Referencedata_hg38/bismark-indexes_genome
+    ncore=24
+
+    Bismark.sh -p $ncore -m rrbs $index fastq/SRR1609039.fastq.gz
+    Bismark.sh -p $ncore -m rrbs $index fastq/SRR1609040.fastq.gz
 
 
 The results are output in ``Bismarkdir/``. If you want to specify the name of the output directory, use ``-d`` option.
@@ -75,3 +77,61 @@ The results are output in ``Bismarkdir/``. If you want to specify the name of th
     - multiqc_report.html ... Output of MultiQC
 
 See `Bismark User Guide <https://rawgit.com/FelixKrueger/Bismark/master/Docs/Bismark_User_Guide.html>`_ for more detail.
+
+Methylkit for differential analysis
+------------------------------------------------
+
+You can then conduct differential analysis using `methylKit <https://github.com/al2na/methylKit>`_.
+This is a sample R script.
+
+.. code-block:: r
+    library(methylKit)
+
+    files <- list("Bismarkdir/SRR1609039_trimmed_bismark_bt2.sorted.bam", "Bismarkdir/SRR1609040_trimmed_bismark_bt2.sorted.bam")
+    sample.id <- list("SRR1609039", "SRR1609040")
+
+    myobj=processBismarkAln(location = files,　
+                                    sample.id=sample.id,
+                                    assembly="hg38",
+                                    read.context="CpG",
+                                    mincov = 4,
+                                    treatment=c(0,1),
+                                    save.folder=getwd()
+                                    )
+
+    if (!dir.exists("methylKit")){
+            dir.create("methylKit")
+    }
+
+    pdf("methylKit/methyl_stats.pdf")
+    getMethylationStats(myobj[[1]],plot=TRUE,both.strands=FALSE)
+    dev.off()
+
+    pdf("methylKit/coverage_stats.pdf")
+    getCoverageStats(myobj[[2]],plot=TRUE,both.strands=FALSE)
+    dev.off()
+
+    meth=unite(myobj, destrand=FALSE)
+
+    pdf("methylKit/getCorrelation.pdf")
+    getCorrelation(meth,plot=TRUE)
+    dev.off()
+
+    pdf("methylKit/clusterSamples.pdf")
+    clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
+    dev.off()
+
+    pdf("methylKit/clusterSamples.pdf")
+    PCASamples(meth, screeplot=TRUE)
+    PCASamples(meth)
+    dev.off()
+
+    myDiff=calculateDiffMeth(meth, mc.cores=2)
+
+
+.. figure:: img/getCorrelation.jpg
+   :width: 700px
+   :align: center
+   :alt: Alternate
+
+   getCorrelation.pdf
