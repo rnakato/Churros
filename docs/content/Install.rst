@@ -59,7 +59,7 @@ The latest version of **Churros** uses the following tools internally.
 - ChIP-seq analysis
    - `MACS2 <https://github.com/macs3-project/MACS>`_ v2.2.9.1
    - `MACS3 <https://github.com/macs3-project/MACS>`_ v3.0.4
-   - `DROMPA+ <https://drompaplus.readthedocs.io/en/latest/>`_ v1.20.0
+   - `DROMPA+ <https://drompaplus.readthedocs.io/en/latest/>`_ v1.20.5
    - `ROSE <http://younglab.wi.mit.edu/super_enhancer_code.html>`_ v0.1
    - `STARE <https://stare.readthedocs.io/en/latest/index.html>`_ v1.0.4
    - `ChromImpute <https://ernstlab.biolchem.ucla.edu/ChromImpute/>`_ v1.0.5
@@ -101,7 +101,7 @@ The latest version of **Churros** uses the following tools internally.
    - `FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`_ v0.11.9
    - `fastp <https://github.com/OpenGene/fastp>`_ v0.23.2
    - `MultiQC <https://multiqc.info/>`_ v1.21
-   - `SSP <https://github.com/rnakato/SSP>`_ v1.4.0
+   - `SSP <https://github.com/rnakato/SSP>`_ v1.4.3
 
 - File processing
    - `SAMtools <http://www.htslib.org/>`_ v1.21
@@ -119,3 +119,4 @@ The latest version of **Churros** uses the following tools internally.
 
 - Utility tools
    - `SRAtoolkit <https://github.com/ncbi/sra-tools>`_ v3.2.1
+   - `pfastq-dump <https://github.com/inutano/pfastq-dump>`_ v0.1.6
