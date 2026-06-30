@@ -25,11 +25,10 @@ Contents:
    content/StepbyStep
    content/Spikein
    content/Peakheatmap
+   content/Tutorial.Bisulfite
    content/Tutorial.ATACseq
    content/Tutorial.CUTTag
-   content/Tutorial.Bisulfite
    content/Commands
-..   content/Appendix
 
 
 Citation:

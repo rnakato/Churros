@@ -42,13 +42,13 @@ Here we use three ATAC-seq samples, which are paired-end.
 Running Churros
 ------------------------------------------------
 
-``churros`` has the ``--atac``` option for ATAC-seq analysis, where MACS3 uses ``hmmratac``` command in addition to ``callpeak``.
+``churros`` has the ``--atac``` option for ATAC-seq analysis, where MACS3 uses ``hmmratac`` command in addition to ``callpeak``.
 
 .. code-block:: bash
 
     build=hg38
     Ddir=/work/Database/Database_fromDocker/Referencedata_$build
-    ncore=24
+    ncore=12
 
     churros --atac -p $ncore samplelist.txt samplepairlist.txt $build $Ddir
 
@@ -76,7 +76,7 @@ After running ``churros``, you can use ``churros_tobias.sh`` to apply TOBIAS for
             -p <int>: Number of cores to use (default: 4)
 
 ``churros_tobias.sh`` executes ``TOBIAS ATACorrect``, ``TOBIAS ScoreBigwig``, and ``TOBIAS BINDetect``.
-It also uses ``TOBIAS PlotAggregate`` to plot top three target motifs from `JASPAR2026 database <https://jaspar.elixir.no/>_`.
+It also uses ``TOBIAS PlotAggregate`` to plot top three target motifs from `JASPAR2026 database <https://jaspar.elixir.no/>`_.
 
 This is a example script to execute TOBIAS to all samples included in ``samplelist.txt``.
 
