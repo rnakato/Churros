@@ -39,12 +39,12 @@ The optional parameters:
    H3K27ac_ENCSR752UOD_rep3_peaks.narrowPeak       histone
 
 
-Example usage of binary mode
+Example usage
 +++++++++++++++++++++++++++++++++++
 
 .. code-block:: bash
 
-   churros_peakheatmap -l samplelabel.tsv binary Rad21_ENCSR000BTQ_rep1_peaks.narrowPeak ./peakdir/
+   peakheatmap_binary -l samplelabel.tsv reference.bed ./peakdir/
 
 This command takes as input a file representing regions of interest (``Rad21_ENCSR000BTQ_rep1_peaks.narrowPeak``) and a directory  (``./peakdir/``) containing multiple epigenomic signals.
 We also assigned labels to the files in the ``./peakdir/`` directory.
