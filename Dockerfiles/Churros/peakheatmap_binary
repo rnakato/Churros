@@ -32,7 +32,7 @@ while getopts "k:s:o:l:n:m:" opt; do
     k) kcluster=${OPTARG};;
     s) sortname=${OPTARG};;
     o) outdir=${OPTARG};;
-    l) samplelabeltsv=${OPTARG};;
+    l) samplelabel=${OPTARG};;
     m) clustermethod=${OPTARG};;
     \?)
       echo "Invalid option: -${OPTARG}" >&2

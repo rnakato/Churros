@@ -28,6 +28,7 @@ outdir="output_quantitative/"
 binsize=1000 # must when using quantitative
 normalize="zscore"
 clustermethod="minikmeans"
+samplelabel=""
 
 # Parse command line arguments
 while getopts "k:s:o:b:l:n:m:" opt; do
