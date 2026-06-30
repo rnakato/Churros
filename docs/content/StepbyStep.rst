@@ -207,11 +207,11 @@ By default, the ``churros`` command does not include this step. Add the ``--call
     churros_callpeak -t 8 samplepairlist.txt hg38
 
 - Output
-    - macs/ ... peak files called by MACS2. The log files are stored in \*log. ``samplepairlist.txt`` in ``macs/`` directory includes the filename of peak files that is used in ``churros_visualize``.
+    - macs/ ... peak files called by MACS3. The log files are stored in \*log. ``samplepairlist.txt`` in ``macs/`` directory includes the filename of peak files that is used in ``churros_visualize``.
 
 
 churros_visualize: visualize read distributions
---------------------------------------------------------------------
+------------------------------------------------------
 
 ``churros_visualize`` visualizes the distribution of raw reads, ChIP/Input enrichment and ChIP/Input p-value in PDF format using `DROMPAplus <https://drompaplus.readthedocs.io/en/latest/>`_.
 The pdf files and corresponding peak lists are generated in ``pdf/``.
@@ -268,7 +268,8 @@ Supply ``--pvalue`` option to visualize -log10(p) distribution of ChIP/input enr
 Chromosome-wide view
 +++++++++++++++++++++++++++++++++
 
-To visualize genome-wide view, supply ``-G`` option.
+With the ``-G`` option, ``churros_visualize`` visualizes ChIP/Input enrichment for whole chromosomes with 100 kbp.
+This option is useful for examining the euchromatin/heterochromatin pattern, for example.
 
 .. code-block:: bash
 
