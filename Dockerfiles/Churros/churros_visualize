@@ -178,7 +178,7 @@ def visualize_PCENRICH(args, param, samplepairlist, chipdir, inputdir, pdfdir, l
         param += " --showpenrich 1"
     if args.logratio:
         param += " --showratio 2"
-    if args.preset != "scer":
+    if args.preset != "scer" and args.keepfullpdf != True:
         param += " --showchr "
 
     df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
@@ -208,7 +208,7 @@ def visualize_PCENRICH(args, param, samplepairlist, chipdir, inputdir, pdfdir, l
     command = "drompa+ PC_ENRICH " + param + " --callpeak " + s + " -o " + outputprefix + ".callpeak > " + logfile_prefix + ".callpeak.log"
     echo_and_print_and_exec_shell(command, logfile_prefix + ".callpeak.log")
 
-    if args.preset != "scer":
+    if args.preset != "scer" and args.keepfullpdf != True:
         os.remove(outputprefix + ".pdf")
         os.remove(outputprefix + ".callpeak.pdf")
 
@@ -218,7 +218,7 @@ def visualize_PCSHARP(args, param, samplepairlist, chipdir, inputdir, pdfdir, lo
         param += " --showctag 0 --showpenrich 1"
 
     param += " --callpeak"
-    if args.preset != "scer":
+    if args.preset != "scer" and args.keepfullpdf != True:
         param += " --showchr "
 
     df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
@@ -253,7 +253,7 @@ def visualize_PCSHARP(args, param, samplepairlist, chipdir, inputdir, pdfdir, lo
     print (command)
     echo_and_print_and_exec_shell(command, logfile)
 
-    if args.preset != "scer":
+    if args.preset != "scer" and args.keepfullpdf != True:
         os.remove(outputprefix + ".pdf")
     print_and_exec_shell("rm " + outputprefix + "*.peak.bed " + outputprefix + "*.peak.tsv")
 
@@ -270,6 +270,7 @@ if(__name__ == '__main__'):
     parser.add_argument("-l", "--linesize", help="Line size for each page (kbp, defalt: 1000)", type=int, default=-1)
     parser.add_argument("--nompbl", help="Do not consider genome mappability", action="store_true")
     parser.add_argument("--nofilter", help="Use data where PCR duplication is not filtered", action="store_true")
+    parser.add_argument("--keepfullpdf", help="Keep the full PDF output", action="store_true")
     parser.add_argument("--chipdirectory", help="Directory of ChIP bigWig files (default: 'TotalReadNormalized/')", type=str, default="TotalReadNormalized/")
     parser.add_argument("--inputdirectory", help="Directory of Input bigWig files (default: 'TotalReadNormalized/')", type=str, default="TotalReadNormalized/")
     parser.add_argument("--postfix", help="Parameter string of parse2wig+ files to be used (default: '.mpbl')", type=str, default="")
