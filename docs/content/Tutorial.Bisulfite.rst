@@ -85,6 +85,7 @@ You can then conduct differential analysis using `methylKit <https://github.com/
 This is a sample R script.
 
 .. code-block:: r
+    
     library(methylKit)
 
     files <- list("Bismarkdir/SRR1609039_trimmed_bismark_bt2.sorted.bam", "Bismarkdir/SRR1609040_trimmed_bismark_bt2.sorted.bam")
