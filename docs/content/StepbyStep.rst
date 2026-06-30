@@ -193,7 +193,7 @@ See the `checkQC.py: check the quality of the input ChIP-seq samples <https://ch
 churros_callpeak: call peaks by MACS2
 --------------------------------------------------
 
-``churros_callpeak`` calls peaks of the samples specified in ``samplepairlist.txt`` using `MACS2 <https://github.com/macs3-project/MACS>`_.
+``churros_callpeak`` calls peaks of the samples specified in ``samplepairlist.txt`` using `MACS3 <https://macs3-project.github.io/MACS/>`_.
 If input samples are omitted, peaks are called using ChIP samples only.
 
 By default, the ``churros`` command does not include this step. Add the ``--callpeak`` option to include this step in ``churros``.
@@ -206,16 +206,14 @@ By default, the ``churros`` command does not include this step. Add the ``--call
 
     churros_callpeak -t 8 samplepairlist.txt hg38
 
-``churros_callpeak`` also outputs the correlation scores (Simpson index) and heatmaps.
-
 - Output
     - macs/ ... peak files called by MACS2. The log files are stored in \*log. ``samplepairlist.txt`` in ``macs/`` directory includes the filename of peak files that is used in ``churros_visualize``.
 
 
-churros_visualize: visualize read distributions by DROMPA+
+churros_visualize: visualize read distributions
 --------------------------------------------------------------------
 
-``churros_visualize`` visualizes the distribution of raw reads, ChIP/Input enrichment and ChIP/Input p-value in PDF format.
+``churros_visualize`` visualizes the distribution of raw reads, ChIP/Input enrichment and ChIP/Input p-value in PDF format using `DROMPAplus <https://drompaplus.readthedocs.io/en/latest/>`_.
 The pdf files and corresponding peak lists are generated in ``pdf/``.
 
 .. code-block:: bash
