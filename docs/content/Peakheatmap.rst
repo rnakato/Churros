@@ -3,6 +3,7 @@ Peakheatmap: Large-scale profile analysis
 
 **Churros** provides commands for clustering and visualizing large-scale peak profiles.
 These functions take a reference region (BED format) and cluster regions based on the overlap pattern of peaks or bigWig profiles.
+The sample scripts are also available at `Churros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial/06.peakheatmap>`_.
 
 peakheatmap_binary: Binary comparison
 --------------------------------------------------------------------
