@@ -5,8 +5,8 @@ Here we show the step-by-step ChIP-seq analysis using **Churros**. See also the 
 
 .. note::
 
-   | This tutorial assumes using the **Churros** singularity image (``churros.sif``). Please add ``singularity exec churros.sif`` before each command below.
-   | Example: ``singularity exec churros.sif download_genomedata.sh``
+   | This tutorial assumes using the **Churros** singularity image (``churros.sif``). Please add ``apptainer exec churros.sif`` before each command below.
+   | Example: ``apptainer exec churros.sif download_genomedata.sh``
 
 
 .. contents:: 

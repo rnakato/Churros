@@ -3,23 +3,23 @@ DNA methylation analysis by Churros
 
 This page describes how to analyze Bisulfite sequencing data for DNA methylation analysis.
 Churros includes `Bismark <https://www.bioinformatics.babraham.ac.uk/projects/bismark/>`_ to handle Bisulfite sequencing data.
+The sample scripts are also available at `Churros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial/05.DNAmethylation>`_.
 
 .. note::
 
-   | This tutorial assumes using the **Churros** singularity image (``churros.sif``). Please add ``singularity exec churros.sif`` before each command below.
-   | Example: ``singularity exec churros.sif download_genomedata.sh``
+   | This tutorial assumes using the **Churros** singularity image (``churros.sif``). Please add ``apptainer exec churros.sif`` before each command below.
+   | Example: ``apptainer exec churros.sif download_genomedata.sh``
 
 
 Get data
 ------------------------
 
-Here we use mouse DNA methylation data using PBAT from `GSE203292 <https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE203292>`_.
-These are paired-end fastq files.
+Here we use two human Bisulfite-Seq data.
 
 .. code-block:: bash
 
     mkdir -p fastq
-    for id in SRR19268567
+    for id in SRR1609039 SRR1609040
     do
         fastq-dump --split-files --gzip $id -O fastq
     done

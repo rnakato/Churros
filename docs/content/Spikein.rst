@@ -13,8 +13,8 @@ In this experiment, EPZ5676-treated cells (low H3K79me2 levels) were mixed with 
 
 .. note::
 
-   | This tutorial assumes using the **Churros** singularity image (``churros.sif``). Please add ``singularity exec churros.sif`` before each command below.
-   | Example: ``singularity exec churros.sif download_genomedata.sh``
+   | This tutorial assumes using the **Churros** singularity image (``churros.sif``). Please add ``apptainer exec churros.sif`` before each command below.
+   | Example: ``apptainer exec churros.sif download_genomedata.sh``
 
 
 .. contents:: 
@@ -24,14 +24,14 @@ In this experiment, EPZ5676-treated cells (low H3K79me2 levels) were mixed with 
 Get data
 ------------------------
 
-Here we use `parallel-fastq-dump <https://github.com/rvalieris/parallel-fastq-dump>`_ to download the fastq files from the SRA database.
+Here we use `pfastq-dump <https://github.com/inutano/pfastq-dump>`_ to download the fastq files from the SRA database.
 
 .. code-block:: bash
 
     mkdir -p fastq
     for id in SRR1536557 SRR1536558 SRR1536559 SRR1536560 SRR1536561 SRR1584489 SRR1584490 SRR1584491 SRR1584492 SRR1584493
     do
-        parallel-fastq-dump --sra-id $id --threads 4 --outdir fastq/ --gzip
+        pfastq-dump -s $id -t 4 --outdir fastq/ --gzip
     done
 
 Then download and generate the reference dataset including genome, gene annotation and index files.
@@ -46,7 +46,7 @@ Here we specify ``hg38`` and ``dm6`` for genome build.
     for build in hg38 dm6
     do
         Ddir=Referencedata_$build
-        download_genomedata.sh $build $Ddir 2>&1 | tee log/$Ddir
+        download_genomedata.sh -s $build $Ddir 2>&1 | tee log/$Ddir
         build-index.sh -p $ncore bowtie2 $Ddir
     done
 
@@ -111,7 +111,7 @@ The output directory contains several new subdirectories:
 
 .. note::
 
-   Currently, spike-in normalization is not applied to peak calling with MACS2.
+   Currently, spike-in normalization is not applied to peak calling with MACS3.
 
 Let's look at the read distribution with total read normalization (in the ``pdf/`` directory) and spike-in normalization (in the ``pdf_spikein/`` directory). The first page of chromosome 10 (``drompa+.bin5M.PCSHARP.5000_chr10.pdf``) looks like this.
 
