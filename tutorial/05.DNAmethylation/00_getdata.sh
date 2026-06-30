@@ -4,7 +4,7 @@ sing="apptainer exec --bind /work,/work2,/work3 /work3/SingularityImages/churros
 mkdir -p fastq
 for id in SRR1609039 SRR1609040
 do
-    $sing parallel-fastq-dump --sra-id $id --threads 4 --outdir fastq/ --gzip
+    $sing pfastq-dump -s $id -t 4 --outdir fastq/ --gzip
 done
 
 mkdir -p log
