@@ -316,10 +316,10 @@ For example, if you want to change the y-axis scale to 50, add ``--scale_tag 50`
     drompa+ PC_SHARP --scale_tag 50 --ls 1000 (...) \
     -o Churros_result/pdf/drompa+.PCSHARP.100.modified
 
-See `DROMPAplus manual <https://drompaplus.readthedocs.io/en/latest/index.html>`_ for the detailed usage of DROMPA+.
+See `the manual <https://drompaplus.readthedocs.io/en/latest/index.html>`_ for the detailed usage of DROMPAplus.
 
 
-churros_compare: compare peaks among ChIP samples
+churros_compare: compare peaks between ChIP samples
 --------------------------------------------------------------------
 
 ``churros_compare`` outputs the heatmap of the correlation of peaks between ChIP samples.
@@ -327,9 +327,10 @@ The results are output to the ``comparsion/`` directory.
 
 .. note::
 
-   By default, the ``churros`` command does not include this step because the computation time becomes long when the number of samples is quite large. Add the ``--comparative`` option to include this step in ``churros``.
+   By default, the ``churros`` command does not include this step because the computation time becomes long when the number of samples is large. Add the ``--comparative`` option to include this step in ``churros``.
 
-It the number of peaks largely varies among samples, the comparison may become unfair. Therefore ``churros_compare`` also estimates peak overlap for 'top-ranked 2000 peaks'.
+If the number of peaks largely varies among samples, the comparison may become unfair.
+Therefore, ``churros_compare`` also estimates peak overlap for **top-ranked 2000 peaks**.
 
 .. code-block:: bash
 
