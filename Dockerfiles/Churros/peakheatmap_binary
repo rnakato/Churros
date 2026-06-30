@@ -82,11 +82,10 @@ cut -f 1-3 $region | sed '1ichromosome\tstart\tend' > $outdir/input.bed3.tmp
 paste $outdir/input.bed3.tmp $outdir/binary*tmp > $outdir/Output1_raw_matrix.tsv
 rm $outdir/*tmp
 
-if [ ! -z "$samplelabel" ]; then
+if [ "$samplelabel" != "" ]; then
   param="--samplelabeltsv $samplelabel"
 fi
 
 peakheatmap.py binary $outdir/Output1_raw_matrix.tsv \
   --sortname $sortname --kcluster $kcluster \
   --outdir $outdir $param --clustermethod $clustermethod
-
