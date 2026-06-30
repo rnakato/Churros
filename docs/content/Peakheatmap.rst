@@ -5,6 +5,9 @@ Peakheatmap: Large-scale profile analysis
 These functions take a reference region (BED format) and cluster regions based on the overlap pattern of peaks or bigWig profiles.
 The sample scripts are also available at `Churros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial/06.peakheatmap>`_.
 
+.. contents:: 
+   :depth: 3
+
 peakheatmap_binary: Binary comparison
 --------------------------------------------------------------------
 
