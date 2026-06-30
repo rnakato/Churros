@@ -20,11 +20,13 @@ Contents:
    :maxdepth: 1
 
    content/Install
-   content/Quickstart
+   content/Tutorial.human
    content/Tutorial.scer
    content/StepbyStep
-   content/Peakheatmap
    content/Spikein
+   content/Peakheatmap
+   content/Tutorial.ATACseq
+   content/Tutorial.CUTTag
    content/Tutorial.Bisulfite
    content/Commands
 ..   content/Appendix

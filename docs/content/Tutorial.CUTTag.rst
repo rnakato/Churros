@@ -1,7 +1,7 @@
-DNA methylation analysis
+DNA methylation analysis by Churros
 ===========================================
 
-This page describes how to analyze Bisulfite sequencing data for DNA methylation analysis with **Churros**.
+This page describes how to analyze Bisulfite sequencing data for DNA methylation analysis.
 Churros includes `Bismark <https://www.bioinformatics.babraham.ac.uk/projects/bismark/>`_ to handle Bisulfite sequencing data.
 The sample scripts are also available at `Churros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial/05.DNAmethylation>`_.
 
@@ -25,7 +25,7 @@ Here we use two human RRBS data.
     done
 
 | Then download and generate the reference dataset including genome, gene annotation and index files. **Chuross** contains scripts for that: ``download_genomedata.sh`` and ``build-index.sh``.
-| Here we specify ``hg38`` for genome build. See :doc:`Appendix` for the detail of genome build.
+| Here we specify ``mm39`` for genome build. See :doc:`Appendix` for the detail of genome build.
 
 .. code-block:: bash
 
