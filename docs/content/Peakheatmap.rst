@@ -60,7 +60,7 @@ Five output files are generated:
    Output5_kmeans_heatmap.png
 
 
-.. figure:: img/classheat_kmeans.png
+.. figure:: img/peakheatmap_binary.png
    :width: 700px
    :align: center
    :alt: Alternate
