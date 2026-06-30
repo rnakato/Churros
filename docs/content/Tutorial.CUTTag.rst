@@ -44,9 +44,10 @@ Running Churros
 
 Several specific parameters must be specified for CUT&Tag analysis.
 
-First, adapter trimming is highly recommended in CUT&Tag and can be enabled with the ``--fastqtrimming`` option.
-Second, reads that are typically marked as PCR duplicates should not be filtered out because, in CUT&Tag, they may reflect high target specificity rather than PCR amplification artifacts. The ``--keepdup`` option opts out of the duplicate filtering step.
-Third, here we use the parameter set for mapping recommended by `Kaya-Okur et al, Nat Protoc. 2020 <https://www.nature.com/articles/s41596-020-0373-x>`_.
+- First, adapter trimming is highly recommended in CUT&Tag and can be enabled with the ``--fastqtrimming`` option.
+- Second, reads that are typically marked as PCR duplicates should not be filtered out because, in CUT&Tag, they may reflect high target specificity rather than PCR amplification artifacts. The ``--keepdup`` option opts out of the duplicate filtering step.
+- Third, here we use the parameter set for mapping recommended by `Kaya-Okur et al, Nat Protoc. 2020 <https://www.nature.com/articles/s41596-020-0373-x>`_.
+
 The resulting command is as follows.
 
 
