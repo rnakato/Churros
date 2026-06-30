@@ -78,9 +78,9 @@ samplepairlist.txt
 ChIP and input sample labels should be identical to those in ``samplelist.txt``.
 Input samples can be omitted if unavailable.
 ``prefix`` is used for the output files.
-``peak mode`` is either ``[sharp|broad|sharp-nomodel|broad-nomodel]``. This parameter is used for peak calling by `MACS2 <https://github.com/macs3-project/MACS>`_.
+``peak mode`` is either ``[sharp|broad|sharp-nomodel|broad-nomodel]``. This parameter is used for peak calling by `MACS3 <https://macs3-project.github.io/MACS/>`_.
 
-Because MACS2 is not designed for small genomes such as yeast, the fragment length estimation sometimes fails.
+Because MACS3 is not designed for small genomes such as yeast, the fragment length estimation sometimes fails.
 Therefore here we specify ``sharp-nomodel`` that skips the model building.
 
 .. code-block:: bash

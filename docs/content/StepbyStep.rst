@@ -1,7 +1,7 @@
 Step-by-step analysis (ChIP-seq, human)
 =================================================
 
-Here we show the step-by-step ChIP-seq analysis using **Churros**. See also the sample scripts in the `tutorial <https://github.com/rnakato/Churros/tree/main/tutorial/human>`_ on GitHub.
+Here we show the step-by-step ChIP-seq analysis using **Churros**. See also the sample scripts in the `tutorial <https://github.com/rnakato/Churros/tree/main/tutorial>`_ on GitHub.
 
 .. note::
 
@@ -68,6 +68,8 @@ When using paired-end fastqs, use the second and the third columns to specify th
 
 `gen_samplelist.sh -p <https://churros.readthedocs.io/en/latest/content/Commands.html#utility-tools>`_ makes the samplelist.txt for paired-end samples.
 
+Please do not separate paired-end fastqs with commas, as this will treat the reads as single-end.
+
 .. code-block:: bash
 
     gen_samplelist.sh -p fastq/ > samplelist.txt
@@ -128,7 +130,7 @@ Prepare sample pair list
 
 ChIP and input sample labels should be identical to those in ``samplelist.txt``.
 ``prefix`` is used for the output files.
-``peak mode`` is either ``[sharp|broad|sharp-nomodel|broad-nomodel]``. This parameter is used for peak calling by `MACS2 <https://github.com/macs3-project/MACS>`_.
+``peak mode`` is either ``[sharp|broad|sharp-nomodel|broad-nomodel]``. This parameter is used for peak calling by MACS3.
 
 Input samples can be omitted if unavailable.
 
@@ -151,7 +153,7 @@ In addition, **Churros** also has a script `gen_samplepairlist.sh <https://churr
 churros_mapping: mapping reads
 --------------------------------------------------
 
-``churros_mapping`` takes FASTQ and maps reads to the genome specified by Bowtie2 by default.
+``churros_mapping`` takes FASTQ and maps reads to the genome specified by `Bowtie2 <https://bowtie-bio.sourceforge.net/bowtie2/index.shtml>`_ by default.
 The mapped reads are then quality-checked and converted to BigWig files.
 
 .. code-block:: bash
