@@ -338,7 +338,7 @@ Therefore, ``churros_compare`` also estimates peak overlap for **top-ranked 2000
 
 - The results include three types of comparisons.
     - ``bigwigCorrelation/`` ... Spearman correlation of read distributions in 100 bp and 100 kbp bins from `deepTools plotCorrelation <https://deeptools.readthedocs.io/en/develop/content/tools/plotCorrelation.html>`_. This score evaluates the similarity of the entire genome including non-peak regions. Therefore, the results may reflect the genome-wide features (e.g., GC bias and copy number variation) rather than peak overlap.
-    - ``Peak_BPlevel_overlap/`` ... results of the base-pair level overlap of peaks (Jaccard index) using `BEDtools jaccard <https://bedtools.readthedocs.io/en/latest/content/tools/jaccard.html>`_. This score is good for broad peaks such as some histone modifications (H3K27me3 and H3K36me3).
+    - ``Peak_BPlevel_overlap/`` ... results of the base-pair level overlap of peaks (Jaccard index) using `BEDtools jaccard <https://bedtools.readthedocs.io/en/latest/content/tools/jaccard.html>`_. This score is good for broad histone modifications (e.g., H3K27me3 and H3K36me3).
     - ``Peak_Number_overlap/`` ... results of peak-number level comparison (Simpson index). ``PairwiseComparison/`` contains the results of all pairs (overlapped peak list and Venn diagram) and the ``Peaks`` contains the top-ranked peaks of samples. This score is good for comparing sharp peaks such as transcription factors.
 
 
@@ -359,7 +359,7 @@ Therefore, ``churros_compare`` also estimates peak overlap for **top-ranked 2000
 churros_genPvalwig: generate P-value distribution as bedGraph
 --------------------------------------------------------------------
 
-``churros_genPvalwig`` generates a -log10(P-value) distribution in bedGraph format. The P-value of upregulation and downregulation is output separately. This bedGraph file is suitable for the ChIP-seq imputation. The results are output in ``drompa+.pval/``.
+``churros_genPvalwig`` generates a -log10(P-value) distribution in bedGraph format. The P-value of upregulation and downregulation is output separately. The results are output in ``drompa+.pval/``.
 
 .. note::
 
