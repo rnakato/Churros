@@ -1,17 +1,19 @@
 Peakheatmap: Large-scale profile analysis
 =================================================
 
-**Churros** provides a ``peakheatmap`` function for clustering and visualizing large-scale epigenomic profiles.
-This function takes regions of interest (e.g., specific protein binding sites) as input 1 and a folder of epigenomic signal files (either binary or continuous) as input 2.
+**Churros** provides commands for clustering and visualizing large-scale peak profiles.
+These functions take a reference region (BED format) and cluster regions based on the overlap pattern of peaks or bigWig profiles.
 
-    - In the binary mode, ``peakheatmap`` outputs a binary matrix (output 1) representing the overlap of epigenomic markers at given genomic regions. The binary matrix is then formatted and sorted by the user-defined column (i.e., the filename of the selected marker) to generate the processed matrix (output 2) and plot the sorted heatmap (output 3). Subsequently, ``peakheatmap`` utilizes PCA followed by k-means clustering  (or other clustering methods) to produce the clustered matrix (output 4) and the clustered heatmap (output 5).
-    - In the continuous mode, ``peakheatmap`` calculates the averaged read density of each epigenomic marker at given genomic regions (output 1). After logarithmic transformation, z-score normalization (optional method is 0-to-1 scaling), and sorting, ``peakheatmap`` generates the remaining outputs in the same manner as in binary mode.
+peakheatmap_binary: Binary comparison
+--------------------------------------------------------------------
+
+In the binary mode, ``peakheatmap`` outputs a binary matrix (output 1) representing the overlap of epigenomic markers at given genomic regions. The binary matrix is then formatted and sorted by the user-defined column (i.e., the filename of the selected marker) to generate the processed matrix (output 2) and plot the sorted heatmap (output 3). Subsequently, ``peakheatmap`` utilizes PCA followed by k-means clustering  (or other clustering methods) to produce the clustered matrix (output 4) and the clustered heatmap (output 5).
 
 The main usages are:
 
 .. code-block:: bash
 
-   churros_peakheatmap mode region directory \
+   peakheatmap_binary region directory \
      [-k kcluster] [-s sortname] [-l samplelabel] [-n normalize type] [-m cluster method]
 
 The required parameters:
@@ -66,9 +68,12 @@ Five output files are generated:
    Output5_kmeans_heatmap.png
 
 
-Example usage of continuous mode
-++++++++++++++++++++++++++++++++++++++++
+peakheatmap_quantitative: Quantitative comparison
+--------------------------------------------------------------------
+
+``peakheatmap_quantitative`` calculates the averaged read density of each epigenomic marker at given genomic regions (output 1). 
+After logarithmic transformation, z-score normalization (optional method is 0-to-1 scaling), and sorting, it generates the remaining outputs in the same manner as in binary mode.
 
 .. code-block:: bash
 
-   churros_peakheatmap -l samplelabel.tsv -s GATA3_ENCSR000EWV_rep1.bw -k 3 -n zscore continuous Rad21_ENCSR000BTQ_rep1_peaks.narrowPeak ./bwdir/
+   peakheatmap_binary -l samplelabel.tsv -s GATA3_ENCSR000EWV_rep1.bw -k 3 -n zscore continuous Rad21_ENCSR000BTQ_rep1_peaks.narrowPeak ./bwdir/
