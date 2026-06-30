@@ -2,7 +2,7 @@ Quick start (ChIP-seq, *S. cerevisiae*)
 =======================================
 
 This tutorial is for the analysis of `S. cerevisiae`. For human analysis, see :doc:`Quickstart`.
-The sample scripts are also available at `Churros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial/yeast>`_.
+The sample scripts are also available at `Churros GitHub site <https://github.com/rnakato/Churros/tree/main/tutorial/02.ChIP-seq_yeast>`_.
 
 .. note::
 
