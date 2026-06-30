@@ -35,7 +35,7 @@ Here we use Scc1 and RPO21 ChIP-seq data from `Jeppsson et al., Science Advance,
     build=sacCer3
     ncore=24
     # download the genome
-    download_genomedata.sh $build Referencedata_$build/ 2>&1 | tee log/Referencedata_$build
+    download_genomedata.sh -s $build Referencedata_$build/ 2>&1 | tee log/Referencedata_$build
     # make Bowtie2 index
     build-index.sh -p $ncore bowtie2 Referencedata_$build
 
@@ -63,7 +63,7 @@ Multiple fastq files can be specified by separateing with ``,``.
     InputRPO21_thiolutin    fastq/SRR13065975.fastq.gz
 
 .. note:: 
-    See :ref:`label_samplelist_pairedend` for paired-end fastqs.
+    See `label_samplelist_pairedend <https://churros.readthedocs.io/en/latest/content/StepbyStep.html#id11>` for paired-end fastqs.
 
 samplepairlist.txt
 ++++++++++++++++++++++++++

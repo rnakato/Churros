@@ -57,7 +57,7 @@ Here we use five histone modification data of HepG2 cells from `ENCODE Project <
     ncore=12    # number of CPUs
 
     # download the genome
-    download_genomedata.sh $build $Ddir 2>&1 | tee log/$Ddir
+    download_genomedata.sh -s $build $Ddir 2>&1 | tee log/$Ddir
 
     # make Bowtie2 index
     build-index.sh -p $ncore bowtie2 $Ddir
