@@ -10,6 +10,9 @@ The sample scripts are also available at `Churros GitHub site <https://github.co
    | This tutorial assumes using the **Churros** singularity image (``churros.sif``). Please add ``apptainer exec churros.sif`` before each command below.
    | Example: ``apptainer exec churros.sif download_genomedata.sh``
 
+.. contents:: 
+   :depth: 3
+
 
 Get data
 ------------------------
