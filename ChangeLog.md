@@ -11,7 +11,7 @@
   - Added ``--detect_adapter_for_pe`` option to `fastp` in `churros` for paired-end samples. This option allows `fastp` to automatically detect the adapter sequences for paired-end data, which can improve the accuracy of adapter trimming.
   - Updated Bioconductor 3.22 to 3.23
   - Added ``tobias.sh`` to run TOBIAS for footprinting analysis.
-  - Added [SEACR](https://github.com/FredHutch/SEACR) for peak calling of CUT&RUN/CUT&Tag data.
+  - Added [SEACR](https://github.com/FredHutch/SEACR) and ``churros_SEACR`` for peak calling of CUT&RUN/CUT&Tag data.
   - Added ``plot_fragmentlength.sh`` to plot the fragment length distribution of the mapped reads.
   - Added [ENCODE_Blacklist_v2](https://github.com/Boyle-Lab/Blacklist) in the ``/opt`` directory.
   - Added JASPER motif files 2026 in the ``/opt`` directory.
