@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2.0.0 (2026.6.30): Major update
-  - **Important**: Updated **Churros** to use MACS3 insated of MACS2 for peak calling.
+  - **Important**: Updated **Churros** to use MACS3 instead of MACS2 for peak calling.
       - Added [MACS3](https://macs3-project.github.io/MACS/index.html).
       - Added ``macs3.sh`` to excuse macs3 instead of macs2 in ``macs.sh``.
   - Added a new genome build ``Medaka``.
