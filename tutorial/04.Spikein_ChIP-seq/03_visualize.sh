@@ -7,5 +7,6 @@ Ddir=Referencedata_$build
 $sing churros_visualize samplepairlist.txt drompa+ $build $Ddir
 
 # Spike-in normalization (in the pdf_spikein directory)
-$sing churros_visualize --pdfdir pdf_spikein --chipdirectory Spikein --inputdirectory TotalReadNormalized \
-                        samplepairlist.txt drompa+ $build $Ddir
+#$sing churros_visualize --pdfdir pdf_spikein --chipdirectory Spikein --inputdirectory TotalReadNormalized \
+#                        samplepairlist.txt drompa+ $build $Ddir
+$sing churros_visualize --spikein samplepairlist.txt drompa+ $build $Ddir

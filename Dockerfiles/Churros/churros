@@ -570,6 +570,8 @@ def do_visualize(args, chdir, build, samplepairlist, Ddir, is_spikein):
         param_churros_visualize += " --preset T2T "
     if args.nofilter:
         param_churros_visualize += " --nofilter --pdfdir pdf_nofilter"
+    if args.keepfullpdf:
+        param_churros_visualize += " --keepfullpdf"
 
     print (f"The log files are in {logfile}")
     if args.preset == "scer":
@@ -604,6 +606,7 @@ if(__name__ == '__main__'):
     parser.add_argument("--macsdir", help="Output directory of MACS3 (default: 'macs')", type=str, default="macs")
     parser.add_argument("--mapparam", help="Additional parameter for bowtie|bowtie2 (shouled be quated)", type=str, default="")
     parser.add_argument("--parse2wigparam", help="Additional parameter for parse2wig+ (shouled be quated)", type=str, default="")
+    parser.add_argument("--keepfullpdf", help="(For visualization) Keep the full PDF output", action="store_true")
     parser.add_argument("--spikein", help="Spike-in mode", action="store_true")
     parser.add_argument("--build_spikein", help="(For Spike-in mode) Genome build of spikein genome (e.g., mm39)", type=str)
     parser.add_argument("--Ddir_spikein", help="(For Spike-in mode) Directory of spikein genome data", type=str)

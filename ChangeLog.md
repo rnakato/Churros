@@ -8,6 +8,7 @@
   - Added ``--keepdup`` option to ``churros`` and ``-a`` option to ``churros_callpeak`` to specify whether to remove PCR duplicates in MACS3 peak calling. By default, PCR duplicates are removed (``--keep-dup 1``) except for yeast samples, but with the `-a` option, all duplicates will be kept (``--keep-dup all``).
   - Added ``--atac`` option to ``churros`` and ``-A`` option to ``churros_callpeak`` for ATAC-seq analysis. This option enables the use of HMMRATAC for peak calling in ATAC-seq data.
   - Updated ``churros`` and ``churros_visualize`` to address FutureWarnings.
+  - Added ``--spikein`` option to ``churros_visualize``, which added the parameter ``--pdfdir pdf_spikein --chipdirectory Spikein --inputdirectory TotalReadNormalized -P "--pthre_enrich 3 --scale_pvalue 3"`` to it.
   - Added ``--detect_adapter_for_pe`` option to `fastp` in `churros` for paired-end samples. This option allows `fastp` to automatically detect the adapter sequences for paired-end data, which can improve the accuracy of adapter trimming.
   - Updated Bioconductor 3.22 to 3.23
   - Added ``tobias.sh`` to run TOBIAS for footprinting analysis.

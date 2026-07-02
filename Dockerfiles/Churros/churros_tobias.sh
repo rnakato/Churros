@@ -108,6 +108,7 @@ do
         Churros_result/hg38/tobias/${label}/${label}.sort_uncorrected.bw \
         Churros_result/hg38/tobias/${label}/${label}.sort_expected.bw \
         Churros_result/hg38/tobias/${label}/${label}.sort_corrected.bw \
+        Churros_result/hg38/tobias/${label}/${label}_footprints.bw  \
     --output Churros_result/hg38/tobias/${label}/${logo}_footprint_aggregate.pdf \
     --share_y sites \
     --plot_boundaries \

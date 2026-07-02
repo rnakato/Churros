@@ -180,7 +180,6 @@ def visualize_PCENRICH(args, param, samplepairlist, chipdir, inputdir, pdfdir, l
         param += " --showratio 2"
     if args.preset != "scer" and args.keepfullpdf != True:
         param += " --showchr "
-
     df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
 
     if not is_exist_input(samplepairlist):
@@ -216,7 +215,6 @@ def visualize_PCENRICH(args, param, samplepairlist, chipdir, inputdir, pdfdir, l
 def visualize_PCSHARP(args, param, samplepairlist, chipdir, inputdir, pdfdir, logdir, fileext, post, Ddir, chdir):
     if args.pvalue:
         param += " --showctag 0 --showpenrich 1"
-
     param += " --callpeak"
     if args.preset != "scer" and args.keepfullpdf != True:
         param += " --showchr "
@@ -278,11 +276,20 @@ if(__name__ == '__main__'):
     parser.add_argument("--bowtie1", help="Specified bowtie1", action="store_true")
     parser.add_argument("-P","--drompaparam", help="Additional parameters for DROMPA+ (shouled be quated)", type=str, default="")
     parser.add_argument("-G", help="Genome-wide view (100kbp)", action="store_true")
+    parser.add_argument("--spikein", help="Spike-in mode", action="store_true")
     parser.add_argument("--enrich", help="PC_ENRICH: show ChIP/Input ratio (preferred for yeast)", action="store_true")
     parser.add_argument("--logratio", help="(for PC_ENRICH) Show log-scaled ChIP/Input ratio", action="store_true")
     parser.add_argument("--preset", help="Preset parameters for mapping reads ([scer|T2T])", type=str, default="")
 
     args = parser.parse_args()
+
+    # Spike-in mode
+    if args.spikein:
+        args.pdfdir = "pdf_spikein"
+        args.chipdirectory = "Spikein"
+        args.inputdirectory = "TotalReadNormalized"
+        args.drompaparam += " --pthre_enrich 3 --scale_pvalue 3"
+
 #    print(args)
 
     if args.preset != "":
