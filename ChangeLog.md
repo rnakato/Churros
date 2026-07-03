@@ -17,6 +17,7 @@
   - Added [ENCODE_Blacklist_v2](https://github.com/Boyle-Lab/Blacklist) in the ``/opt`` directory.
   - Added JASPER motif files 2026 in the ``/opt`` directory.
   - Added directories and scripts for ATAC-seq and CUT&Tag analyses in the ``tutorial/`` directory.
+  - Added [edirect](https://manpages.debian.org/testing/ncbi-entrez-direct/edirect.1.en.html)
   - Moved ``epilogos`` to a separated virtual environment ``epilogos``.
   - Added ``download_Ecoli.sh`` and ``download_Lambdaphage.sh``.
   - Added ``isnumber.sh``

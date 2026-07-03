@@ -101,15 +101,15 @@ for logo in CTCF_MA0139.2 `sort -k6,6nr $odir/${label}/tobias_bindetect/bindetec
 do
     TOBIAS PlotAggregate \
     --TFBS \
-        Churros_result/hg38/tobias/${label}/tobias_bindetect/${logo}/beds/${logo}_all.bed \
-        Churros_result/hg38/tobias/${label}/tobias_bindetect/${logo}/beds/${logo}_${label}_bound.bed \
-        Churros_result/hg38/tobias/${label}/tobias_bindetect/${logo}/beds/${logo}_${label}_unbound.bed \
+        ${odir}/${label}/tobias_bindetect/${logo}/beds/${logo}_all.bed \
+        ${odir}/${label}/tobias_bindetect/${logo}/beds/${logo}_${label}_bound.bed \
+        ${odir}/${label}/tobias_bindetect/${logo}/beds/${logo}_${label}_unbound.bed \
     --signals \
-        Churros_result/hg38/tobias/${label}/${label}.sort_uncorrected.bw \
-        Churros_result/hg38/tobias/${label}/${label}.sort_expected.bw \
-        Churros_result/hg38/tobias/${label}/${label}.sort_corrected.bw \
-        Churros_result/hg38/tobias/${label}/${label}_footprints.bw  \
-    --output Churros_result/hg38/tobias/${label}/${logo}_footprint_aggregate.pdf \
+        ${odir}/${label}/${label}.sort_uncorrected.bw \
+        ${odir}/${label}/${label}.sort_expected.bw \
+        ${odir}/${label}/${label}.sort_corrected.bw \
+        ${odir}/${label}/${label}_footprints.bw  \
+    --output ${odir}/${label}/${logo}_footprint_aggregate.pdf \
     --share_y sites \
     --plot_boundaries \
     2>&1 | tee $odir/${label}/TOBIAS_PlotAggregate.$logo.log
