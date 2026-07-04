@@ -48,7 +48,11 @@ tutorial/08.CUTandTAG/fastq/
 tutorial/08.CUTandTAG/Churros_result/
 tutorial/01.ChIP-seq_human/Churros_result_noinput/
 tutorial/06.peakheatmap/archive/
-
+tutorial/06.peakheatmap/output_binary/
+tutorial/06.peakheatmap/output_quantitative/
+tutorial/06.peakheatmap/peakdir/
+tutorial/06.peakheatmap/peaks.tar.gz
+tutorial/06.peakheatmap/reference.bed
 tutorial/archive/
 Dockerfiles/log/
 Dockerfiles/testrun.log
