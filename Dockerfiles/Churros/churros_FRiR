@@ -1,0 +1,132 @@
+#!/bin/bash
+cmdname=`basename $0`
+function usage()
+{
+    echo "$cmdname [Options] <samplelist> <Churrosdir> <build> <Ddir>" 1>&2
+    echo '   <samplelist>: List of samples' 1>&2
+    echo '   <Churrosdir>: Churros output directory' 1>&2
+    echo '   <build>: Genome build' 1>&2
+    echo '   <Ddir>: Directory of reference genome' 1>&2
+    echo '   Options:' 1>&2
+    echo '      -p <int>: Number of threads (default: 4)' 1>&2
+    echo '   Example:' 1>&2
+    echo "      $cmdname samplelist.txt Churros_result hg38 Referencedata_hg38" 1>&2
+}
+
+ncore=4
+while getopts p: option
+do
+    case ${option} in
+        p) ncore=${OPTARG};;
+        *)
+            usage
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+if test $# -ne 4; then
+    usage
+    exit 0
+fi
+
+samplelist=$1
+chdir=$2
+build=$3
+Ddir=$4
+
+FRiRdir=$chdir/$build/FRiR
+BAMdir=$chdir/$build/bam
+
+ex(){ echo $1; eval $1; }
+export -f ex
+
+mkdir -p $FRiRdir
+
+do_FRiR(){
+    label=$1
+    Ddir=$2
+    FRiRdir=$3
+    BAMdir=$4
+
+    IPbam=$BAMdir/$label.sort.bam
+
+    for ty in class family; do
+        if [ ! -f $FRiRdir/$label.$ty.txt ]; then
+            ex "FRiR.sh -o $FRiRdir -s $ty $IPbam $label.$ty.txt $Ddir"
+        else
+            echo "$FRiRdir/$label.$ty.txt exists. Skipping.."
+        fi
+    done
+}
+export -f do_FRiR
+
+array=""
+while read -r LINE || [ -n "$LINE" ]; do
+    LINE=($LINE)
+    prefix=${LINE[0]}
+    array="$array $prefix"
+done < $samplelist
+
+echo ${array[@]} | tr ' ' '\n' \
+    | xargs -I {} -P $ncore bash -c "do_FRiR {} \"$Ddir\" \"$FRiRdir\" \"$BAMdir\""
+
+for ty in class family; do
+    s=""
+    for label in $array; do
+    	s="$s $FRiRdir/$label.$ty.txt"
+    done
+
+    outfile="$FRiRdir/Allsample.$ty.txt"
+    outfig="$FRiRdir/Allsample.$ty.png"
+
+    echo "combine_FRiRfiles $s > $outfile"
+
+    INPUT_FILE="$outfile" \
+    OUTPUT_FILE="$outfig" \
+    TYPE="$ty" \
+    python - <<'PY'
+import os
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+input_file = os.environ["INPUT_FILE"]
+output_file = os.environ["OUTPUT_FILE"]
+data_type = os.environ["TYPE"]
+
+df = pd.read_csv(
+    input_file,
+    sep="\t",
+    index_col=0
+)
+
+df.replace([np.inf, -np.inf], 0, inplace=True)
+
+if data_type == "class":
+    figsize = (10, 10)
+else:
+    figsize = (10, 20)
+
+g = sns.clustermap(
+    df,
+    cmap="coolwarm",
+    center=0,
+    linewidths=0.3,
+    figsize=figsize,
+    method="average",
+    metric="euclidean"
+)
+
+g.savefig(
+    output_file,
+    dpi=300,
+    bbox_inches="tight"
+)
+
+plt.close("all")
+PY
+done

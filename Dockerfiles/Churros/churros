@@ -85,7 +85,11 @@ def check_dir(dir):
         exit()
 
 def check_fastq_in_samplelist(samplelist):
-    df = pd.read_csv(samplelist, sep=r'\s+', header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
+    try:
+        df = pd.read_csv(samplelist, sep=r'\s+', header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
+    except Exception as e:
+        print(f"Error: Failed to read {samplelist}. Please check the file format. Exception: {e}")
+        exit()
 
     for index, row in df.iterrows():
         if (len(row)<2 or row[1] == ""):
@@ -336,7 +340,11 @@ def make_samplepairlist_withflen(samplepairlist, build, chdir):
     if(os.path.isfile(samplepairlist_withflen)):
         os.remove(samplepairlist_withflen)
 
-    df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
+    try:
+        df = pd.read_csv(samplepairlist, sep=",", header=None, skip_blank_lines=True, dtype=str, keep_default_na=False)
+    except Exception as e:
+        print(f"Error: Failed to read {samplepairlist}. Please check the file format. Exception: {e}")
+        exit()
 
     for index, row in df.iterrows():
         if all(str(cell).strip() == "" for cell in row):

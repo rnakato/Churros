@@ -5,7 +5,6 @@ function usage()
     echo "$cmdname [Options] <fastq> <prefix> <Ddir>" 1>&2
     echo '   <fastq>: fastq file' 1>&2
     echo '   <prefix>: output prefix' 1>&2
-#    echo '   <build>: genome build (e.g., hg38)' 1>&2
     echo '   <Ddir>: directory of bowtie index' 1>&2
     echo '   Options:' 1>&2
     echo '      -t STR: for SOLiD data ([fastq|csfata|csfastq], defalt: fastq)' 1>&2
@@ -53,7 +52,6 @@ fi
 
 fastq=$1
 prefix=$2
-#build=$3
 Ddir=$3
 post=`echo $param | tr -d ' '`
 
@@ -62,10 +60,8 @@ bamdir=$chdir/$bamdir
 mkdir -p $logdir $bamdir
 
 if test $format = "BAM"; then
-#    file=$bamdir/$prefix$post-$build.sort.bam
     file=$bamdir/$prefix$post.sort.bam
 else
-#    file=$bamdir/$prefix$post-$build.sort.cram
     file=$bamdir/$prefix$post.sort.cram
 fi
 

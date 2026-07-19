@@ -184,7 +184,7 @@ if test $1 = "header"; then
             a=`cat $statsdir/$prefix.stats.singleline.GC.tsv | head -n1 | cut -f1,2`
         else
             if test $csfasta -eq 1; then
-                a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | head -n1 | cut -f2-`
+                a=`parsebowtielog.pl $pair $logdir/bowtie/$prefix.txt | head -n1`
             else
                 a=`parsebowtielog2.pl $pair $logdir/bowtie2/$prefix.txt | head -n1 | cut -f2-`
             fi

@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.1.0 (2026.7.19):
+  - Updated ``FRiR.sh`` to accept the directory of the reference genome as an argument instead of the genome build name. It outputs both class and family FRiR results.
+  - Added ``churros_FRiR`` to run ``FRiR.sh`` for multiple samples in ``samplelist.txt``.
+  - Bug fix in ``download_genomedata.sh`` where the RepeatMasker.txt.gz was not downloaded successfully
+  - Added the repeatmasker file for the following genomes:
+    - Mus_musculus.GRCm39
+    - Rattus_norvegicus.GRCr8
+    - Danio_rerio.GRCz11
+    - Gallus_gallus.GRCg6a
+    - Xenopus_tropicalis.xenLae2
+    - Drosophila_melanogaster.BDGP6
+    - Caenorhabditis_elegans.WBcel235
+
 ## 2.0.0 (2026.6.30): Major update
   - **Important**: Updated **Churros** to use MACS3 instead of MACS2 for peak calling.
       - Added [MACS3](https://macs3-project.github.io/MACS/index.html).

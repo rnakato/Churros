@@ -1,0 +1,69 @@
+#!/bin/bash
+
+files=$@
+
+awk -F '\t' -v OFS='\t' '
+FNR == 1 {
+    if ($6 != "log10(read/length)") {
+        printf "ERROR: sixth column is not log10(read/length): %s\n", FILENAME > "/dev/stderr"
+        bad = 1
+    }
+
+    sample = FILENAME
+    sub(/^.*\//, "", sample)
+    sub(/\.class\.tsv$/, "", sample)
+
+    samples[++n] = sample
+    if (n == 1)
+        label_header = $1
+
+    next
+}
+
+{
+    row = FNR - 1
+
+    if (n == 1) {
+        labels[row] = $1
+        nrow = row
+    } else if ($1 != labels[row]) {
+        printf "ERROR: label mismatch in %s at row %d: %s != %s\n",
+               FILENAME, row, $1, labels[row] > "/dev/stderr"
+        bad = 1
+    }
+
+    values[row, n] = $6
+    rows_in_file[n] = row
+}
+
+END {
+    for (j = 2; j <= n; j++) {
+        if (rows_in_file[j] != nrow) {
+            printf "ERROR: row-count mismatch in %s\n",
+                   samples[j] > "/dev/stderr"
+            bad = 1
+        }
+    }
+
+    if (bad)
+        exit 1
+
+    printf "%s", label_header
+    for (j = 1; j <= n; j++)
+        printf OFS "%s", samples[j]
+    print ""
+
+    for (i = 1; i <= nrow; i++) {
+        printf "%s", labels[i]
+        for (j = 1; j <= n; j++)
+            printf OFS "%s", values[i, j]
+        print ""
+    }
+}
+
+' $files | sed -e 's/.class.txt//g' -e 's/.family.txt//g' |
+{
+    IFS= read -r header
+    printf '%s\n' "$header"
+    LC_ALL=C sort -t $'\t' -k1,1
+} 
