@@ -82,6 +82,7 @@ for ty in class family; do
     outfig="$FRiRdir/Allsample.$ty.png"
 
     echo "combine_FRiRfiles $s > $outfile"
+    combine_FRiRfiles $s > $outfile
 
     INPUT_FILE="$outfile" \
     OUTPUT_FILE="$outfig" \

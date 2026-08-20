@@ -120,7 +120,6 @@ else
 fi
 
 
-
 func_stats(){
     head=$1
     fq1=$2
@@ -209,6 +208,7 @@ if test $command = "stats"; then
         prefix=${LINE[0]}
         fq1=${LINE[1]}
         fq2=${LINE[2]}
+
         func_stats "$prefix" "$fq1" "$fq2"
     done < $samplelist
     exit 0
@@ -341,10 +341,18 @@ if test $command = "postprocess" -o $command = "exec"; then
             fi
 
             ln -sf $mapfile $chdir/$bamdir/$prefix.sort.bam
-        elif test $format = "CRAM"; then
-            mapfile=$chdir/$bamdir/$prefix.sort.cram
         else
-            mapfile=$chdir/$bamdir/$prefix.sort.bam
+#            if test $csfasta -eq 1; then
+#                post=`echo $bowtieparam | tr -d ' '`
+#                prefix2=$prefix$post
+#            else
+#                prefix2=$prefix
+#            fi
+            if test $format = "CRAM"; then
+                mapfile=$chdir/$bamdir/$prefix.sort.cram
+            else
+                mapfile=$chdir/$bamdir/$prefix.sort.bam
+            fi
         fi
 
         func_postprocess $prefix "$fq1" "$fq2" $mapfile

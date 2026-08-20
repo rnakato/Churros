@@ -29,10 +29,24 @@ with open(samplepairlist, 'r') as file:
         data_dict[key] = value
 
 column_name = data.columns.get_loc("Sample")
-column_maprate = data.columns.get_loc("Mapped 1 time") + 1
+#column_maprate = data.columns.get_loc("Mapped 1 time") + 1
 column_uniquereads = data.columns.get_loc("Nonredundant")
 column_complexity = data.columns.get_loc("Complexity for10M")
 column_genomecov = data.columns.get_loc("Genome coverage")
+
+maprate_candidates = ["Mapped 1 time", "mapped unique"]
+
+maprate_column = next(
+    (column for column in maprate_candidates if column in data.columns),
+    None
+)
+
+if maprate_column is None:
+    raise KeyError(
+        f"Map-rate column not found. Expected one of: {maprate_candidates}"
+    )
+
+column_maprate = data.columns.get_loc(maprate_column) + 1
 
 if "GC summit" in data.columns:
     column_GC = data.columns.get_loc("GC summit")

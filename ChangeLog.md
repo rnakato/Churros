@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.1 (2026.8.20):
+  - Bug fix in ``churros`` and ``churros_mapping`` where ``ssp.sh`` did not run correctly when the ``--csfastq`` option was specified.
+  - Bug fix in ``checkQC.py`` when the ``--csfastq`` option was specified.
+  - Changed the name of output files of ``bowtie.sh`` not to include the mapping parameter.
+  - Fixed the FutureWarning in ``churros``: Calling int on a single element Series is deprecated and will raise a TypeError in the future. Use int(ser.iloc[0]) instead
+  flen = int(sspstats["fragment length"])
+
 ## 2.1.0 (2026.7.19):
   - Updated ``FRiR.sh`` to accept the directory of the reference genome as an argument instead of the genome build name. It outputs both class and family FRiR results.
   - Added ``churros_FRiR`` to run ``FRiR.sh`` for multiple samples in ``samplelist.txt``.

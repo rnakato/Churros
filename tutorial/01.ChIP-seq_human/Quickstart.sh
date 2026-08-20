@@ -1,4 +1,4 @@
-sing="apptainer exec --bind /work,/work2,/work3 /work/SingularityImages/churros.2.1.0.sif"
+sing="apptainer exec --bind /work,/work2,/work3 /work/SingularityImages/churros.2.1.1.sif"
 
 build=hg38
 Ddir=Referencedata_$build

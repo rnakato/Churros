@@ -10,7 +10,7 @@ function usage()
     echo '      -t STR: for SOLiD data ([fastq|csfata|csfastq], defalt: fastq)' 1>&2
     echo '      -c: output as CRAM format (defalt: BAM)' 1>&2
     echo '      -p INT: number of CPUs (default: 12)' 1>&2
-    echo '      -P "STR": parameter of bowtie (shouled be quated, default: "-n2 -m1")' 1>&2
+    echo '      -P "STR": parameter of bowtie (shouled be quated)' 1>&2
     echo '      -D: output dir (defalt: ./)' 1>&2
     echo "   Example:" 1>&2
     echo "      For single-end: $cmdname -P \"-n2 -m1\" chip.fastq.gz chip Referencedata_hg38" 1>&2
@@ -53,7 +53,7 @@ fi
 fastq=$1
 prefix=$2
 Ddir=$3
-post=`echo $param | tr -d ' '`
+#post=`echo $param | tr -d ' '`
 
 logdir=$chdir/log/bowtie
 bamdir=$chdir/$bamdir

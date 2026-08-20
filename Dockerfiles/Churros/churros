@@ -364,7 +364,8 @@ def make_samplepairlist_withflen(samplepairlist, build, chdir):
             continue
 
         sspstats = pd.read_csv(chdir + '/sspout/' + chip + '.stats.txt', sep="\t", header=0)
-        flen = int(sspstats["fragment length"])
+        #flen = int(sspstats["fragment length"])
+        flen = int(sspstats["fragment length"].iloc[0])
 
         with open(samplepairlist_withflen, 'a') as f:
             print(f"{chip},{input},{label},{mode},{flen}", file=f)
