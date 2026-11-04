@@ -328,53 +328,6 @@ def mapping_spikein(args):
         create_spikein_bw(args, odir_ref, chip, nNormed)
 
 
-def mapping_spikein_old(args):
-    samplelist = pd.read_csv(args.samplelist, sep="\t", header=None)
-    samplelist.fillna("", inplace=True)
-
-    odir_ref = f'{args.outputdir}/{args.build}'
-    odir_spikein = f'{args.outputdir}/{args.build_spikein}'
-
-    for index, row in samplelist.iterrows():
-        prefix = row[0]
-        fq1 = row[1]
-        if (len(row)>2):
-            fq2 = row[2]
-        else:
-            fq2 = ""
-        func_map(args, odir_ref, odir_spikein, prefix, fq1, fq2)
-        func_postprocess(args, odir_ref, odir_spikein, prefix, fq1, fq2)
-
-    sfdir = f'{odir_ref}/spikein_scalingfactor'
-    sffile = f'{sfdir}/scaling_factors.tsv'
-    os.makedirs(sfdir, exist_ok=True)
-
-    df = pd.read_csv(args.samplepairlist, sep=",", header=None)
-    df.fillna("", inplace=True)
-    on = 0
-    for index, row in df.iterrows():
-        chip  = row[0]
-        input = row[1]
-        label = row[2]
-
-        if args.nofilter:
-            chip  = f'{chip}-nofilter'
-            input = f'{input}-nofilter'
-
-        if args.spikein_simple:
-            nNormed = Output_scalingfactor_Orlando(args, chip, input, label, odir_ref, odir_spikein, sfdir)
-        else:
-            nNormed = Output_scalingfactor_Hu(args, chip, input, label, odir_ref, odir_spikein, sfdir)
-
-        if on == 0:
-            print_and_exec_shell(f"cat {sfdir}/{label}.tsv > {sffile}")
-            on = 1
-        else:
-            print_and_exec_shell(f"tail -n1 {sfdir}/{label}.tsv >> {sffile}")
-
-        create_spikein_bw(args, odir_ref, chip, nNormed)
-
-
 def func_stats(args):
     odir_ref = f'{args.outputdir}/{args.build}'
 
