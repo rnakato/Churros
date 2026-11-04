@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0 (2026.11.5):
+- Bug fix in ``churros_mapping_spikein`` when the ``--nofilter`` option was specified.
+- Bug fix in ``parse2wig+.sh`` where the bigwig files in the ``RawCount/`` directory were not being skipped if they already existed and the ``--nofilter`` option was specified.
+
 ## 2.1.1 (2026.8.20):
   - Bug fix in ``churros`` and ``churros_mapping`` where ``ssp.sh`` did not run correctly when the ``--csfastq`` option was specified.
   - Bug fix in ``checkQC.py`` when the ``--csfastq`` option was specified.

@@ -152,7 +152,7 @@ func(){
         rdir=$pdir/RawCount
         mkdir -p $rdir
         for b in $bins; do
-            file=$rdir/$prefix$mppost.$b.bw
+            file=$rdir/$prefix$mppost$filterpost.$b.bw
             if [ -e "$file" ] && [ "$(wc -c < "$file")" -ge 1000 ] && [ "$force" -eq 0 ]; then
                 echo "$file already exists. skipping"
             else

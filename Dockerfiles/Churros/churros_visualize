@@ -78,6 +78,7 @@ def do_churros_visualize(args):
     inputdir = chdir + "/bigWig/" + args.inputdirectory + "/"
 
     fileext = "bw"
+    post = ""
 
     if args.postfix != "":
         post = args.postfix
@@ -85,7 +86,6 @@ def do_churros_visualize(args):
         if args.nompbl:
             post = ""
         else:
-#            post = ".mpbl"
             post = ""
         if args.nofilter:
             post += "-nofilter"

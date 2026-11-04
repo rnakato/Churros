@@ -28,7 +28,6 @@ def echo_and_print_and_exec_shell(command, logfile):
     os.system("echo '" + command + "' >" + logfile)
     print_and_exec_shell(command)
 
-
 def check_file(file):
     if os.path.isfile(file):
         pass
@@ -43,6 +42,17 @@ def check_dir(dir):
         print ("Error: " + dir + " does not exist.")
         exit()
 
+def check_spikein_reads(sample, nreads, min_reads):
+    if nreads < min_reads:
+        print(
+            f"Warning: {sample} has only {nreads:,} spike-in reads "
+            f"(threshold: {min_reads:,}). "
+            "Spike-in normalization may be unreliable. "
+            "Please verify that the sample contains spike-in DNA.",
+            file=sys.stderr,
+            flush=True
+        )
+
 
 def func_map(args, odir_ref, odir_spikein, prefix, fq1, fq2):
     if fq2 == "":
@@ -51,12 +61,12 @@ def func_map(args, odir_ref, odir_spikein, prefix, fq1, fq2):
     else:
         check_file(fq1)
         check_file(fq2)
-        fastq = f"-1 {fq1} -2 {fq2}"
+        fastq = f"\-1 {fq1} \-2 {fq2}"
 
     if args.bowtieparam == "":
         bowtieparam = ""
     else:
-        bowtieparam = "-P \"{args.bowtieparam}\""
+        bowtieparam = f"-P \"{args.bowtieparam}\""
 
     cramparam = "-c" if args.cram else ""
 
@@ -94,7 +104,7 @@ def func_postprocess(args, odir_ref, odir_spikein, prefix, fq1, fq2):
     if not os.path.exists(sspstats):
         print(f"Error: {sspstats} was not created correctly.")
         sys.exit(1)
-        
+
     try:
         command = f"cut -f5 {sspstats} | tail -n1"
         flen = subprocess.check_output(command, shell=True, text=True).strip()
@@ -103,11 +113,15 @@ def func_postprocess(args, odir_ref, odir_spikein, prefix, fq1, fq2):
         sys.exit(1)
 
     parseparam = f"-a -D {odir_ref} {pair} -s stats -o bigWig -t {ncore} {pair} -f {args.output_format} -l {flen}"
+    parseparam_for_spikein = "--pair" if fq2 != "" else ""
+    post_spikein = ""
 
     if not args.nompbl:
         parseparam += f" -m -k {args.kmer}"
     if args.nofilter:
         parseparam += " -n"
+        parseparam_for_spikein = parseparam_for_spikein + " --nofilter"
+        post_spikein = "-nofilter"
     if args.param_parse2wig != "":
        parseparam += f' -P \"{args.param_parse2wig}\"'
 
@@ -115,12 +129,15 @@ def func_postprocess(args, odir_ref, odir_spikein, prefix, fq1, fq2):
     cmd = f"parse2wig+.sh {parseparam} -b {binsize} {args.peak} {mapfile} {prefix} {build} {Ddir_ref} 2>&1 | tee {odir_ref}/log/parse2wig+/{prefix}.log"
     print_and_exec_shell(cmd)
 
-    path=f"{odir_spikein}/parse2wigdir+/{prefix}.100000.tsv"
+    path=f"{odir_spikein}/parse2wigdir+/{prefix}{post_spikein}.100000.tsv"
     if os.path.isfile(path):
         print(f"{path} already exists. skipping.")
     else:
         os.makedirs(f"{odir_spikein}/log/parse2wig+", exist_ok=True)
-        cmd = f"parse2wig+ -b 100000 -i {odir_spikein}/bam/{prefix}.sort.bam --gt {Ddir_spikein}/genometable.txt -p {ncore} -o {prefix} --odir {odir_spikein}/parse2wigdir+ 2>&1 | tee {odir_spikein}/log/parse2wig+/{prefix}.spikein.log"
+
+        mapfile = f'{odir_spikein}/bam/{prefix}.sort.cram' if args.cram else f'{odir_spikein}/bam/{prefix}.sort.bam'
+
+        cmd = f"parse2wig+ {parseparam_for_spikein} -b 100000 -i {mapfile} --gt {Ddir_spikein}/genometable.txt -p {ncore} -o {prefix}{post_spikein} --odir {odir_spikein}/parse2wigdir+ 2>&1 | tee {odir_spikein}/log/parse2wig+/{prefix}.spikein.log"
         print_and_exec_shell(cmd)
 
 
@@ -133,6 +150,7 @@ def run_parsestats(file_path):
     command = f"parsestats4DROMPAplus.pl {file_path} | cut -f6 | tail -n1 | cut -f1 -d' '"
     result = subprocess.run(command, shell=True, text=True, capture_output=True)
 
+    print(command)
     return int(result.stdout.strip().split('\n')[-1])
 
 
@@ -142,10 +160,17 @@ def Output_scalingfactor_Hu(args, chip, input, label, odir_ref, odir_spikein, sf
     num_Input_ref   = run_parsestats(f'{odir_ref}/bigWig/TotalReadNormalized/{input}.100.tsv')
     num_Input_spike = run_parsestats(f'{odir_spikein}/parse2wigdir+/{input}.100000.tsv')
 
-    rIP =  num_ChIP_ref / num_ChIP_spike if num_ChIP_ref else 0
+    check_spikein_reads(f"{label} (ChIP)",  num_ChIP_spike,  args.min_spikein_reads)
+    check_spikein_reads(f"{label} (Input)", num_Input_spike, args.min_spikein_reads)
+
+    if num_ChIP_spike == 0 or num_Input_spike == 0:
+        raise ValueError(
+            f"{label}: Cannot normalize with zero spike-in reads for {chip} and {input}."
+        )
+
+    rIP = num_ChIP_ref / num_ChIP_spike
     rcell = num_Input_spike / num_Input_ref if num_Input_ref else 0
     occupancy_ratio = rIP * rcell
-#    sf_rpm = args.spikein_constant / num_ChIP_ref if num_ChIP_ref else 0
     nNormed_rpm = args.spikein_constant * 200000
     nNormed = int(occupancy_ratio * nNormed_rpm)
 
@@ -164,7 +189,14 @@ def Output_scalingfactor_Orlando(args, chip, input, label, odir_ref, odir_spikei
     num_ChIP_ref    = run_parsestats(f'{odir_ref}/bigWig/TotalReadNormalized/{chip}.100.tsv')
     num_ChIP_spike  = run_parsestats(f'{odir_spikein}/parse2wigdir+/{chip}.100000.tsv')
 
-    sf = args.spikein_constant * 50000 / num_ChIP_spike if num_ChIP_spike else 0
+    check_spikein_reads(label, num_ChIP_spike, args.min_spikein_reads)
+
+    if num_ChIP_spike == 0:
+        raise ValueError(
+            f"{label}: Cannot normalize with zero spike-in reads for {chip}."
+        )
+
+    sf = args.spikein_constant * 50000 / num_ChIP_spike
     nNormed = int(sf * num_ChIP_ref)
     outputfile = f"{sfdir}/{label}.tsv"
 
@@ -178,21 +210,41 @@ def Output_scalingfactor_Orlando(args, chip, input, label, odir_ref, odir_spikei
 
 
 def create_spikein_bw(args, odir_ref, chip, nNormed):
+    if nNormed <= 0:
+        raise ValueError(
+            f"Invalid spike-in normalization factor "
+            f"for {chip}: {nNormed}"
+        )
+
     ncore = args.threads
     build = args.build
     binsize = args.binsize
     Ddir_ref = args.Ddir_ref
     outputdir = args.outputdir
 
-    with open(args.samplelist, 'r') as file:
-        for line in file:
-            line = line.strip().split()
-            prefix = line[0]
-            fq1 = line[1]
-            fq2 = line[2] if len(line) > 2 else ""
-            pair = "-p" if fq2 else ""
-            if prefix == chip:
-                break
+    samplelist = pd.read_csv(args.samplelist, sep="\t", header=None, dtype=str).fillna("")
+    matched = samplelist.loc[samplelist[0] == chip]
+
+    if len(matched) != 1:
+        raise ValueError(
+            f"Sample '{chip}' not found uniquely in "
+            f"{args.samplelist}: {len(matched)} matches"
+        )
+
+    row = matched.iloc[0]
+    prefix = row.iloc[0]
+    fq2 = row.iloc[2] if len(row) > 2 else ""
+    pair = "-p" if fq2 else ""
+
+#    with open(args.samplelist, 'r') as file:
+#        for line in file:
+#            line = line.strip().split()
+#            prefix = line[0]
+#            fq1 = line[1]
+#            fq2 = line[2] if len(line) > 2 else ""
+#            pair = "-p" if fq2 else ""
+#            if prefix == chip:
+#                break
 
     gt = f'{Ddir_ref}/genometable.txt'
     mptable = f'{Ddir_ref}/mappability_Mosaics_{args.kmer}mer/map_fragL150_genome.txt'
@@ -223,7 +275,63 @@ def create_spikein_bw(args, odir_ref, chip, nNormed):
 def mapping_spikein(args):
     samplelist = pd.read_csv(args.samplelist, sep="\t", header=None)
     samplelist.fillna("", inplace=True)
-    
+
+    odir_ref = f'{args.outputdir}/{args.build}'
+    odir_spikein = f'{args.outputdir}/{args.build_spikein}'
+
+    for index, row in samplelist.iterrows():
+        prefix = row[0]
+        fq1 = row[1]
+        if (len(row)>2):
+            fq2 = row[2]
+        else:
+            fq2 = ""
+        func_map(args, odir_ref, odir_spikein, prefix, fq1, fq2)
+        func_postprocess(args, odir_ref, odir_spikein, prefix, fq1, fq2)
+
+    sfdir = f'{odir_ref}/spikein_scalingfactor'
+    sffile = f'{sfdir}/scaling_factors.tsv'
+    os.makedirs(sfdir, exist_ok=True)
+
+    df = pd.read_csv(args.samplepairlist, sep=",", header=None, dtype=str).fillna("")
+
+    on = 0
+    for index, row in df.iterrows():
+        chip = row[0]
+        input_sample = row[1]
+        label = row[2]
+
+        suffix = "-nofilter" if args.nofilter else ""
+
+        # Names of generated statistics files
+        chip_stats = f"{chip}{suffix}"
+        input_stats = f"{input_sample}{suffix}"
+
+        if args.spikein_simple:
+            nNormed = Output_scalingfactor_Orlando(
+                args, chip_stats, input_stats, label,
+                odir_ref, odir_spikein, sfdir
+            )
+        else:
+            nNormed = Output_scalingfactor_Hu(
+                args, chip_stats, input_stats, label,
+                odir_ref, odir_spikein, sfdir
+            )
+
+        if on == 0:
+            print_and_exec_shell(f"cat {sfdir}/{label}.tsv > {sffile}")
+            on = 1
+        else:
+            print_and_exec_shell(f"tail -n1 {sfdir}/{label}.tsv >> {sffile}")
+
+        # Use original sample ID, without the suffix
+        create_spikein_bw(args, odir_ref, chip, nNormed)
+
+
+def mapping_spikein_old(args):
+    samplelist = pd.read_csv(args.samplelist, sep="\t", header=None)
+    samplelist.fillna("", inplace=True)
+
     odir_ref = f'{args.outputdir}/{args.build}'
     odir_spikein = f'{args.outputdir}/{args.build_spikein}'
 
@@ -248,6 +356,11 @@ def mapping_spikein(args):
         chip  = row[0]
         input = row[1]
         label = row[2]
+
+        if args.nofilter:
+            chip  = f'{chip}-nofilter'
+            input = f'{input}-nofilter'
+
         if args.spikein_simple:
             nNormed = Output_scalingfactor_Orlando(args, chip, input, label, odir_ref, odir_spikein, sfdir)
         else:
@@ -258,6 +371,7 @@ def mapping_spikein(args):
             on = 1
         else:
             print_and_exec_shell(f"tail -n1 {sfdir}/{label}.tsv >> {sffile}")
+
         create_spikein_bw(args, odir_ref, chip, nNormed)
 
 
@@ -360,6 +474,8 @@ if(__name__ == '__main__'):
     parser.add_argument("--nompbl", help="Do not consider genome mappability", action="store_true")
     parser.add_argument("--nofilter", help="Use data where PCR duplication is not filtered", action="store_true")
     parser.add_argument("-k","--kmer", help="Read length for mappability file ([28|36|50], default:50)", type=int, default=50)
+    parser.add_argument("--min_spikein_reads", type=int, default=1000, help="Minimum number of spike-in reads for QC warning (default: 1000)"
+)
 
     args = parser.parse_args()
 #    print(args)

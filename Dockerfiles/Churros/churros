@@ -578,7 +578,10 @@ def do_visualize(args, chdir, build, samplepairlist, Ddir, is_spikein):
     if args.preset == "T2T":
         param_churros_visualize += " --preset T2T "
     if args.nofilter:
-        param_churros_visualize += " --nofilter --pdfdir pdf_nofilter"
+        if is_spikein:
+            param_churros_visualize += " --nofilter"
+        else:
+            param_churros_visualize += " --nofilter --pdfdir pdf_nofilter"
     if args.keepfullpdf:
         param_churros_visualize += " --keepfullpdf"
 
